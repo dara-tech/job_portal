@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://your-netlify-site.netlify.app'],
+  origin: ['http://localhost:5173', 'https://jobf.netlify.app'],
   credentials: true
 };
 
