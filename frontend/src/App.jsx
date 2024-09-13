@@ -10,7 +10,7 @@ import Jobs from "./components/Jobs";
 import Browse from "./components/Browse";
 import Profile from "./components/Profile";
 import JobDescription from "./components/JobDescription";
-import Companies from "./components/admin/Companies"; // Corrected import
+import Companies from "./components/admin/Companies";
 import CompanyCreate from "./components/admin/CompanyCreate";
 import CompanySetup from "./components/admin/CompanySetup";
 import AdminJobs from "./components/admin/AdminJobs";
@@ -49,35 +49,34 @@ function App() {
       path: "/description/:id",
       element: <JobDescription />,
     },
-    // Admin
+    // Admin routes
     {
-      path:"/admin/companies",
-      element: <ProtectedRoute><Companies/></ProtectedRoute>
+      path: "/admin/companies",
+      element: <ProtectedRoute><Companies /></ProtectedRoute>,
     },
     {
-      path:"/admin/companies/create",
-      element: <ProtectedRoute><CompanyCreate/></ProtectedRoute> 
+      path: "/admin/companies/create",
+      element: <ProtectedRoute><CompanyCreate /></ProtectedRoute>,
     },
     {
-      path:"/admin/companies/:id",
-      element:<ProtectedRoute><CompanySetup/></ProtectedRoute> 
+      path: "/admin/companies/:id",
+      element: <ProtectedRoute><CompanySetup /></ProtectedRoute>,
     },
     {
-      path:"/admin/jobs",
-      element:<ProtectedRoute><AdminJobs/></ProtectedRoute> 
+      path: "/admin/jobs",
+      element: <ProtectedRoute><AdminJobs /></ProtectedRoute>,
     },
     {
       path: "/admin/job/create",
-      element: <ProtectedRoute><PostJob/></ProtectedRoute>
+      element: <ProtectedRoute><PostJob /></ProtectedRoute>,
     },
-    
     {
-      path:"/admin/jobs/:id/applicants",
-      element:<ProtectedRoute><Applicants/></ProtectedRoute> 
+      path: "/admin/jobs/:id/applicants",
+      element: <ProtectedRoute><Applicants /></ProtectedRoute>,
     },
     {
       path: "/admin/job/update/:id",
-      element:<ProtectedRoute><UpdateJob/></ProtectedRoute> , // Using the default import
+      element: <ProtectedRoute><UpdateJob /></ProtectedRoute>,
     },
   ]);
 
