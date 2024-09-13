@@ -18,9 +18,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'https://your-netlify-site.netlify.app'],
   credentials: true
 };
+
 
 app.use(cors(corsOptions));
 app.use('/api/v1/user', userRoute);
