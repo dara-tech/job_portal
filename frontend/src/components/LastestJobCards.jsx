@@ -10,7 +10,7 @@ const LastestJobCards = ({ job }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative p-3 bg-white dark:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-700 shadow-md hover:shadow-lg rounded-lg transition-shadow duration-300">
+    <div className="mb-2 relative p-3 bg-white dark:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-700 shadow-md hover:shadow-lg rounded-lg transition-shadow duration-300">
       {/* Job Header */}
       <div className="flex justify-between items-center mb-5">
         {/* Company Logo and Name */}

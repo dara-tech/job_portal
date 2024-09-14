@@ -1,7 +1,7 @@
 import { setCompanies } from '@/redux/companySlice';
 import { COMPANY_API_END_POINT } from '@/utils/constant';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const useGetAllCompanies = () => {

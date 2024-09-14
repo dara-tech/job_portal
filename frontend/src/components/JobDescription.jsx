@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "./shared/Navbar";
 import { Button } from "./ui/button";
@@ -31,15 +31,17 @@ const JobDescription = () => {
         const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
           withCredentials: true,
         });
-        console.log("API Response:", res.data);
+        // console.log("API Response:", res.data);
 
         if (res.data.success) {
           dispatch(setSingleJob(res.data.job));
-          setIsApplied(
-            res.data.job.applications.some(
-              (application) => application.applicant === user?._id
-            )
-          );
+          if (user) {
+            setIsApplied(
+              res.data.job.applications.some(
+                (application) => application.applicant === user?._id
+              )
+            );
+          }
         } else {
           console.error("Failed to fetch job details:", res.data.message);
         }
@@ -52,6 +54,11 @@ const JobDescription = () => {
   }, [jobId, dispatch, user?._id]);
 
   const applyJobHandler = async () => {
+    if (!user) {
+      toast.error("You need to be signed in to apply for this job");
+      return;
+    }
+
     try {
       const res = await axios.get(
         `${APPLICATION_API_END_POINT}/apply/${jobId}`,
@@ -116,14 +123,16 @@ const JobDescription = () => {
             <Button
               onClick={!isApplied ? applyJobHandler : null}
               className="flex items-center gap-2"
-              disabled={isApplied}
+              disabled={isApplied || !user} // Disable if already applied or not signed in
             >
               {isApplied ? (
                 <>
                   Applied <Check className="w-4 text-green-500" />
                 </>
-              ) : (
+              ) : user ? (
                 "Apply now"
+              ) : (
+                "Sign in to apply"
               )}
             </Button>
           </div>

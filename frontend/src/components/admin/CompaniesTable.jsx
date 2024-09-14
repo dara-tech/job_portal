@@ -1,39 +1,50 @@
-import React, { useEffect, useState, useMemo } from "react";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableCell,
-} from "../ui/table";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
-import { Edit3, FilePenLine } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Edit3, Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+
 
 const CompaniesTable = () => {
   const { companies = [], loading, searchCompanyByText } = useSelector((store) => store.company);
+  const { authToken } = useSelector((store) => store.auth);
   const [filterCompany, setFilterCompany] = useState(companies);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const filteredCompany = companies.filter((company) => {
+    const filteredCompanies = companies.filter((company) => {
       if (!searchCompanyByText) return true;
       return company?.name?.toLowerCase().includes(searchCompanyByText.toLowerCase());
     });
-    setFilterCompany(filteredCompany);
+    setFilterCompany(filteredCompanies);
   }, [companies, searchCompanyByText]);
 
-  const filteredCompanies = useMemo(() => {
-    return companies.filter((company) =>
-      company?.name?.toLowerCase().includes(searchCompanyByText.toLowerCase())
-    );
-  }, [companies, searchCompanyByText]);
+  const handleDelete = async (companyId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this company? This action cannot be undone.");
+    if (!isConfirmed) return;
+
+    try {
+      const response = await axios.delete(`https://job-portal-qpq4.onrender.com/api/v1/company/delete/${companyId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        withCredentials: true
+      });
+
+      if (response.status === 200) {
+        setFilterCompany(filterCompany.filter((company) => company._id !== companyId));
+      } else {
+        console.error("Failed to delete company", response.status, response.data);
+      }
+    } catch (error) {
+      console.error("Error deleting company", error.response ? error.response.data : error.message);
+    }
+  };
 
   return (
     <div>
@@ -67,15 +78,15 @@ const CompaniesTable = () => {
                   </TableCell>
                 </TableRow>
               ))
-          ) : filteredCompanies.length === 0 ? (
+          ) : filterCompany.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className="text-center">
                 You haven't registered any company yet
               </TableCell>
             </TableRow>
           ) : (
-            filteredCompanies.map((company) => (
-              <TableRow key={company.id}>
+            filterCompany.map((company) => (
+              <TableRow key={company._id}>
                 <TableCell>
                   <Avatar className="h-10 w-10">
                     <AvatarImage
@@ -91,19 +102,25 @@ const CompaniesTable = () => {
                 </TableCell>
                 <TableCell className="text-center">
                   <Popover>
-                    <PopoverTrigger asChild>
-                      <button
-                        className="p-2 cursor-pointer"
-                        aria-label="Edit Company"
-                      >
-                        <FilePenLine className="w-4 h-4" />
+                    <PopoverTrigger>
+                      <button className="p-2 cursor-pointer" aria-label="More actions">
+                        <MoreHorizontal />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-32">
-                      <div onClick={()=>navigate(`/admin/companies/${company._id}`)}
-                       className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                      <div
+                        onClick={() => navigate(`/admin/companies/${company._id}`)}
+                        className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                      >
                         <Edit3 className="w-4 h-4" />
                         <span className="font-semibold text-sm">Edit</span>
+                      </div>
+                      <div
+                        onClick={() => handleDelete(company._id)}
+                        className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer mt-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="font-semibold text-sm">Delete</span>
                       </div>
                     </PopoverContent>
                   </Popover>

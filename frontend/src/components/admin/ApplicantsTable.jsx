@@ -124,7 +124,7 @@ const ApplicantsTable = () => {
                                             onClick={() => statusHandler(status, applicant._id)}
                                             className="flex w-full items-center my-2 dark:hover:text-black cursor-pointer hover:bg-gray-100 p-1 rounded"
                                         >
-                                            <span>{status}</span>
+                                            <span className="text-sm font-semibold text-muted-foreground hover:text-teal-800 px-2 ">{status}</span>
                                         </div>
                                     ))}
                                 </PopoverContent>

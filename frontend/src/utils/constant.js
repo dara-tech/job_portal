@@ -4,6 +4,7 @@
 // export const COMPANY_API_END_POINT = "http://localhost:8000/api/v1/company";
 
 
+
 // src/utils/constant.js
 
 export const USER_API_END_POINT = "https://job-portal-qpq4.onrender.com/api/v1/user";

@@ -1,4 +1,6 @@
-import React from "react";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setAuthToken } from "@/redux/authSlice";
 import { ThemeProvider } from "@/components/theme";
 import "./App.css";
 import Footer from "./components/shared/Footer";
@@ -20,63 +22,80 @@ import UpdateJob from "./components/admin/UpdateJob";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 function App() {
+  const dispatch = useDispatch();
+
+  // Load token from localStorage on app initialization
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      dispatch(setAuthToken(token)); // Set the token in Redux when app initializes
+    }
+  }, [dispatch]);
+
   const appRouter = createBrowserRouter([
-    {
-      path: "/",
-      element: <Home />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/signup",
-      element: <Signup />,
-    },
-    {
-      path: "/jobs",
-      element: <Jobs />,
-    },
-    {
-      path: "/browse",
-      element: <Browse />,
-    },
-    {
-      path: "/profile",
-      element: <Profile />,
-    },
-    {
-      path: "/description/:id",
-      element: <JobDescription />,
-    },
+    { path: "/", element: <Home /> },
+    { path: "/login", element: <Login /> },
+    { path: "/signup", element: <Signup /> },
+    { path: "/jobs", element: <Jobs /> },
+    { path: "/browse", element: <Browse /> },
+    { path: "/profile", element: <Profile /> },
+    { path: "/description/:id", element: <JobDescription /> },
     // Admin routes
     {
       path: "/admin/companies",
-      element: <ProtectedRoute><Companies /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <Companies />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/admin/companies/create",
-      element: <ProtectedRoute><CompanyCreate /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <CompanyCreate />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/admin/companies/:id",
-      element: <ProtectedRoute><CompanySetup /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <CompanySetup />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/admin/jobs",
-      element: <ProtectedRoute><AdminJobs /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <AdminJobs />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/admin/job/create",
-      element: <ProtectedRoute><PostJob /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <PostJob />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/admin/jobs/:id/applicants",
-      element: <ProtectedRoute><Applicants /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <Applicants />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/admin/job/update/:id",
-      element: <ProtectedRoute><UpdateJob /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <UpdateJob />
+        </ProtectedRoute>
+      ),
     },
   ]);
 

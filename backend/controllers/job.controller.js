@@ -72,71 +72,34 @@ export const postJob = async (req, res) => {
   }
 };
 // Controller for fetching all jobs with an optional keyword search
+// In job.controller.js
 export const getAllJobs = async (req, res) => {
   try {
-    const keyword = req.query.keyword || "";
-    const jobType = req.query.jobType || "";
-    const company = req.query.company || "";
-    const location = req.query.location || ""; // Add more filters if needed
-    const page = parseInt(req.query.page, 10) || 1;
-    const pageSize = parseInt(req.query.pageSize, 10) || 10;
+    const { keyword } = req.query;
 
-    console.log("Search Parameters:", { keyword, jobType, company, location, page, pageSize });
+    // Build the query object based on the keyword
+    const query = {};
 
-    // Sanitize and validate inputs if necessary
-    const sanitizedKeyword = keyword.trim().toLowerCase();
-    const sanitizedJobType = jobType.trim().toLowerCase();
-    const sanitizedCompany = company.trim().toLowerCase();
-    const sanitizedLocation = location.trim().toLowerCase();
-
-    // Build the search query
-    const searchQuery = {
-      $and: [
-        {
-          $or: [
-            { title: { $regex: sanitizedKeyword, $options: "i" } },
-            { description: { $regex: sanitizedKeyword, $options: "i" } },
-            ...(sanitizedCompany ? [{ "company.name": { $regex: sanitizedCompany, $options: "i" } }] : []),
-            ...(sanitizedJobType ? [{ jobType: { $regex: sanitizedJobType, $options: "i" } }] : []),
-          ]
-        },
-        ...(sanitizedLocation ? [{ location: { $regex: sanitizedLocation, $options: "i" } }] : []),
-      ]
-    };
-
-    // Fetch jobs from the database with the constructed query
-    const jobs = await Job.find(searchQuery)
-      .populate("company")
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize);
-
-    // Count the total number of matching documents for pagination
-    const totalJobs = await Job.countDocuments(searchQuery);
-
-    if (!jobs.length) {
-      return res.status(404).json({
-        message: "No jobs found matching the search criteria.",
-        success: false,
-        totalJobs: 0,
-        totalPages: 0
-      });
+    // Handle search keyword if provided
+    if (keyword && keyword !== 'Select Location Select Industry Select Salary') {
+      // Adjust the query to match your schema and requirements
+      query.title = { $regex: keyword, $options: 'i' }; // Example for matching job titles
     }
 
-    return res.status(200).json({
-      jobs,
-      success: true,
-      totalJobs,
-      totalPages: Math.ceil(totalJobs / pageSize)
-    });
+    // Fetch jobs from the database and sort by the most recent posting date
+    const jobs = await Job.find(query)
+      .populate('applications')
+      .populate('company')
+      .sort({ postedDate: -1 }); // Sort by `postedDate` in descending order
+
+    return res.status(200).json({ jobs, success: true });
   } catch (error) {
-    console.log("Error fetching jobs:", error);
-    return res.status(500).json({
-      message: "Server error.",
-      success: false
-    });
+    console.error(error);
+    return res.status(500).json({ message: 'Server error.', success: false });
   }
 };
+
+
 
 
   // export const getJobById = async (req, res) => {
@@ -284,4 +247,38 @@ export const updateJob = async (req, res) => {
     });
   }
 };
+export const deleteJob = async (req, res) => {
+  try {
+    const jobId = req.params.id; // Access the jobId parameter
+    console.log("Deleting job with ID:", jobId); // Log jobId
+
+    if (!jobId) {
+      return res.status(400).json({
+        message: 'Job ID is required.',
+        success: false,
+      });
+    }
+
+    const result = await Job.deleteOne({ _id: jobId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        message: 'Job not found.',
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Job successfully deleted.',
+      success: true,
+    });
+  } catch (error) {
+    console.error('Error deleting job:', error.message);
+    return res.status(500).json({
+      message: 'An internal server error occurred.',
+      success: false,
+    });
+  }
+};
+
 

@@ -134,3 +134,36 @@ export const updateCompany = async (req, res) => {
     });
   }
 };
+export const deleteCompany = async (req, res) => {
+  try {
+    const companyId = req.params.id;
+
+    if (!companyId) {
+      return res.status(400).json({
+        message: "Company ID is required.",
+        success: false,
+      });
+    }
+
+    const result = await Company.deleteOne({ _id: companyId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        message: "Company not found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Company successfully deleted.",
+      success: true,
+    });
+  } catch (error) {
+    console.error('Error deleting company:', error.message);
+    return res.status(500).json({
+      message: 'An internal server error occurred.',
+      success: false,
+    });
+  }
+};
+

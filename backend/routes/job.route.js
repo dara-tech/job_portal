@@ -1,22 +1,32 @@
-import express from "express";
+import express from 'express';
+import {
+  getAdminJobs,
+  getAllJobs,
+  getJobById,
+  postJob,
+  updateJob,
+  deleteJob, // Make sure to import deleteJob if you add the delete route
+} from "../controllers/job.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
-import { getAdminJobs, getAllJobs, getJobById, postJob, updateJob } from "../controllers/job.controller.js";
 
 const router = express.Router();
 
-// Route to post a new job
-router.route("/post").post(isAuthenticated, postJob);
+// Public route to get all jobs
+router.route("/get").get(getAllJobs);
 
-// Route to get all jobs with optional filters and pagination
-router.route("/get").get(isAuthenticated, getAllJobs);
-
-// Route to get all jobs created by the authenticated admin
+// Protected route to get jobs created by the authenticated admin
 router.route("/getadminjobs").get(isAuthenticated, getAdminJobs);
 
-// Route to get a job by ID
-router.route("/get/:id").get(isAuthenticated, getJobById);
+// Public route to get a specific job by its ID
+router.route("/get/:id").get(getJobById);
 
-// Route to update a job by ID
+// Protected route to create a new job
+router.route("/post").post(isAuthenticated, postJob);
+
+// Protected route to update a job by its ID
 router.route("/update/:id").put(isAuthenticated, updateJob);
+
+// Optional: Add route for deleting a job if needed
+router.route("/delete/:id").delete(isAuthenticated, deleteJob);
 
 export default router;

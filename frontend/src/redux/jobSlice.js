@@ -3,16 +3,16 @@ import { createSlice } from "@reduxjs/toolkit";
 const jobSlice = createSlice({
   name: "job",
   initialState: {
-    allJobs: [],  // Store fetched jobs
-    allAdminJobs: [],  // Store admin jobs if needed
-    singleJob: null,  // Store single job details
-    searchJobByText: "",  // Text search
-    allAppliedJobs: [],  // Store applied jobs
-    searchedQuery: "",  // Store the search query
+    allJobs: [],
+    allAdminJobs: [],
+    singleJob: null,
+    searchJobByText: "",
+    allAppliedJobs: [],
+    searchedQuery: "",
   },
   reducers: {
     setAllJobs: (state, action) => {
-      state.allJobs = action.payload;  // Set the fetched jobs
+      state.allJobs = action.payload;
     },
     setSingleJob: (state, action) => {
       state.singleJob = action.payload;
@@ -27,10 +27,10 @@ const jobSlice = createSlice({
       state.allAppliedJobs = action.payload;
     },
     setSearchedQuery: (state, action) => {
-      state.searchedQuery = action.payload;  // Set the searched query in the state
+      state.searchedQuery = action.payload;
     },
     clearAllJobs: (state) => {
-      state.allJobs = [];  // Clear all jobs
+      state.allJobs = [];
     },
     resetJobState: (state) => {
       state.allJobs = [];
@@ -39,19 +39,24 @@ const jobSlice = createSlice({
       state.searchJobByText = "";
       state.allAppliedJobs = [];
       state.searchedQuery = "";
+    },
+    removeJob: (state, action) => {
+      state.allJobs = state.allJobs.filter(job => job.id !== action.payload);
+      state.allAdminJobs = state.allAdminJobs.filter(job => job.id !== action.payload);
     }
   }
 });
 
 export const {
-  setAllJobs, 
-  setSingleJob, 
+  setAllJobs,
+  setSingleJob,
   setAllAdminJobs,
-  setSearchJobByText, 
+  setSearchJobByText,
   setAllAppliedJobs,
   setSearchedQuery,
-  clearAllJobs,  // Added clearAllJobs
-  resetJobState  // Added resetJobState
+  clearAllJobs,
+  resetJobState,
+  removeJob
 } = jobSlice.actions;
 
 export default jobSlice.reducer;

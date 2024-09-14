@@ -10,8 +10,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading, setUser } from "@/redux/authSlice";
-import store from "@/redux/store";
+import { setLoading, setUser, setAuthToken } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 
 const Login = () => {
@@ -26,31 +25,46 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setInput((prevInput) => ({ ...prevInput, [name]: value }));
   };
 
   const submitHandler = async (e) => {
     e.preventDefault(); // Prevent default form submission
 
     try {
-      dispatch(setLoading(true));
+      dispatch(setLoading(true)); // Show loading state
+
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials: true,
+        withCredentials: true, // If your API uses cookies for auth, keep this.
       });
 
+      console.log("Login response:", res.data);
+
       if (res.data.success) {
-        dispatch(setUser(res.data.user))
+        const { token, user } = res.data;
+
+        // Store token in localStorage
+        localStorage.setItem("authToken", token);
+
+        // Update Redux state
+        dispatch(setUser(user));
+        dispatch(setAuthToken(token));
+
+        // Navigate to the homepage after successful login
         navigate("/");
         toast.success(res.data.message);
+      } else {
+        toast.error(res.data.message || "Failed to log in");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Login error:", error);
       toast.error("Something went wrong, please try again.");
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoading(false)); // Hide loading state
     }
   };
 
