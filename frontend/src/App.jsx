@@ -20,6 +20,7 @@ import PostJob from "./components/admin/PostJob";
 import Applicants from "./components/admin/Applicants";
 import UpdateJob from "./components/admin/UpdateJob";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import Dashbaord from "./components/Dashbaord";
 
 function App() {
   const dispatch = useDispatch();
@@ -94,6 +95,14 @@ function App() {
       element: (
         <ProtectedRoute>
           <UpdateJob />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/admin/dashbaord",
+      element: (
+        <ProtectedRoute>
+          <Dashbaord/>
         </ProtectedRoute>
       ),
     },

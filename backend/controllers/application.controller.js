@@ -95,6 +95,30 @@ export const getApplicants = async (req,res) => {
         console.log(error);
     }
 }
+
+
+export const getAllApplicants = async (req, res) => {
+    try {
+        const applicants = await Application.find().populate({
+            path: 'applicant', // Assuming this references the user model
+        });
+
+        return res.status(200).json({
+            applicants,
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "An error occurred while retrieving applicants.",
+            success: false
+        });
+    }
+};
+
+
+
+
 export const updateStatus = async (req,res) => {
     try {
         const {status} = req.body;

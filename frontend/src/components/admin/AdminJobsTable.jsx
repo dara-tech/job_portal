@@ -7,6 +7,7 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { setAuthToken } from "@/redux/authSlice";
+import { JOB_API_END_POINT } from "@/utils/constant";
 
 const AdminJobsTable = () => {
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ const AdminJobsTable = () => {
     if (!isConfirmed) return;
 
     try {
-      const response = await axios.delete(`https://job-portal-qpq4.onrender.com/api/v1/job/delete/${jobId}`, {
+      const response = await axios.delete(`${JOB_API_END_POINT}/delete/${jobId}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}`

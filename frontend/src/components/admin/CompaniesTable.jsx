@@ -7,6 +7,7 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Edit3, Trash2 } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
+import { COMPANY_API_END_POINT } from "@/utils/constant";
 
 
 const CompaniesTable = () => {
@@ -28,7 +29,7 @@ const CompaniesTable = () => {
     if (!isConfirmed) return;
 
     try {
-      const response = await axios.delete(`https://job-portal-qpq4.onrender.com/api/v1/company/delete/${companyId}`, {
+      const response = await axios.delete(`${COMPANY_API_END_POINT}/delete/${companyId}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}`

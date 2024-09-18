@@ -15,7 +15,7 @@ const ApplicantsTable = () => {
 
     const statusHandler = async (status, id) => {
         try {
-            const response = await axios.post(`${APPLICATION_API_END_POINT}/status/${id}/update`, { status }, { withCredentials: true });
+            const response = await axios.put(`${APPLICATION_API_END_POINT}/status/${id}/update`, { status }, { withCredentials: true });
             if (response.data.success) {
                 toast.success(response.data.message);
             } else {

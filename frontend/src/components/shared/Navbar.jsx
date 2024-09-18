@@ -1,163 +1,196 @@
-import React from "react";
-import { ModeToggle } from "../toggle";
-import Logo from "../logo";
-import { Link, useNavigate } from "react-router-dom";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import React, { useState } from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import axios from "axios"
+import { toast } from "sonner"
 import {
-  BriefcaseBusiness,
-  Building,
-  Globe,
   HomeIcon,
+  BriefcaseBusiness,
+  Globe,
+  Building,
+  LayoutDashboardIcon,
   LogOut,
   UserRound,
-} from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
-import axios from "axios";
-import { USER_API_END_POINT } from "@/utils/constant";
-import { setUser } from "@/redux/authSlice";
+  Menu,
+  X,
+} from "lucide-react"
+import { ModeToggle } from "../toggle"
+import Logo from "../logo"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { USER_API_END_POINT } from "@/utils/constant"
+import { setUser } from "@/redux/authSlice"
 
 const Navbar = () => {
-  const { user } = useSelector((store) => store.auth);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { user } = useSelector((store) => store.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const logoutHandler = async () => {
     try {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
         withCredentials: true,
-      });
+      })
       if (res.data.success) {
-        dispatch(setUser(null));
-        navigate("/");
-        toast.success(res.data.message);
+        dispatch(setUser(null))
+        navigate("/")
+        toast.success(res.data.message)
       } else {
-        toast.error("Logout failed. Please try again.");
+        toast.error("Logout failed. Please try again.")
       }
     } catch (error) {
-      console.log("Logout Error: ", error);
+      console.log("Logout Error: ", error)
       const errorMessage =
-        error.response?.data?.message || "An unexpected error occurred";
-      toast.error(errorMessage);
+        error.response?.data?.message || "An unexpected error occurred"
+      toast.error(errorMessage)
     }
-  };
+  }
+
+  const NavLink = ({ to, icon: Icon, label }) => (
+    <Link
+      to={to}
+      className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+        location.pathname === to
+          ? "bg-primary text-primary-foreground"
+          : "hover:bg-accent hover:text-accent-foreground"
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      <span className="text-sm font-medium">{label}</span>
+    </Link>
+  )
+
+  const recruiterLinks = [
+    { to: "/admin/companies", icon: Building, label: "Companies" },
+    { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs" },
+    { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
+  ]
+
+  const userLinks = [
+    { to: "/", icon: HomeIcon, label: "Home" },
+    { to: "/jobs", icon: BriefcaseBusiness, label: "Jobs" },
+    { to: "/browse", icon: Globe, label: "Browse" },
+  ]
+
+  const links = user && user.role === "recruiter" ? recruiterLinks : userLinks
 
   return (
-    <div className="border-b-8 bg-white dark:bg-gray-900 rounded-t-lg rounded-lg p-2">
-      <div className="flex items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="flex">
-            {user && user.role === "recruiter" ? (
-              <ul className="flex items-center lg:gap-6 gap-3 font-extralight ring-1 ring-gray-200 dark:ring-gray-700 rounded-md px-4">
-                <Link to="/admin/companies" className="hover:text-blue-800">
-                  <li>
-                    <div className="">
-                      <Building className="w-4 ml-4" />
-                      <span className="flex items-center text-xs hover:text-blue-800 font-semibold text-muted-foreground">
-                        Company
-                      </span>
-                    </div>
-                  </li>
-                </Link>
-                <Link to="/admin/jobs" className="hover:text-blue-800">
-                  <li>
-                    <div className="">
-                      <BriefcaseBusiness className="w-4 ml-1" />
-                      <span className="flex items-center hover:text-blue-800 text-xs font-semibold text-muted-foreground">
-                        Jobs
-                      </span>
-                    </div>
-                  </li>
-                </Link>
-              </ul>
-            ) : (
-              <ul className="flex items-center lg:gap-6 gap-3 font-extralight ring-1 ring-gray-200 dark:ring-gray-700 rounded-md px-4">
-                <Link to="/" className="hover:text-blue-800">
-                  <li>
-                    <div className="">
-                      <HomeIcon className="w-4 ml-[7px]" />
-                      <span className="flex hover:text-blue-800 items-center text-xs font-semibold text-muted-foreground">
-                        Home
-                      </span>
-                    </div>
-                  </li>
-                </Link>
-                <Link to="/jobs" className="hover:text-blue-800">
-                  <li>
-                    <div className="">
-                      <BriefcaseBusiness className="w-4 ml-0.5" />
-                      <span className="flex hover:text-blue-800 items-center text-xs font-semibold text-muted-foreground">
-                        Job
-                      </span>
-                    </div>
-                  </li>
-                </Link>
-                <Link to="/browse" className="hover:text-blue-800">
-                  <li>
-                    <Globe className="ml-3 w-4" />
-                    <span className="flex items-center hover:text-blue-800 text-xs font-semibold text-muted-foreground">
-                      Browse
-                    </span>
-                  </li>
-                </Link>
-              </ul>
-            )}
+    <nav className="bg-background border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <Logo />
+            <div className="hidden md:block ml-10">
+              <div className="flex items-baseline space-x-4">
+                {links.map((link) => (
+                  <NavLink key={link.to} {...link} />
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="ring-1 rounded-md ring-gray-200 dark:ring-gray-900">
+          <div className="hidden md:flex items-center gap-4">
             <ModeToggle />
-          </div>
-
-          {!user ? (
-            <div className="flex gap-2 text-sm ring-1 rounded-md ring-gray-200 dark:ring-gray-900">
+            {!user ? (
               <Link to="/signup">
                 <Button>
-                  <UserRound className="w-4" />
+                  <UserRound className="w-4 h-4 mr-2" />
+                  Sign Up
                 </Button>
               </Link>
-            </div>
-          ) : (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Avatar>
-                  <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </PopoverTrigger>
-              <PopoverContent className="mr-4">
-                <div className="flex items-center gap-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={user?.profile?.profilePhoto}
-                      alt="avatar"
-                    />
-                    <AvatarFallback>CN</AvatarFallback>
+            ) : (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
+                    <AvatarFallback>{user?.fullname?.[0]}</AvatarFallback>
                   </Avatar>
-                  <Link to="/profile">
+                </PopoverTrigger>
+                <PopoverContent className="w-64">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Avatar>
+                      <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
+                      <AvatarFallback>{user?.fullname?.[0]}</AvatarFallback>
+                    </Avatar>
                     <div className="flex-1">
-                      <h4 className="text-base font-light hover:font-semibold">
-                        {user?.fullname}
-                      </h4>
-                      <p className="text-xs text-muted-foreground">
-                        {user?.profile?.bio}
+                      <h4 className="text-sm font-medium">{user?.fullname}</h4>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user?.profile?.bio || "No bio available"}
                       </p>
                     </div>
-                  </Link>
-                  <div className="ml-auto cursor-pointer">
-                    <Button onClick={logoutHandler}>
-                      <LogOut />
-                    </Button>
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
+                  <Link to="/profile" className="block mb-2">
+                    <Button variant="outline" className="w-full justify-start">
+                      <UserRound className="w-4 h-4 mr-2" />
+                      View Profile
+                    </Button>
+                  </Link>
+                  <Button variant="destructive" className="w-full" onClick={logoutHandler}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
+          <div className="md:hidden flex items-center">
+            <ModeToggle />
+            <Button variant="ghost" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+      {mobileMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {links.map((link) => (
+              <NavLink key={link.to} {...link} />
+            ))}
+          </div>
+          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+            {!user ? (
+              <div className="px-2">
+                <Link to="/signup">
+                  <Button className="w-full">
+                    <UserRound className="w-4 h-4 mr-2" />
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="px-2 space-y-1">
+                <Link to="/profile">
+                  <Button variant="outline" className="w-full justify-start">
+                    <UserRound className="w-4 h-4 mr-2" />
+                    View Profile
+                  </Button>
+                </Link>
+                <Button variant="destructive" className="w-full" onClick={logoutHandler}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  )
+}
 
-export default Navbar;
+export default Navbar

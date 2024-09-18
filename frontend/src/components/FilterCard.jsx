@@ -1,194 +1,231 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
+import { useDispatch } from "react-redux"
+import { setSearchedQuery } from "@/redux/jobSlice"
+import { Filter, X, ChevronDown, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "./ui/dropdown-menu";
-import { useDispatch } from "react-redux";
-import { setSearchedQuery } from "@/redux/jobSlice";
-import { BrushIcon, Filter, RouteOff } from "lucide-react";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "./ui/select";
-import { MdClearAll } from "react-icons/md";
+} from "@/components/ui/dropdown-menu"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const filterData = [
   {
-    "filterType": "Location",
-    "array": [
-      "Banteay Meanchey",
-      "Battambang",
-      "Kandal",
-      "Kep",
-      "Koh Kong",
-      "Krong Preah Sihanouk",
-      "Krong Pailin",
-      "Kampong Cham",
-      "Kampong Chhnang",
-      "Kampong Speu",
-      "Kampong Thom",
-      "Kampot",
-      "Kandal",
-      "Kep",
-      "Koh Kong",
-      "Krong Preah Sihanouk",
-      "Krong Pailin",
-      "Kratie",
-      "Mondulkiri",
-      "Phnom Penh",
-      "Preah Vihear",
-      "Prey Veng",
-      "Siem Reap",
-      "Sihanoukville",
-      "Stung Treng",
-      "Svay Rieng",
-      "Takeo",
-      "Tboung Khmum"
+    filterType: "Location",
+    array: [
+      "Banteay Meanchey", "Battambang", "Kandal", "Kep", "Koh Kong",
+      "Krong Preah Sihanouk", "Krong Pailin", "Kampong Cham", "Kampong Chhnang",
+      "Kampong Speu", "Kampong Thom", "Kampot", "Kratie", "Mondulkiri",
+      "Phnom Penh", "Preah Vihear", "Prey Veng", "Siem Reap", "Sihanoukville",
+      "Stung Treng", "Svay Rieng", "Takeo", "Tboung Khmum"
     ]
   },
-  
   {
-    "filterType": "Industry",
-    "array": [
-      "Software Development",
-      "Data Science",
-      "Healthcare",
-      "Finance",
-      "Education",
-      "Marketing",
-      "Sales",
-      "Engineering",
-      "Customer Service",
-      "Human Resources",
-      "Legal",
-      "Construction",
-      "Manufacturing",
-      "Retail",
-      "Information Technology",
-      "Consulting",
-      "Logistics",
-      "Real Estate",
-      "Entertainment",
-      "Media",
-      "Telecommunications",
-      "Hospitality",
-      "Transportation",
-      "Energy",
-      "Government",
-      "Agriculture",
-      "Tourism",
-      "Pharmaceuticals",
-      "Non-Profit",
-      "Startups",
-      "Automotive"
+    filterType: "Industry",
+    array: [
+      "Software Development", "Data Science", "Healthcare", "Finance",
+      "Education", "Marketing", "Sales", "Engineering", "Customer Service",
+      "Human Resources", "Legal", "Construction", "Manufacturing", "Retail",
+      "Information Technology", "Consulting", "Logistics", "Real Estate",
+      "Entertainment", "Media", "Telecommunications", "Hospitality",
+      "Transportation", "Energy", "Government", "Agriculture", "Tourism",
+      "Pharmaceuticals", "Non-Profit", "Startups", "Automotive"
     ]
-  }
-  ,
+  },
   {
     filterType: "Salary",
     array: ["0-100", "100-1000", "1000-10K"],
   },
-];
+]
 
-const FilterCard = ({ setSortOrder }) => {
+const FilterCard = ({ setSortOrder, onSearch = () => {} }) => {
   const [selectedFilters, setSelectedFilters] = useState(() => {
-    const savedFilters = localStorage.getItem("jobFilters");
+    const savedFilters = localStorage.getItem("jobFilters")
     return savedFilters
       ? JSON.parse(savedFilters)
       : {
-          Location: "Select Location",
-          Industry: "Select Industry",
-          Salary: "Select Salary",
-        };
-  });
+          Location: [],
+          Industry: [],
+          Salary: [],
+        }
+  })
+  const [searchKeyword, setSearchKeyword] = useState("")
+  const [sortOrder, setSortOrderState] = useState("latest")
 
-  const [sortOrder, setSortOrderState] = useState("latest"); // Maintain sortOrder state
-
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    const activeFilters = Object.values(selectedFilters).filter(
-      (filter) =>
-        filter !== "Location" &&
-        filter !== "Industry" &&
-        filter !== "Salary"
-    );
+    const activeFilters = Object.entries(selectedFilters)
+      .flatMap(([key, values]) => 
+        Array.isArray(values) ? values.map(value => `${key.toLowerCase()}:${value}`) : []
+      )
 
-    dispatch(setSearchedQuery(activeFilters.join(" ")));
+    const keyword = [searchKeyword, ...activeFilters].filter(Boolean).join(" ")
+    dispatch(setSearchedQuery(keyword))
+    onSearch(keyword)
 
-    // Save filters to local storage
-    localStorage.setItem("jobFilters", JSON.stringify(selectedFilters));
-  }, [selectedFilters, dispatch]);
+    localStorage.setItem("jobFilters", JSON.stringify(selectedFilters))
+  }, [selectedFilters, searchKeyword, dispatch, onSearch])
 
   const handleSelect = (filterType, item) => {
     setSelectedFilters((prevState) => ({
       ...prevState,
-      [filterType]: item,
-    }));
-  };
+      [filterType]: Array.isArray(prevState[filterType])
+        ? prevState[filterType].includes(item)
+          ? prevState[filterType].filter((i) => i !== item)
+          : [...prevState[filterType], item]
+        : [item],
+    }))
+  }
 
   const clearFilters = () => {
     setSelectedFilters({
-      Location: "Location",
-      Industry: "Industry",
-      Salary: "Salary",
-    });
-    localStorage.removeItem("jobFilters");
-  };
+      Location: [],
+      Industry: [],
+      Salary: [],
+    })
+    setSearchKeyword("")
+    localStorage.removeItem("jobFilters")
+  }
 
   const handleSortChange = (value) => {
-    setSortOrderState(value);
-    setSortOrder(value); // Pass the selected value to the parent component
-  };
+    setSortOrderState(value)
+    setSortOrder(value)
+  }
+
+  const removeFilter = (filterType, item) => {
+    setSelectedFilters((prevState) => ({
+      ...prevState,
+      [filterType]: Array.isArray(prevState[filterType])
+        ? prevState[filterType].filter((i) => i !== item)
+        : [],
+    }))
+  }
+
+  const handleSearchChange = (e) => {
+    setSearchKeyword(e.target.value)
+  }
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    onSearch(searchKeyword)
+  }
 
   return (
-    <div className="mb-4">
-      <div className="flex items-center justify-center text-xs font-semibold gap-2">
-        {filterData.map((filter) => (
-          <DropdownMenu key={filter.filterType}>
-            <DropdownMenuTrigger asChild>
-              <button className="cursor-pointer text-start dark:bg-gray-800 rounded-md py-2 px-2 border border-gray-300 p-1 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                {selectedFilters[filter.filterType]}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-lg">
-              {filter.array.map((item, itemIndex) => (
-                <DropdownMenuItem
-                  key={itemIndex}
-                  className="hover:bg-gray-200"
-                  onClick={() => handleSelect(filter.filterType, item)}
-                >
-                  {item}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ))}
-        <div className="flex gap-2 items-center">
-          {/* Clear Filters Button */}
-          <button
-            onClick={clearFilters}
-            className="text-sm text-blue-800 border border-blue-800 rounded-md py-1.5 px-2 hover:bg-blue-500 hover:text-white"
-          >
-            <span className="flex items-center gap-2">
-              <RouteOff className="w-4 h-4" /> Clear
-            </span>
-          </button>
-          {/* Sort Dropdown with Icon */}
-          <div className="relative">
-            <Select value={sortOrder} onValueChange={handleSortChange}>
-              <SelectTrigger className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest">Sort by Latest</SelectItem>
-                <SelectItem value="salary">Sort by Salary</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+    <Card className="mb-6">
+      <CardContent className="p-4">
+        <form onSubmit={handleSearchSubmit} className="flex gap-2 mb-4">
+          <Input
+            type="text"
+            placeholder="Search jobs..."
+            value={searchKeyword}
+            onChange={handleSearchChange}
+            className="flex-grow"
+          />
+          <Button type="submit">
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
+        </form>
+        <div className="flex flex-wrap items-center gap-4">
+          {filterData.map((filter) => (
+            <DropdownMenu key={filter.filterType}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="h-9">
+                  {filter.filterType}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <ScrollArea className="h-72">
+                  {filter.array.map((item, itemIndex) => (
+                    <DropdownMenuItem
+                      key={itemIndex}
+                      onSelect={() => handleSelect(filter.filterType, item)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(selectedFilters[filter.filterType]) && selectedFilters[filter.filterType].includes(item)}
+                          onChange={() => {}}
+                          className="h-4 w-4"
+                        />
+                        <span>{item}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </ScrollArea>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
+          <Select value={sortOrder} onValueChange={handleSortChange}>
+            <SelectTrigger className="w-[180px] h-9">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="latest">Sort by Latest</SelectItem>
+              <SelectItem value="salary">Sort by Salary</SelectItem>
+            </SelectContent>
+          </Select>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={clearFilters} className="h-9 w-9">
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Clear all filters</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-      </div>
-    </div>
-  );
-};
+        <div className="mt-4 flex flex-wrap gap-2">
+          {searchKeyword && (
+            <Badge variant="secondary">
+              {searchKeyword}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-4 w-4 p-0 ml-2"
+                onClick={() => setSearchKeyword("")}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          {Object.entries(selectedFilters).map(([filterType, values]) =>
+            Array.isArray(values) && values.map((item) => (
+              <Badge key={`${filterType}-${item}`} variant="secondary">
+                {filterType}: {item}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-4 w-4 p-0 ml-2"
+                  onClick={() => removeFilter(filterType, item)}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            ))
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
-export default FilterCard;
+export default FilterCard
