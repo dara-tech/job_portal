@@ -99,7 +99,7 @@ function App() {
       ),
     },
     {
-      path: "/admin/dashbaord",
+      path: "/admin/dashboard",
       element: (
         <ProtectedRoute>
           <Dashbaord/>

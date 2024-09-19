@@ -1,6 +1,10 @@
 import { Company } from "./../models/company.model.js";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
+import { Job } from '../models/job.model.js';
+import { Application } from '../models/application.model.js';
+import { User } from '../models/user.model.js';
+
 export const registerCompany = async (req, res) => {
   try {
     const { companyName } = req.body;
@@ -137,6 +141,7 @@ export const updateCompany = async (req, res) => {
 export const deleteCompany = async (req, res) => {
   try {
     const companyId = req.params.id;
+    const userId = req.id;
 
     if (!companyId) {
       return res.status(400).json({
@@ -145,25 +150,92 @@ export const deleteCompany = async (req, res) => {
       });
     }
 
-    const result = await Company.deleteOne({ _id: companyId });
-
-    if (result.deletedCount === 0) {
-      return res.status(404).json({
-        message: "Company not found.",
+    // Check user role
+    const user = await User.findById(userId);
+    if (!user || user.role !== 'recruiter') {
+      return res.status(403).json({
+        message: "Access denied. Only recruiters can delete companies.",
         success: false,
       });
     }
 
+    // Find the company
+    const company = await Company.findOne({ _id: companyId, userId });
+
+    if (!company) {
+      return res.status(404).json({
+        message: "Company not found or you don't have permission to delete it.",
+        success: false,
+      });
+    }
+
+    // Soft delete the company
+    company.isDeleted = true;
+    company.deletedAt = new Date();
+    await company.save();
+
+    // Mark all associated jobs as deleted
+    await Job.updateMany(
+      { company: companyId },
+      { $set: { isDeleted: true, deletedAt: new Date() } }
+    );
+
+    // Update associated applications
+    await Application.updateMany(
+      { job: { $in: await Job.find({ company: companyId }).select('_id') } },
+      { $set: { status: 'Company No Longer Available' } }
+    );
+
     return res.status(200).json({
-      message: "Company successfully deleted.",
+      message: "Company and associated jobs successfully marked as deleted.",
       success: true,
     });
   } catch (error) {
     console.error('Error deleting company:', error.message);
     return res.status(500).json({
-      message: 'An internal server error occurred.',
+      message: 'Failed to delete the company. Please try again.',
       success: false,
     });
   }
 };
+export const getApplicantCount = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+    const count = await Application.countDocuments({ company: companyId });
+    res.status(200).json({ success: true, count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error getting applicant count', error: error.message });
+  }
+};
 
+// New function to get job count
+export const getJobCount = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+    const count = await Job.countDocuments({ company: companyId });
+    res.status(200).json({ success: true, count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error getting job count', error: error.message });
+  }
+};
+
+// New function to get all companies with counts
+export const getAllCompaniesWithCounts = async (req, res) => {
+  try {
+    const companies = await Company.find();
+    const companiesWithCounts = await Promise.all(
+      companies.map(async (company) => {
+        const applicantsCount = await Application.countDocuments({ company: company._id });
+        const jobsCount = await Job.countDocuments({ company: company._id });
+        return {
+          ...company.toObject(),
+          applicantsCount,
+          jobsCount
+        };
+      })
+    );
+    res.status(200).json({ success: true, companies: companiesWithCounts });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error getting all companies with counts', error: error.message });
+  }
+};

@@ -1,6 +1,6 @@
 import express from "express";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
-import { deleteCompany, getCompany, getCompanyById, registerCompany, updateCompany } from "../controllers/campany.controller.js";
+import { deleteCompany, getCompany, getCompanyById, registerCompany, updateCompany,getApplicantCount,getJobCount,getAllCompaniesWithCounts } from "../controllers/campany.controller.js";
 import { singleUpload } from "../middlewares/multer.js";
 
 const router = express.Router();
@@ -18,5 +18,10 @@ router.get("/get/:id", isAuthenticated, getCompanyById);
 router.put("/update/:id", isAuthenticated,singleUpload, updateCompany);
 router.route('/delete/:id').delete(isAuthenticated, deleteCompany);
 
+
+// New routes
+router.get('/applicant-count/:companyId', isAuthenticated, getApplicantCount);
+router.get('/job-count/:companyId', isAuthenticated, getJobCount);
+router.get('/all-with-counts', isAuthenticated, getAllCompaniesWithCounts);
 
 export default router;

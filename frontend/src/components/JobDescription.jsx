@@ -118,12 +118,12 @@ const JobDescription = () => {
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                  <div className="relative  rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
                     {!logoError && job?.company?.logo ? (
                       <img
                         src={job.company.logo}
                         alt={`${job.company.name} logo`}
-                        className="w-full h-full object-cover"
+                        className="w-16 h-16 rounded-full object-cover"
                         onError={handleLogoError}
                       />
                     ) : (

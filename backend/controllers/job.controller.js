@@ -1,4 +1,6 @@
-import { Job } from "../models/job.model.js";
+import mongoose from 'mongoose';
+import { Job } from '../models/job.model.js';
+import { Application } from "../models/application.model.js";
 
 export const postJob = async (req, res) => {
   try {
@@ -248,9 +250,12 @@ export const updateJob = async (req, res) => {
   }
 };
 export const deleteJob = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const jobId = req.params.id; // Access the jobId parameter
-    console.log("Deleting job with ID:", jobId); // Log jobId
+    const jobId = req.params.id;
+    console.log("Deleting job with ID:", jobId);
 
     if (!jobId) {
       return res.status(400).json({
@@ -259,25 +264,36 @@ export const deleteJob = async (req, res) => {
       });
     }
 
-    const result = await Job.deleteOne({ _id: jobId });
+    // Delete all applications associated with this job
+    const deleteApplicationsResult = await Application.deleteMany({ job: jobId }).session(session);
+    console.log(`Deleted ${deleteApplicationsResult.deletedCount} applications`);
 
-    if (result.deletedCount === 0) {
+    // Delete the job
+    const deleteJobResult = await Job.deleteOne({ _id: jobId }).session(session);
+
+    if (deleteJobResult.deletedCount === 0) {
+      await session.abortTransaction();
       return res.status(404).json({
         message: 'Job not found.',
         success: false,
       });
     }
 
+    await session.commitTransaction();
     return res.status(200).json({
-      message: 'Job successfully deleted.',
+      message: 'Job and associated applications successfully deleted.',
       success: true,
+      deletedApplications: deleteApplicationsResult.deletedCount,
     });
   } catch (error) {
-    console.error('Error deleting job:', error.message);
+    await session.abortTransaction();
+    console.error('Error deleting job and applications:', error.message);
     return res.status(500).json({
       message: 'An internal server error occurred.',
       success: false,
     });
+  } finally {
+    session.endSession();
   }
 };
 

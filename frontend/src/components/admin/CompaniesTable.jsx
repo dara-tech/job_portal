@@ -3,12 +3,14 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Edit3, Trash2 } from "lucide-react";
-import { MoreHorizontal } from "lucide-react";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
+import { Edit3, Trash2, MoreHorizontal } from "lucide-react";
 import { COMPANY_API_END_POINT } from "@/utils/constant";
-
+import { toast } from "sonner";
 
 const CompaniesTable = () => {
   const { companies = [], loading, searchCompanyByText } = useSelector((store) => store.company);
@@ -25,9 +27,6 @@ const CompaniesTable = () => {
   }, [companies, searchCompanyByText]);
 
   const handleDelete = async (companyId) => {
-    const isConfirmed = window.confirm("Are you sure you want to delete this company? This action cannot be undone.");
-    if (!isConfirmed) return;
-
     try {
       const response = await axios.delete(`${COMPANY_API_END_POINT}/delete/${companyId}`, {
         headers: {
@@ -39,49 +38,56 @@ const CompaniesTable = () => {
 
       if (response.status === 200) {
         setFilterCompany(filterCompany.filter((company) => company._id !== companyId));
+        toast.success("Company deleted", {
+          description: "The company has been successfully removed.",
+        });
       } else {
-        console.error("Failed to delete company", response.status, response.data);
+        throw new Error("Failed to delete company");
       }
     } catch (error) {
       console.error("Error deleting company", error.response ? error.response.data : error.message);
+      toast.error("Error", {
+        description: "Failed to delete the company. Please try again.",
+      });
     }
   };
 
   return (
-    <div>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold tracking-tight">Companies</h2>
       <Table>
-        <TableCaption>A list of your recent registered companies</TableCaption>
+        <TableCaption>A list of your recently registered companies</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Logo</TableHead>
+            <TableHead className="w-[100px]">Logo</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead className="text-center">Action</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             Array(5)
-              .fill()
+              .fill(null)
               .map((_, index) => (
                 <TableRow key={index}>
                   <TableCell>
-                    <Skeleton circle={true} height={40} width={40} />
+                    <Skeleton className="h-10 w-10 rounded-full" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton height={20} width={100} />
+                    <Skeleton className="h-4 w-[200px]" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton height={20} width={60} />
+                    <Skeleton className="h-4 w-[100px]" />
                   </TableCell>
-                  <TableCell className="text-center">
-                    <Skeleton height={20} width={50} />
+                  <TableCell className="text-right">
+                    <Skeleton className="h-8 w-8 rounded-full ml-auto" />
                   </TableCell>
                 </TableRow>
               ))
           ) : filterCompany.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
+              <TableCell colSpan={4} className="h-24 text-center">
                 You haven't registered any company yet
               </TableCell>
             </TableRow>
@@ -89,40 +95,61 @@ const CompaniesTable = () => {
             filterCompany.map((company) => (
               <TableRow key={company._id}>
                 <TableCell>
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-10 w-10 relative overflow-hidden">
                     <AvatarImage
-                      src={company.logo || "default_logo_url"}
+                      src={company.logo || "/placeholder.svg?height=40&width=40"}
                       alt={`${company.name} logo`}
-                      className="object-cover h-full w-full"
+                      className="object-cover object-center w-full h-full"
                     />
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {company.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                 </TableCell>
-                <TableCell>{company.name}</TableCell>
+                <TableCell className="font-medium">{company.name}</TableCell>
                 <TableCell>
                   {company.createdAt ? new Date(company.createdAt).toLocaleDateString() : "N/A"}
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="text-right">
                   <Popover>
-                    <PopoverTrigger>
-                      <button className="p-2 cursor-pointer" aria-label="More actions">
-                        <MoreHorizontal />
-                      </button>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-32">
-                      <div
+                    <PopoverContent className="w-40">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
                         onClick={() => navigate(`/admin/companies/${company._id}`)}
-                        className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                       >
-                        <Edit3 className="w-4 h-4" />
-                        <span className="font-semibold text-sm">Edit</span>
-                      </div>
-                      <div
-                        onClick={() => handleDelete(company._id)}
-                        className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer mt-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span className="font-semibold text-sm">Delete</span>
-                      </div>
+                        <Edit3 className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" className="w-full justify-start text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the company
+                              and remove its data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(company._id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </PopoverContent>
                   </Popover>
                 </TableCell>

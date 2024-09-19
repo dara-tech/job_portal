@@ -41,9 +41,9 @@ const jobSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    expire: {  // Changed to 'expire' for clarity
+    expire: {
         type: Date,
-        default: null  // or set to a specific default date if required
+        default: () => new Date(+new Date() + 30*24*60*60*1000) // Default to 30 days from now
     },
     created_by: {
         type: mongoose.Schema.Types.ObjectId,
@@ -55,7 +55,15 @@ const jobSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Application',
         }
-    ]
+    ],
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date,
+        default: null
+    }
 }, { timestamps: true });
 
 export const Job = mongoose.model("Job", jobSchema);

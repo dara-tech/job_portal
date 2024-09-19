@@ -4,75 +4,89 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* white */
-    --foreground: 0 0% 3.9%; /* very dark gray */
-
-    --card: 0 0% 100%; /* white */
-    --card-foreground: 0 0% 3.9%; /* very dark gray */
-
-    --popover: 0 0% 100%; /* white */
-    --popover-foreground: 0 0% 3.9%; /* very dark gray */
-
-    --primary: 0 0% 9%; /* very dark gray */
-    --primary-foreground: 0 0% 98%; /* very light gray */
-
-    --secondary: 0 0% 96.1%; /* very light gray */
-    --secondary-foreground: 0 0% 9%; /* very dark gray */
-
-    --muted: 0 0% 96.1%; /* very light gray */
-    --muted-foreground: 0 0% 45.1%; /* gray */
-
-    --accent: 0 0% 96.1%; /* very light gray */
-    --accent-foreground: 0 0% 9%; /* very dark gray */
-
-    --destructive: 0 84.2% 60.2%; /* red */
-    --destructive-foreground: 0 0% 98%; /* very light gray */
-
-    --border: 0 0% 89.8%; /* light gray */
-    --input: 0 0% 89.8%; /* light gray */
-    --ring: 0 0% 3.9%; /* very dark gray */
-
-    --radius: 0.5rem; /* border-radius */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 3.9%; /* very dark gray */
-    --foreground: 0 0% 98%; /* very light gray */
-
-    --card: 0 0% 3.9%; /* very dark gray */
-    --card-foreground: 0 0% 98%; /* very light gray */
-
-    --popover: 0 0% 3.9%; /* very dark gray */
-    --popover-foreground: 0 0% 98%; /* very light gray */
-
-    --primary: 0 0% 98%; /* very light gray */
-    --primary-foreground: 0 0% 9%; /* very dark gray */
-
-    --secondary: 0 0% 14.9%; /* dark gray */
-    --secondary-foreground: 0 0% 98%; /* very light gray */
-
-    --muted: 0 0% 14.9%; /* dark gray */
-    --muted-foreground: 0 0% 63.9%; /* gray */
-
-    --accent: 0 0% 14.9%; /* dark gray */
-    --accent-foreground: 0 0% 98%; /* very light gray */
-
-    --destructive: 0 62.8% 30.6%; /* dark red */
-    --destructive-foreground: 0 0% 98%; /* very light gray */
-
-    --border: 0 0% 14.9%; /* dark gray */
-    --input: 0 0% 14.9%; /* dark gray */
-    --ring: 0 0% 83.1%; /* light gray */
-  }
-
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-  }
-
-  .card {
-    background-color: hsl(var(--card));
-    color: hsl(var(--card-foreground));
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
   }
 }
 
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+
+  body {
+    background-image: linear-gradient(-45deg, 
+      hsl(var(--background) / 0.9),
+      hsl(var(--card) / 0.9),
+      hsl(var(--popover) / 0.9),
+      hsl(var(--muted) / 0.9)
+    );
+  }
+
+  .dark body {
+    background-image: linear-gradient(-45deg, 
+      hsl(var(--background) / 0.9),
+      hsl(var(--card) / 0.9),
+      hsl(var(--popover) / 0.9),
+      hsl(var(--muted) / 0.9)
+    );
+  }
+
+  .card {
+    @apply bg-card text-card-foreground;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

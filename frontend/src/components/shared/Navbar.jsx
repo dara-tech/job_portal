@@ -1,8 +1,11 @@
-import React, { useState } from "react"
+'use client'
+
+import React, { useState, useEffect } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import axios from "axios"
 import { toast } from "sonner"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   HomeIcon,
   BriefcaseBusiness,
@@ -13,6 +16,9 @@ import {
   UserRound,
   Menu,
   X,
+  ChevronDown,
+  Settings,
+  HelpCircle,
 } from "lucide-react"
 import { ModeToggle } from "../toggle"
 import Logo from "../logo"
@@ -36,6 +42,15 @@ const Navbar = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const logoutHandler = async () => {
     try {
@@ -60,7 +75,7 @@ const Navbar = () => {
   const NavLink = ({ to, icon: Icon, label }) => (
     <Link
       to={to}
-      className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 ${
         location.pathname === to
           ? "bg-primary text-primary-foreground"
           : "hover:bg-accent hover:text-accent-foreground"
@@ -86,7 +101,14 @@ const Navbar = () => {
   const links = user && user.role === "recruiter" ? recruiterLinks : userLinks
 
   return (
-    <nav className="bg-background border-b">
+    <motion.nav
+      className={`sticky top-0 z-50 bg-background border-b transition-shadow duration-200 ${
+        scrolled ? 'shadow-md' : ''
+      }`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -109,41 +131,42 @@ const Navbar = () => {
                 </Button>
               </Link>
             ) : (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
-                    <AvatarFallback>{user?.fullname?.[0]}</AvatarFallback>
-                  </Avatar>
-                </PopoverTrigger>
-                <PopoverContent className="w-64">
-                  <div className="flex items-center gap-4 mb-4">
-                    <Avatar>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <Avatar className="w-8 h-8">
                       <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
                       <AvatarFallback>{user?.fullname?.[0]}</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium">{user?.fullname}</h4>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {user?.profile?.bio || "No bio available"}
-                      </p>
-                    </div>
-                  </div>
-                  <Link to="/profile" className="block mb-2">
-                    <Button variant="outline" className="w-full justify-start">
-                      <UserRound className="w-4 h-4 mr-2" />
-                      View Profile
-                    </Button>
-                  </Link>
-                  <Button variant="destructive" className="w-full" onClick={logoutHandler}>
+                    <span className="font-medium">{user?.fullname}</span>
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <UserRound className="w-4 h-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/help')}>
+                    <HelpCircle className="w-4 h-4 mr-2" />
+                    Help & Support
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logoutHandler} className="text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
-                  </Button>
-                </PopoverContent>
-              </Popover>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
             <ModeToggle />
             <Button variant="ghost" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? (
@@ -155,41 +178,55 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {links.map((link) => (
-              <NavLink key={link.to} {...link} />
-            ))}
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-            {!user ? (
-              <div className="px-2">
-                <Link to="/signup">
-                  <Button className="w-full">
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="md:hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              {links.map((link) => (
+                <NavLink key={link.to} {...link} />
+              ))}
+            </div>
+            <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+              {!user ? (
+                <div className="px-2">
+                  <Link to="/signup">
+                    <Button className="w-full">
+                      <UserRound className="w-4 h-4 mr-2" />
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="px-2 space-y-1">
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/profile')}>
                     <UserRound className="w-4 h-4 mr-2" />
-                    Sign Up
+                    Profile
                   </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="px-2 space-y-1">
-                <Link to="/profile">
-                  <Button variant="outline" className="w-full justify-start">
-                    <UserRound className="w-4 h-4 mr-2" />
-                    View Profile
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/settings')}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
                   </Button>
-                </Link>
-                <Button variant="destructive" className="w-full" onClick={logoutHandler}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </nav>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/help')}>
+                    <HelpCircle className="w-4 h-4 mr-2" />
+                    Help & Support
+                  </Button>
+                  <Button variant="destructive" className="w-full" onClick={logoutHandler}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   )
 }
 
