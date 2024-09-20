@@ -6,7 +6,7 @@ import { Application } from '../models/application.model.js';
 import { User } from '../models/user.model.js';
 
 export const registerCompany = async (req, res) => {
-  try {
+  try {  
     const { companyName } = req.body;
     if (!companyName) {
       return res.status(400).json({
@@ -19,7 +19,7 @@ export const registerCompany = async (req, res) => {
       return res.status(400).json({
         message: "You can't register same company.",
         success: false,
-      });
+      }); 
     }
     company = await Company.create({
       name: companyName,
