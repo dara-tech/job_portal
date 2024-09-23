@@ -34,7 +34,6 @@ const userSchema = new mongoose.Schema({
       type: [String],
       default: [],
     },
-   
     skills: {
       type: [String],
       default: [],
@@ -45,6 +44,10 @@ const userSchema = new mongoose.Schema({
     company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
     profilePhoto: { type: String, default: '' },
   },
+  savedJobs: [{ // Add savedJobs field
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Job', // Reference to the Job model
+  }],
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);

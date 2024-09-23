@@ -1,14 +1,15 @@
-import React from "react"
-import { useSelector } from "react-redux"
-import { motion } from "framer-motion"
-import { BriefcaseBusiness, ArrowRight, Loader2 } from "lucide-react"
-import LatestJobCards from "@/components/LastestJobCards"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import React from "react";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import { BriefcaseBusiness, ArrowRight, Loader2 } from "lucide-react";
+import LatestJobCards from "@/components/LastestJobCards";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import JobCard from "@/components/LastestJobCards";
 
 export default function LatestJobs() {
-  const { allJobs, loading, error } = useSelector((state) => state.job)
+  const { allJobs, loading, error } = useSelector((state) => state.job);
 
   const container = {
     hidden: { opacity: 1, scale: 0 },
@@ -17,18 +18,18 @@ export default function LatestJobs() {
       scale: 1,
       transition: {
         delayChildren: 0.3,
-        staggerChildren: 0.2
-      }
-    }
-  }
+        staggerChildren: 0.2,
+      },
+    },
+  };
 
   const item = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
-      opacity: 1
-    }
-  }
+      opacity: 1,
+    },
+  };
 
   if (loading) {
     return (
@@ -46,7 +47,7 @@ export default function LatestJobs() {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (error) {
@@ -58,10 +59,12 @@ export default function LatestJobs() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-red-500 dark:text-red-400">{error.message}</p>
+          <p className="text-center text-red-500 dark:text-red-400">
+            {error.message}
+          </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -89,7 +92,7 @@ export default function LatestJobs() {
           >
             {allJobs.slice(0, 6).map((job) => (
               <motion.div key={job._id} variants={item}>
-                <LatestJobCards job={job} />
+                <JobCard job={job} />
               </motion.div>
             ))}
           </motion.div>
@@ -104,5 +107,5 @@ export default function LatestJobs() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

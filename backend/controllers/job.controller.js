@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { Job } from '../models/job.model.js';
 import { Application } from "../models/application.model.js";
+import { User } from '../models/user.model.js';
 
 export const postJob = async (req, res) => {
   try {
@@ -297,4 +298,125 @@ export const deleteJob = async (req, res) => {
   }
 };
 
+export const saveJob = async (req, res) => {
+  try {
+    const jobId = req.params.id; // Job ID from the route parameters
+    const userId = req.id; // User ID from request (from authentication middleware)
+
+    // Validate jobId
+    if (!jobId) {
+      return res.status(400).json({ message: "Job ID is required.", success: false });
+    }
+
+    // Find the job by ID
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found.", success: false });
+    }
+
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found.", success: false });
+    }
+
+    // Check if the job is already saved
+    if (user.savedJobs.includes(jobId)) {
+      return res.status(400).json({ message: "Job is already saved.", success: false });
+    }
+
+    // Add job to user's saved jobs
+    user.savedJobs.push(jobId);
+    await user.save();
+
+    return res.status(200).json({ message: "Job saved successfully.", success: true });
+  } catch (error) {
+    console.error("Error saving job:", error);
+    return res.status(500).json({ message: "Internal server error.", success: false });
+  }
+};
+export const getSavedJobs = async (req, res) => {
+  try {
+    const userId = req.id; // User ID from authentication middleware
+
+    // Find the user by ID and populate saved jobs
+    const user = await User.findById(userId).populate('savedJobs');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found.", success: false });
+    }
+
+    // Respond with saved jobs
+    return res.status(200).json({
+      savedJobs: user.savedJobs,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error fetching saved jobs:", error);
+    return res.status(500).json({ message: "Internal server error.", success: false });
+  }
+};
+export const unsaveJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const userId = req.id;
+
+    if (!jobId) {
+      return res.status(400).json({ message: "Job ID is required.", success: false });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found.", success: false });
+    }
+
+    // Check if the job is in the saved list
+    const jobIndex = user.savedJobs.indexOf(jobId);
+    if (jobIndex === -1) {
+      return res.status(400).json({ message: "Job is not in the saved list.", success: false });
+    }
+
+    // Remove the job from savedJobs array
+    user.savedJobs.splice(jobIndex, 1);
+
+    // Save the user document without version key check
+    await User.findByIdAndUpdate(userId, { savedJobs: user.savedJobs }, { new: true });
+
+    return res.status(200).json({ message: "Job removed from saved list successfully.", success: true });
+  } catch (error) {
+    console.error("Error unsaving job:", error);
+    return res.status(500).json({ message: "Internal server error.", success: false });
+  }
+};
+export const isJobSaved = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const userId = req.id; // Assuming you have middleware that sets the user ID in the request
+
+    // Validate jobId
+    if (!jobId) {
+      return res.status(400).json({ message: "Job ID is required.", success: false });
+    }
+
+    // Check if the job exists
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found.", success: false });
+    }
+
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found.", success: false });
+    }
+
+    // Check if the job is in the user's saved jobs
+    const isSaved = user.savedJobs.includes(jobId);
+
+    return res.status(200).json({ isSaved, success: true });
+  } catch (error) {
+    console.error("Error checking if job is saved:", error);
+    return res.status(500).json({ message: "Internal server error.", success: false });
+  }
+};
 

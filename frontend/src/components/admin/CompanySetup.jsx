@@ -6,7 +6,7 @@ import { useSelector } from "react-redux"
 import axios from "axios"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Building, Earth, LocateIcon, NotepadText, Save, Upload, Check, X } from "lucide-react"
+import { ArrowLeft, Building, Earth, LocateIcon, Save, Upload, Check, RefreshCw } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { COMPANY_API_END_POINT } from "@/utils/constant"
 import useGetCompanyById from "@/hooks/useGetCompanyById"
 import Navbar from "../shared/Navbar"
@@ -23,11 +24,9 @@ const defaultLogoUrl = "https://cdn-icons-png.flaticon.com/512/149/149071.png"
 
 export default function CompanySetup() {
   const params = useParams()
-  useGetCompanyById(params.id)
-
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
-  const navigate = useNavigate()
   const [input, setInput] = useState({
     name: "",
     description: "",
@@ -35,7 +34,20 @@ export default function CompanySetup() {
     location: "",
     file: null,
   })
+  const { loading: fetchLoading, error: fetchError, refetch } = useGetCompanyById(params.id)
   const { singleCompany } = useSelector((store) => store.company)
+
+  useEffect(() => {
+    if (singleCompany) {
+      setInput({
+        name: singleCompany.name || "",
+        description: singleCompany.description || "",
+        website: singleCompany.website || "",
+        location: singleCompany.location || "",
+        file: singleCompany.logo || null,
+      })
+    }
+  }, [singleCompany])
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value })
@@ -83,23 +95,11 @@ export default function CompanySetup() {
       }
     } catch (error) {
       console.error(error)
-      toast.error(error.response?.data?.message || "An error occurred")
+      toast.error(error.response?.data?.message || "An error occurred while updating the company")
     } finally {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    if (singleCompany) {
-      setInput({
-        name: singleCompany.name || "",
-        description: singleCompany.description || "",
-        website: singleCompany.website || "",
-        location: singleCompany.location || "",
-        file: singleCompany.logo || null,
-      })
-    }
-  }, [singleCompany])
 
   useEffect(() => {
     return () => {
@@ -110,6 +110,38 @@ export default function CompanySetup() {
   }, [input.file])
 
   const isFormComplete = input.name && input.description && input.website && input.location
+
+  const retryFetch = () => {
+    refetch()
+  }
+
+  if (fetchLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <motion.div
+          className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+    )
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to fetch company data. Please try again.
+            <Button variant="outline" onClick={retryFetch} className="mt-4 w-full">
+              <RefreshCw className="mr-2 h-4 w-4" /> Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-slate-950">
@@ -175,7 +207,7 @@ export default function CompanySetup() {
                         name="name"
                         value={input.name}
                         onChange={changeEventHandler}
-                        className="pl-10 dark:ring-1 dark:ring-gray-700  "
+                        className="pl-10 dark:ring-1 dark:ring-gray-700"
                         placeholder="Enter company name"
                       />
                     </div>
@@ -189,7 +221,7 @@ export default function CompanySetup() {
                         name="website"
                         value={input.website}
                         onChange={changeEventHandler}
-                        className="pl-10 dark:ring-1 dark:ring-gray-700  "
+                        className="pl-10 dark:ring-1 dark:ring-gray-700"
                         placeholder="Enter website URL"
                       />
                     </div>
@@ -203,7 +235,7 @@ export default function CompanySetup() {
                         name="location"
                         value={input.location}
                         onChange={changeEventHandler}
-                        className="pl-10 dark:ring-1 dark:ring-gray-700  "
+                        className="pl-10 dark:ring-1 dark:ring-gray-700"
                         placeholder="Enter company location"
                       />
                     </div>
@@ -211,13 +243,12 @@ export default function CompanySetup() {
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="description">Description</Label>
                     <div className="relative">
-
                       <Textarea
                         id="description"
                         name="description"
                         value={input.description}
                         onChange={changeEventHandler}
-                        className="min-h-[100px] dark:ring-1 dark:ring-gray-700  "
+                        className="min-h-[100px] dark:ring-1 dark:ring-gray-700"
                         placeholder="Enter company description"
                       />
                     </div>

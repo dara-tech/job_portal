@@ -1,14 +1,20 @@
-import React from "react"
-import { Bookmark, Share2, DollarSign, MapPin, User, Clock, Briefcase, TrendingUp } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
-import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import React, { useState, useEffect, useCallback } from "react";
+import { Bookmark, Share2, DollarSign, MapPin, User, Clock, Briefcase, TrendingUp } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import { JOB_API_END_POINT } from "@/utils/constant";
 
-export default function Component({ job = {} }) {
-  const navigate = useNavigate()
+export default function JobCard({ job = {} }) {
+  const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isJobSaved, setIsJobSaved] = useState(false);
+  const [isCheckingSaved, setIsCheckingSaved] = useState(true);
 
   const {
     _id,
@@ -20,7 +26,46 @@ export default function Component({ job = {} }) {
     location = "Location not specified",
     position = "Position not specified",
     postedDate,
-  } = job
+  } = job;
+
+  const checkSavedStatus = useCallback(async () => {
+    if (!_id) return;
+    setIsCheckingSaved(true);
+    try {
+      const response = await axios.get(`${JOB_API_END_POINT}/is-saved/${_id}`, { withCredentials: true });
+      setIsJobSaved(response.data.isSaved);
+    } catch (error) {
+      console.error("Error checking saved status:", error);
+      // toast.error("Failed to check saved status. Please try again.");
+    } finally {
+      setIsCheckingSaved(false);
+    }
+  }, [_id]);
+
+  useEffect(() => {
+    checkSavedStatus();
+  }, [checkSavedStatus]);
+
+  const handleSaveToggle = async () => {
+    if (isCheckingSaved) return;
+    setIsSaving(true);
+    try {
+      if (isJobSaved) {
+        await axios.get(`${JOB_API_END_POINT}/unsaved/${_id}`, { withCredentials: true });
+        setIsJobSaved(false);
+        toast.success("Job removed from saved list");
+      } else {
+        await axios.post(`${JOB_API_END_POINT}/save/${_id}`, {}, { withCredentials: true });
+        setIsJobSaved(true);
+        toast.success("Job saved successfully");
+      }
+    } catch (error) {
+      console.error("Error toggling job save status:", error);
+      toast.error(error.response?.data?.message || "An error occurred. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto transition-all duration-300 hover:shadow-lg dark:hover:shadow-gray-700/30 flex flex-col h-[500px]">
@@ -34,8 +79,8 @@ export default function Component({ job = {} }) {
                   alt={`${company.name || "Unknown"} Logo`} 
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.target.onerror = null
-                    e.target.src = `https://ui-avatars.com/api/?name=${company.name || "U"}&background=random`
+                    e.target.onerror = null;
+                    e.target.src = `https://ui-avatars.com/api/?name=${company.name || "U"}&background=random`;
                   }}
                 />
               ) : (
@@ -57,13 +102,19 @@ export default function Component({ job = {} }) {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <Bookmark className="h-4 w-4" />
-                    <span className="sr-only">Save job</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={`text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 ${isJobSaved ? "text-blue-500" : ""}`}
+                    onClick={handleSaveToggle}
+                    disabled={isSaving || isCheckingSaved}
+                  >
+                    <Bookmark className={`h-4 w-4 ${isJobSaved ? "fill-current" : ""}`} />
+                    <span className="sr-only">{isJobSaved ? "Unsave job" : "Save job"}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Save job</p>
+                  <p>{isJobSaved ? "Remove from saved jobs" : "Save this job"}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -121,9 +172,23 @@ export default function Component({ job = {} }) {
           <Button variant="outline" onClick={() => navigate(`/description/${_id}`)} className="flex-1">
             View Details
           </Button>
-          <Button className="flex-1">Apply Now</Button>
+          <Button 
+            className={`flex-1 ${isJobSaved ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"}`}
+            onClick={handleSaveToggle}
+            disabled={isSaving || isCheckingSaved}
+          >
+            {isCheckingSaved ? (
+              "Checking..."
+            ) : isSaving ? (
+              isJobSaved ? "Removing..." : "Saving..."
+            ) : isJobSaved ? (
+              "Unsaved"
+            ) : (
+              "Save Job"
+            )}
+          </Button>
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

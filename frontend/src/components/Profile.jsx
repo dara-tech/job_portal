@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react"
-import { useSelector } from "react-redux"
+import React, { useState, useEffect, useCallback } from "react"
+import { useSelector, useDispatch } from "react-redux"
 import { motion, AnimatePresence } from "framer-motion"
 import { CiLocationOn, CiMail, CiPhone } from "react-icons/ci"
-import { Clock10, Award, Pickaxe, Edit, Download, ExternalLink, Github, Linkedin, Twitter, Upload } from "lucide-react"
+import { Clock10, Award, Pickaxe, Edit, Download, ExternalLink, Github, Linkedin, Twitter, Upload, Palette, Copy } from "lucide-react"
 import { toast, Toaster } from "sonner"
 import Navbar from "./shared/Navbar"
 import AppliedJobTable from "./AppliedJobTable"
@@ -16,16 +16,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+// import { setThemeColor } from "@/redux/themeSlice"
 
 const Profile = () => {
   useGetAppliedJobs()
+  const dispatch = useDispatch()
   const [open, setOpen] = useState(false)
   const user = useSelector((store) => store.auth.user)
+  // const themeColor = useSelector((store) => store.theme.color)
   const skills = user?.profile?.skills || []
   const [skillProgress, setSkillProgress] = useState({})
   const [activeTab, setActiveTab] = useState("skills")
@@ -38,12 +41,28 @@ const Profile = () => {
     setSkillProgress(progress)
   }, [skills])
 
-  const InfoItem = ({ icon, text }) => (
+
+
+  const InfoItem = ({ icon, text, copyable = false }) => (
     <HoverCard>
       <HoverCardTrigger asChild>
         <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-primary transition-colors duration-200">
           {icon}
           <span>{text}</span>
+          {copyable && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(text)} aria-label={`Copy ${text}`}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Copy to clipboard</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-80">
@@ -51,7 +70,7 @@ const Profile = () => {
           <div className="space-y-1">
             <h4 className="text-sm font-semibold">{text}</h4>
             <p className="text-sm">
-              Click to copy or edit this information in your profile settings.
+              {copyable ? "Click the copy icon to copy this information." : "Edit this information in your profile settings."}
             </p>
           </div>
         </div>
@@ -64,12 +83,12 @@ const Profile = () => {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
-      <Card className="flex-1 bg-gradient-to-br from-primary/10 to-primary/5">
+      <Card className="flex-1 bg-gradient-to-br from-primary-100 to-primary-200">
         <CardContent className="flex items-center gap-4 p-4">
-          <div className="p-3 bg-primary/20 rounded-full">{icon}</div>
+          <div className="p-3 bg-primary-300 rounded-full">{icon}</div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <h3 className="text-2xl font-bold">{value}</h3>
+            <p className="text-sm font-medium text-primary-700">{title}</p>
+            <h3 className="text-2xl font-bold text-primary-900">{value}</h3>
           </div>
         </CardContent>
       </Card>
@@ -83,8 +102,35 @@ const Profile = () => {
     })
   }
 
+  const ColorTheme = ({ color, onClick }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-8 h-8 rounded-full p-0 border-2"
+            style={{ backgroundColor: color }}
+            onClick={() => onClick(color)}
+            aria-label={`Set theme color to ${color}`}
+          />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Set theme color</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+
   if (!user) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-t-4 border-primary rounded-full"
+        />
+      </div>
+    )
   }
 
   return (
@@ -96,42 +142,41 @@ const Profile = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="mb-8 overflow-hidden">
-            <div className="h-32 bg-gradient-to-r from-primary to-primary-foreground"></div>
+          <Card className="mb-8 overflow-hidden shadow-lg">
+            <div className="h-48 bg-gradient-to-r from-primary-500 via-primary-400 to-primary-300"></div>
             <CardContent className="relative p-6">
-              <Avatar className="h-32 w-32 absolute -top-16 ring-4 ring-background">
-                <AvatarImage src={user.profile?.profilePhoto || "https://i.mydramalist.com/XdvgoJ_5c.jpg"} alt={user.fullname || "User"} />
+              <Avatar className="h-32 w-32 absolute -top-16 left-6 ring-4 ring-background shadow-xl">
+                <AvatarImage src={user.profile?.profilePhoto || "/placeholder.svg?height=128&width=128"} alt={user.fullname || "User"} />
                 <AvatarFallback>{user.fullname?.[0] || "U"}</AvatarFallback>
               </Avatar>
-              <div className="mt-16">
-                <div className="flex justify-between items-start mb-4">
+              <div className="mt-20">
+                <div className="flex flex-col md:flex-row justify-between items-start mb-4">
                   <div>
-                    <h1 className="text-3xl font-bold">{user.fullname || "User Name"}</h1>
-                    <p className="text-muted-foreground">{user.profile?.bio || "No bio available."}</p>
+                    <h1 className="text-4xl font-bold text-primary-900">
+                      {user.fullname || "User Name"}
+                    </h1>
+                    <p className="text-primary-700 mt-2">{user.profile?.bio || "No bio available."}</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Profile
-                  </Button>
+                  
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                   <InfoItem 
                     icon={<CiLocationOn className="h-5 w-5" />} 
                     text={Array.isArray(user.profile?.location) ? user.profile.location.join(", ") : "Location not specified"} 
                   />
-                  <InfoItem icon={<CiPhone className="h-5 w-5" />} text={user.phoneNumber || "N/A"} />
-                  <InfoItem icon={<CiMail className="h-5 w-5" />} text={user.email || "N/A"} />
+                  <InfoItem icon={<CiPhone className="h-5 w-5" />} text={user.phoneNumber || "N/A"} copyable />
+                  <InfoItem icon={<CiMail className="h-5 w-5" />} text={user.email || "N/A"} copyable />
                 </div>
-                <div className="mt-4 flex gap-2">
-                  <Button variant="outline" size="sm">
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" className="rounded-full">
                     <Github className="mr-2 h-4 w-4" />
                     GitHub
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="rounded-full">
                     <Linkedin className="mr-2 h-4 w-4" />
                     LinkedIn
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="rounded-full">
                     <Twitter className="mr-2 h-4 w-4" />
                     Twitter
                   </Button>
@@ -142,16 +187,16 @@ const Profile = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <StatCard icon={<Clock10 className="h-8 w-8 text-primary" />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
-          <StatCard icon={<Award className="h-8 w-8 text-primary" />} title="Certificates" value="View" />
-          <StatCard icon={<Pickaxe className="h-8 w-8 text-primary" />} title="Skills" value={skills.length} />
+          <StatCard icon={<Clock10 className="h-8 w-8 text-primary-600" />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
+          <StatCard icon={<Award className="h-8 w-8 text-primary-600" />} title="Certificates" value="View" />
+          <StatCard icon={<Pickaxe className="h-8 w-8 text-primary-600" />} title="Skills" value={skills.length} />
         </div>
 
         <Tabs defaultValue="skills" className="mb-8" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="skills">Skills</TabsTrigger>
-            <TabsTrigger value="resume">Resume</TabsTrigger>
-            <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-primary-100">
+            <TabsTrigger value="skills" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Skills</TabsTrigger>
+            <TabsTrigger value="resume" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Resume</TabsTrigger>
+            <TabsTrigger value="portfolio" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Portfolio</TabsTrigger>
           </TabsList>
           <AnimatePresence mode="wait">
             <motion.div
@@ -164,7 +209,7 @@ const Profile = () => {
               <TabsContent value="skills">
                 <Card>
                   <CardHeader>
-                    <h3 className="text-lg font-semibold">Skills</h3>
+                    <h3 className="text-2xl font-semibold text-primary-900">Skills</h3>
                   </CardHeader>
                   <CardContent>
                     <ScrollArea className="h-[300px]">
@@ -172,15 +217,15 @@ const Profile = () => {
                         {skills.length > 0 ? (
                           skills.map((item, index) => (
                             <div key={index} className="space-y-2">
-                              <div className="flex justify-between">
-                                <Badge variant="secondary">{item}</Badge>
-                                <span className="text-sm text-muted-foreground">{skillProgress[item]}%</span>
+                              <div className="flex justify-between items-center">
+                                <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary-100 text-primary-800">{item}</Badge>
+                                <span className="text-sm font-medium text-primary-700">{skillProgress[item]}%</span>
                               </div>
-                              <Progress value={skillProgress[item]} className="w-full" />
+                              <Progress value={skillProgress[item]} className="w-full h-2" indicatorClassName="bg-primary" />
                             </div>
                           ))
                         ) : (
-                          <span className="text-muted-foreground">No skills listed</span>
+                          <span className="text-primary-700">No skills listed</span>
                         )}
                       </div>
                     </ScrollArea>
@@ -190,27 +235,27 @@ const Profile = () => {
               <TabsContent value="resume">
                 <Card>
                   <CardHeader>
-                    <h3 className="text-lg font-semibold">Resume</h3>
+                    <h3 className="text-2xl font-semibold text-primary-900">Resume</h3>
                   </CardHeader>
                   <CardContent>
                     {user.profile?.resume ? (
                       <div className="space-y-4">
-                        <Button variant="outline" asChild>
+                        <Button variant="outline" asChild className="w-full">
                           <a href={user.profile.resume} download>
                             <Download className="mr-2 h-4 w-4" />
                             Download Resume
                           </a>
                         </Button>
-                        <Accordion type="single" collapsible>
+                        <Accordion type="single" collapsible className="w-full">
                           <AccordionItem value="item-1">
-                            <AccordionTrigger>View Resume Summary</AccordionTrigger>
+                            <AccordionTrigger className="text-primary-800">View Resume Summary</AccordionTrigger>
                             <AccordionContent>
                               {user.profile?.resumeSummary ? (
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm text-primary-700">
                                   {user.profile.resumeSummary}
                                 </p>
                               ) : (
-                                <p className="text-sm text-muted-foreground italic">
+                                <p className="text-sm text-primary-600 italic">
                                   No resume summary available. Add a summary to highlight your key qualifications and experiences.
                                 </p>
                               )}
@@ -220,7 +265,7 @@ const Profile = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <p className="text-muted-foreground mb-4">No resume uploaded yet.</p>
+                        <p className="text-primary-700 mb-4">No resume uploaded yet.</p>
                         <Button variant="outline" onClick={() => setOpen(true)}>
                           <Upload className="mr-2 h-4 w-4" />
                           Upload Resume
@@ -233,22 +278,22 @@ const Profile = () => {
               <TabsContent value="portfolio">
                 <Card>
                   <CardHeader>
-                    <h3 className="text-lg font-semibold">Portfolio</h3>
+                    <h3 className="text-2xl font-semibold text-primary-900">Portfolio</h3>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {user.profile?.portfolio && user.profile.portfolio.length > 0 ? (
                         user.profile.portfolio.map((item, index) => (
-                          <Card key={index} className="overflow-hidden">
-                            <img src={`https://source.unsplash.com/random/400x300?${index}`} alt="Project preview" className="w-full h-40 object-cover" />
+                          <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <img src={`https://source.unsplash.com/random/400x300?${index}`} alt="Project preview" className="w-full h-48 object-cover" />
                             <CardHeader>
-                              <h4 className="text-md font-semibold">{item.title}</h4>
+                              <h4 className="text-lg font-semibold text-primary-800">{item.title}</h4>
                             </CardHeader>
                             <CardContent>
-                              <p className="text-sm text-muted-foreground">{item.description}</p>
+                              <p className="text-sm text-primary-600">{item.description}</p>
                             </CardContent>
                             <CardFooter>
-                              <Button variant="outline" asChild>
+                              <Button variant="outline" asChild className="w-full">
                                 <a href={item.link} target="_blank" rel="noopener noreferrer">
                                   <ExternalLink className="mr-2 h-4 w-4" />
                                   View Project
@@ -259,7 +304,7 @@ const Profile = () => {
                         ))
                       ) : (
                         <div className="col-span-full text-center py-8">
-                          <p className="text-muted-foreground mb-4">No portfolio items available</p>
+                          <p className="text-primary-700 mb-4">No portfolio items available</p>
                           <Button variant="outline" onClick={() => setOpen(true)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Add Portfolio Item
@@ -281,6 +326,32 @@ const Profile = () => {
 
       <UpdateProfileDialog open={open} setOpen={setOpen} />
       <Toaster />
+
+      {/* Floating Action Button for quick edit */}
+      <motion.div
+        className="fixed bottom-8 right-8"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="default"
+                size="icon"
+                className="rounded-full w-16 h-16 shadow-lg bg-primary hover:bg-primary-600"
+                onClick={() => setOpen(true)}
+              >
+                <Edit className="h-6 w-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>Edit Profile</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </motion.div>
     </div>
   )
 }

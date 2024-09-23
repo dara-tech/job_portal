@@ -75,7 +75,7 @@ const Navbar = () => {
   const NavLink = ({ to, icon: Icon, label }) => (
     <Link
       to={to}
-      className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 ${
+      className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 ${
         location.pathname === to
           ? "bg-primary text-primary-foreground"
           : "hover:bg-accent hover:text-accent-foreground"
@@ -121,7 +121,7 @@ const Navbar = () => {
               </div>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
             <ModeToggle />
             {!user ? (
               <Link to="/signup">
@@ -149,14 +149,14 @@ const Navbar = () => {
                     <UserRound className="w-4 h-4 mr-2" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                   {/* <DropdownMenuItem onClick={() => navigate('/profile/update')}>
                     <Settings className="w-4 h-4 mr-2" />
                     Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/help')}>
+                  </DropdownMenuItem> */}
+                  <DropdownMenuItem onClick={() => navigate('/saved')}>
                     <HelpCircle className="w-4 h-4 mr-2" />
-                    Help & Support
-                  </DropdownMenuItem>
+                   Save jobs
+                  </DropdownMenuItem> 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logoutHandler} className="text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
@@ -208,14 +208,14 @@ const Navbar = () => {
                     <UserRound className="w-4 h-4 mr-2" />
                     Profile
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/settings')}>
+                  {/* {/* <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/settings')}>
                     <Settings className="w-4 h-4 mr-2" />
                     Settings
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/help')}>
+                  </Button> */}
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/saved')}>
                     <HelpCircle className="w-4 h-4 mr-2" />
-                    Help & Support
-                  </Button>
+                    Saved Jobs
+                  </Button> 
                   <Button variant="destructive" className="w-full" onClick={logoutHandler}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout

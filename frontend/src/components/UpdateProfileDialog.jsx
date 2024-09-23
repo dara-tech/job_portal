@@ -4,7 +4,7 @@ import axios from "axios"
 import { USER_API_END_POINT } from "@/utils/constant"
 import { setUser } from "@/redux/authSlice"
 import { toast } from "sonner"
-import { Loader2, Upload } from "lucide-react"
+import { Loader2, Upload, X } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import {
   Dialog,
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { motion, AnimatePresence } from "framer-motion"
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
   const dispatch = useDispatch()
@@ -110,15 +111,57 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     }
   }
 
+  const FileUploadArea = ({ type, file, rootProps, inputProps, onRemove }) => (
+    <div className="relative">
+      <div
+        {...rootProps}
+        className={`mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-10 transition-all duration-300 ease-in-out ${
+          file ? "border-green-500 bg-green-50" : "hover:border-gray-400"
+        }`}
+      >
+        <div className="text-center">
+          <Upload className={`mx-auto h-12 w-12 ${file ? "text-green-500" : "text-gray-400"}`} aria-hidden="true" />
+          <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
+            <label
+              htmlFor="file-upload"
+              className="relative cursor-pointer rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
+            >
+              <span>{file ? `Change ${type}` : `Upload ${type}`}</span>
+              <input {...inputProps} className="sr-only" />
+            </label>
+          </div>
+          <p className="text-xs leading-5 text-gray-600 mt-2">
+            {type === "photo" ? "PNG, JPG, GIF up to 10MB" : "PDF up to 10MB"}
+          </p>
+          {file && (
+            <p className="text-sm text-green-600 mt-2">
+              {file.name}
+            </p>
+          )}
+        </div>
+      </div>
+      {file && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-0 right-0 text-gray-400 hover:text-red-500"
+          onClick={onRemove}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  )
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Update Your Profile</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">Update Your Profile</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
               <Label htmlFor="fullname">Full Name</Label>
               <Input
                 id="fullname"
@@ -126,9 +169,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 value={formData.fullname}
                 onChange={handleInputChange}
                 placeholder="John Doe"
+                className="w-full"
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -137,11 +181,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="john@example.com"
+                className="w-full"
               />
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
                 id="phoneNumber"
@@ -149,9 +192,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
                 placeholder="+1234567890"
+                className="w-full"
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
@@ -159,16 +203,17 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 value={formData.location}
                 onChange={handleInputChange}
                 placeholder="New York, USA"
+                className="w-full"
               />
             </div>
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="experience">Years of Experience</Label>
             <Select
               value={formData.experience}
               onValueChange={(value) => setFormData(prev => ({ ...prev, experience: value }))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select your experience" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +225,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="skills">Skills</Label>
             <Input
               id="skills"
@@ -188,12 +233,13 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               value={formData.skills}
               onChange={handleInputChange}
               placeholder="React, Node.js, TypeScript"
+              className="w-full"
             />
             <p className="text-sm text-muted-foreground mt-1">
               Enter your skills separated by commas.
             </p>
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>
             <Textarea
               id="bio"
@@ -201,64 +247,43 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               value={formData.bio}
               onChange={handleInputChange}
               placeholder="Tell us about yourself"
-              className="resize-none"
+              className="resize-none w-full h-32"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
               <Label>Profile Photo</Label>
-              <div
-                {...getProfilePhotoRootProps()}
-                className={`mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 ${
-                  profilePhoto ? "border-green-500" : ""
-                }`}
-              >
-                <div className="text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-                  <div className="mt-4 flex justify-center text-sm leading-6 text-gray-600">
-                    <label
-                      htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white px-2 mb-2 font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                    >
-                      <span>{profilePhoto ? "Change photo" : "Upload a photo"}</span>
-                      <input {...getProfilePhotoInputProps()} className="sr-only" />
-                    </label>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
-                </div>
-              </div>
+              <FileUploadArea
+                type="photo"
+                file={profilePhoto}
+                rootProps={getProfilePhotoRootProps()}
+                inputProps={getProfilePhotoInputProps()}
+                onRemove={() => setProfilePhoto(null)}
+              />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Resume</Label>
-              <div
-                {...getResumeRootProps()}
-                className={`mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 ${
-                  resume ? "border-green-500" : ""
-                }`}
-              >
-                <div className="text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                    <label
-                      htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white px-2 mb-2 font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                    >
-                      <span>{resume ? "Change resume" : "Upload a resume"}</span>
-                      <input {...getResumeInputProps()} className="sr-only" />
-                    </label>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600">PDF up to 10MB</p>
-                </div>
-              </div>
+              <FileUploadArea
+                type="resume"
+                file={resume}
+                rootProps={getResumeRootProps()}
+                inputProps={getResumeInputProps()}
+                onRemove={() => setResume(null)}
+              />
             </div>
           </div>
           <DialogFooter>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
-                <>
+                <motion.div
+                  className="flex items-center justify-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Updating...
-                </>
+                </motion.div>
               ) : (
                 "Update Profile"
               )}

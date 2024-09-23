@@ -38,29 +38,42 @@ const Logo = () => {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
-      <div className="relative">
-        {"JobF".split('').map((letter, index) => (
+      <div className="relative flex items-center">
+        {"Job".split('').map((letter, index) => (
           <motion.span
             key={index}
-            className={`text-4xl font-extrabold ${index < 3 ? 'text-primary' : 'text-white'}`}
+            className="text-4xl font-extrabold text-primary"
             variants={letterVariants}
             initial="hidden"
             animate="visible"
             custom={index}
-            style={index === 3 ? { 
-              background: `linear-gradient(135deg, ${roleColor}, #2196F3)`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              padding: '0 4px'
-            } : {}}
           >
             {letter}
           </motion.span>
         ))}
+        <svg width="32" height="48" viewBox="0 0 32 48" className="inline-block" style={{ marginLeft: '-0.1em', marginRight: '-0.1em' }}>
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={roleColor} />
+              <stop offset="100%" stopColor="#2196F3" />
+            </linearGradient>
+          </defs>
+          <text
+            x="0"
+            y="38"
+            className="text-4xl"
+            fontWeight="800"
+            fill="url(#gradient)"
+            fontFamily="Arial, sans-serif"
+            style={{ letterSpacing: '-0.02em' }}
+          >
+            F
+          </text>
+        </svg>
         <AnimatePresence>
           {isHovered && user && (
             <motion.div
-              className="absolute -bottom-1 left-0 h-1 bg-gradient-to-r from-primary to-blue-500"
+              className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-primary to-blue-500"
               initial="hidden"
               animate="visible"
               exit="hidden"
@@ -72,7 +85,7 @@ const Logo = () => {
       <AnimatePresence>
         {isHovered && user && (
           <motion.span
-            className="ml-2 text-sm font-medium"
+            className="ml-1 text-sm font-medium"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
