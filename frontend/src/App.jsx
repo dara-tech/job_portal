@@ -16,7 +16,7 @@ import Companies from "./components/admin/Companies";
 import CompanyCreate from "./components/admin/CompanyCreate";
 import CompanySetup from "./components/admin/CompanySetup";
 import AdminJobs from "./components/admin/AdminJobs";
-import PostJob from "./components/admin/PostJob";
+import PostJob from "./components/admin/form/postjob/PostJob";
 import Applicants from "./components/admin/Applicants";
 import UpdateJob from "./components/admin/UpdateJob";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
