@@ -202,4 +202,109 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find(); // Fetch all users from the database
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        message: "No users found.",
+        success: false,
+      });
+    }
 
+    // Return the list of users
+    return res.status(200).json({
+      message: "Users fetched successfully",
+      success: true,
+      users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+// Get user by ID
+export const getUserById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+    res.status(200).json({
+      message: "User retrieved successfully.",
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+// Edit user by ID
+export const editUser = async (req, res) => {
+  const { id } = req.params;
+  const { fullname, email, phoneNumber, role, profile } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { fullname, email, phoneNumber, role, profile },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully.",
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+// Delete user by ID
+export const deleteUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+    res.status(200).json({
+      message: "User deleted successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};

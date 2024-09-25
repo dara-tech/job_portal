@@ -1,19 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useSelector } from "react-redux";
+"use client"
 
-const Logo = () => {
-  const [isHovered, setIsHovered] = useState(false);
-  const user = useSelector((store) => store.auth.user);
-  const [roleColor, setRoleColor] = useState("#4CAF50");
+import React, { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { useSelector } from "react-redux"
+
+export default function Logo() {
+  const [isHovered, setIsHovered] = useState(false)
+  const user = useSelector((store) => store.auth.user)
+  const [roleColor, setRoleColor] = useState("#4CAF50")
 
   useEffect(() => {
-    setRoleColor(user?.role === "recruiter" ? "#FF5722" : "#4CAF50");
-  }, [user]);
+    switch (user?.role) {
+      case "recruiter":
+        setRoleColor("#FF5722")
+        break
+      case "admin":
+        setRoleColor("#9C27B0")
+        break
+      default:
+        setRoleColor("#4CAF50")
+    }
+  }, [user])
 
   const letterVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: i => ({
+    visible: (i) => ({
       y: 0,
       opacity: 1,
       transition: {
@@ -22,12 +33,12 @@ const Logo = () => {
         opacity: { duration: 0.2 }
       }
     })
-  };
+  }
 
   const roleVariants = {
     hidden: { scaleX: 0 },
     visible: { scaleX: 1, transition: { duration: 0.5, ease: "circOut" } }
-  };
+  }
 
   return (
     <motion.div
@@ -92,12 +103,10 @@ const Logo = () => {
             transition={{ duration: 0.2 }}
             style={{ color: roleColor }}
           >
-            {user.role === "recruiter" ? "Recruiter" : "Student"}
+            {user.role === "recruiter" ? "Recruiter" : user.role === "admin" ? "Admin" : "Student"}
           </motion.span>
         )}
       </AnimatePresence>
     </motion.div>
-  );
-};
-
-export default Logo;
+  )
+}

@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGraduationCap, faBuilding } from "@fortawesome/free-solid-svg-icons";
+import { faGraduationCap, faBuilding, faUser } from "@fortawesome/free-solid-svg-icons";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -147,6 +147,13 @@ export default function Login() {
                     <Label htmlFor="recruiter" className="flex items-center space-x-2 cursor-pointer">
                       <FontAwesomeIcon icon={faBuilding} className="text-green-500" />
                       <span className="text-sm text-gray-700 dark:text-gray-300">Recruiter</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="admin" id="admin" />
+                    <Label htmlFor="admin" className="flex items-center space-x-2 cursor-pointer">
+                      <FontAwesomeIcon icon={faUser} className="text-green-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Admin</span>
                     </Label>
                   </div>
                 </div>

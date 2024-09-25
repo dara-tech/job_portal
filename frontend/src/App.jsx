@@ -22,6 +22,9 @@ import UpdateJob from "./components/admin/UpdateJob";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import Dashboard from "./components/dashboard/Dashboard";
 import SavedJobs from "./components/SavedJob";
+import UserTable from "./components/sadmin/UserTable";
+import UserView from "./components/sadmin/UserView";
+import ChatTable from "./components/admin/ChatTable";
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -41,6 +44,9 @@ const routes = [
   { path: "/admin/jobs/:id/applicants", element: <ProtectedRoute><Applicants /></ProtectedRoute> },
   { path: "/admin/job/update/:id", element: <ProtectedRoute><UpdateJob /></ProtectedRoute> },
   { path: "/admin/dashboard", element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+  { path: "/admin/user", element: <ProtectedRoute><UserTable/></ProtectedRoute> },
+  { path: "/admin/user/:id", element: <ProtectedRoute><UserView/></ProtectedRoute> },
+  { path: "/admin/chat", element: <ProtectedRoute><ChatTable/></ProtectedRoute> },
 ];
 
 function App() {

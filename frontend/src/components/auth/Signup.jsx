@@ -270,6 +270,10 @@ const Signup = () => {
                             <RadioGroupItem value="recruiter" id="recruiter" />
                             <Label htmlFor="recruiter">Recruiter</Label>
                           </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="admin" id="admin" />
+                            <Label htmlFor="recruiter">Admin</Label>
+                          </div>
                         </RadioGroup>
                       </div>
                     </TabsContent>

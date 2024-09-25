@@ -223,10 +223,12 @@ const AIAssistant = ({ jobData, onUpdate, initialContent = { description: '', re
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
+
                 <Switch id="autosave" checked={autoSave} onCheckedChange={setAutoSave} />
+                
                 <Label htmlFor="autosave" className="text-sm font-medium text-gray-700 dark:text-gray-300">Auto-Save</Label>
-              </div>
+              </div> */}
             </TooltipTrigger>
             <TooltipContent>
               <p>Automatically save changes</p>
@@ -281,16 +283,16 @@ const AIAssistant = ({ jobData, onUpdate, initialContent = { description: '', re
             <div className="flex items-center justify-between">
               <div className="space-x-2">
                 <Button variant="outline" size="sm" onClick={() => undo(field)} disabled={historyIndex[field] <= 0}>
-                  <Undo className="w-4 h-4 mr-1" />Undo
+                  <Undo className="w-4 h-4 mr-1" />
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => redo(field)} disabled={historyIndex[field] >= history[field].length - 1}>
-                  <Redo className="w-4 h-4 mr-1" />Redo
+                  <Redo className="w-4 h-4 mr-1" />
                 </Button>
               </div>
               <div className="space-x-2">
-                <Button variant="secondary" size="sm" onClick={() => optimizeContent(field)}>
+                {/* <Button variant="secondary" size="sm" onClick={() => optimizeContent(field)}>
                   <FileText className="w-4 h-4 mr-1" />Optimize
-                </Button>
+                </Button> */}
                 <Button variant="primary" size="sm" onClick={generateContent} disabled={isGenerating}>
                   {isGenerating ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Wand2 className="w-4 h-4 mr-1" />}
                   Generate

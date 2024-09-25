@@ -19,6 +19,8 @@ import {
   ChevronDown,
   Settings,
   HelpCircle,
+  User,
+  MessageSquare,
 } from "lucide-react"
 import { ModeToggle } from "../toggle"
 import Logo from "../logo"
@@ -90,15 +92,23 @@ const Navbar = () => {
     { to: "/admin/companies", icon: Building, label: "Companies" },
     { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
+    { to: "/admin/chat", icon: MessageSquare, label: "Chat" },
+  ]
+  const adminLinks = [
+    { to: "/admin/companies", icon: Building, label: "Companies" },
+    { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs" },
+    { to: "/admin/user", icon: User, label: "User" },
+    { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
   ]
 
   const userLinks = [
     { to: "/", icon: HomeIcon, label: "Home" },
     { to: "/jobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/browse", icon: Globe, label: "Browse" },
+   
   ]
 
-  const links = user && user.role === "recruiter" ? recruiterLinks : userLinks
+  const links = user && (user.role === "recruiter" || user.role === "admin") ? (user.role === "admin" ? adminLinks : recruiterLinks) : userLinks
 
   return (
     <motion.nav
@@ -149,14 +159,12 @@ const Navbar = () => {
                     <UserRound className="w-4 h-4 mr-2" />
                     Profile
                   </DropdownMenuItem>
-                   {/* <DropdownMenuItem onClick={() => navigate('/profile/update')}>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </DropdownMenuItem> */}
-                  <DropdownMenuItem onClick={() => navigate('/saved')}>
-                    <HelpCircle className="w-4 h-4 mr-2" />
-                   Save jobs
-                  </DropdownMenuItem> 
+                  {user.role !== "admin" && (
+                    <DropdownMenuItem onClick={() => navigate('/saved')}>
+                      <HelpCircle className="w-4 h-4 mr-2" />
+                      Save jobs
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logoutHandler} className="text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
@@ -208,14 +216,12 @@ const Navbar = () => {
                     <UserRound className="w-4 h-4 mr-2" />
                     Profile
                   </Button>
-                  {/* {/* <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/settings')}>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Button> */}
-                  <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/saved')}>
-                    <HelpCircle className="w-4 h-4 mr-2" />
-                    Saved Jobs
-                  </Button> 
+                  {user.role !== "admin" && (
+                    <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/saved')}>
+                      <HelpCircle className="w-4 h-4 mr-2" />
+                      Saved Jobs
+                    </Button>
+                  )}
                   <Button variant="destructive" className="w-full" onClick={logoutHandler}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
