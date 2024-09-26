@@ -92,7 +92,7 @@ const SavedJobs = () => {
   if (isLoading) {
     return (
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="container mx-auto p-4 space-y-4">
           <h1 className="text-2xl font-bold mb-4">Saved Jobs</h1>
           {[...Array(3)].map((_, index) => (
@@ -118,7 +118,7 @@ const SavedJobs = () => {
   if (error) {
     return (
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="container mx-auto p-4">
           <h1 className="text-2xl font-bold mb-4">Saved Jobs</h1>
           <Card className="w-full bg-red-50 dark:bg-red-900">
@@ -133,7 +133,7 @@ const SavedJobs = () => {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Saved Jobs</h1>
         {savedJobs.length === 0 ? (

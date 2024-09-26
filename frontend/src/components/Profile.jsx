@@ -135,7 +135,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      <Navbar />
+      {/* <Navbar /> */}
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

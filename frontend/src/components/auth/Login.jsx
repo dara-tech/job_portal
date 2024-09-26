@@ -72,7 +72,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-black flex flex-col">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="flex-grow flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden">
           <CardHeader className="space-y-1 bg-gray-50 dark:bg-gray-700 p-6">

@@ -198,7 +198,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex flex-col">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="flex-grow flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

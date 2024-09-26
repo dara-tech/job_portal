@@ -89,7 +89,7 @@ export default function CompanyCreate() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-secondary/20">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="flex-grow flex flex-col lg:flex-row items-center justify-center p-4 gap-8">
         <div className="w-full lg:w-1/2 h-[300px] lg:h-[600px] max-w-2xl">
           <Canvas>

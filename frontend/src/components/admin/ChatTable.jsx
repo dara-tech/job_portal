@@ -171,7 +171,7 @@ export default function ChatTable() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      {/* <Navbar /> */}
       <main className="container mx-auto py-10">
         <header className="flex items-center gap-2 mb-6">
           <MessageCircle className="h-6 w-6 text-primary" aria-hidden="true" />

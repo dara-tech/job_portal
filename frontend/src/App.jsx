@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setAuthToken } from "@/redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "./App.css";
+import { setAuthToken } from "@/redux/authSlice";
 import Footer from "./components/shared/Footer";
+import Navbar from "./components/shared/Navbar";
+import AdminLayout from "./components/shared/AdminLayout";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import Home from "./components/Home";
@@ -25,28 +26,57 @@ import SavedJobs from "./components/SavedJob";
 import UserTable from "./components/sadmin/UserTable";
 import UserView from "./components/sadmin/UserView";
 import ChatTable from "./components/admin/ChatTable";
+import "./App.css";
+
+const AppLayout = () => {
+  const { user } = useSelector((store) => store.auth);
+
+  if (user && (user.role === 'recruiter' || user.role === 'admin')) {
+    return <AdminLayout />;
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
+        <Outlet />
+      </main>
+      <Footer className="flex justify-end sticky" />
+    </div>
+  );
+};
 
 const routes = [
-  { path: "/", element: <Home /> },
-  { path: "/login", element: <Login /> },
-  { path: "/signup", element: <Signup /> },
-  { path: "/jobs", element: <Jobs /> },
-  { path: "/browse", element: <Browse /> },
-  { path: "/saved", element: <SavedJobs /> },
-  { path: "/profile", element: <Profile /> },
-  { path: "/description/:id", element: <JobDescription /> },
-  // Admin routes
-  { path: "/admin/companies", element: <ProtectedRoute><Companies /></ProtectedRoute> },
-  { path: "/admin/companies/create", element: <ProtectedRoute><CompanyCreate /></ProtectedRoute> },
-  { path: "/admin/companies/:id", element: <ProtectedRoute><CompanySetup /></ProtectedRoute> },
-  { path: "/admin/jobs", element: <ProtectedRoute><AdminJobs /></ProtectedRoute> },
-  { path: "/admin/job/create", element: <ProtectedRoute><PostJob /></ProtectedRoute> },
-  { path: "/admin/jobs/:id/applicants", element: <ProtectedRoute><Applicants /></ProtectedRoute> },
-  { path: "/admin/job/update/:id", element: <ProtectedRoute><UpdateJob /></ProtectedRoute> },
-  { path: "/admin/dashboard", element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
-  { path: "/admin/user", element: <ProtectedRoute><UserTable/></ProtectedRoute> },
-  { path: "/admin/user/:id", element: <ProtectedRoute><UserView/></ProtectedRoute> },
-  { path: "/admin/chat", element: <ProtectedRoute><ChatTable/></ProtectedRoute> },
+  {
+    element: <AppLayout />,
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "/login", element: <Login /> },
+      { path: "/signup", element: <Signup /> },
+      { path: "/jobs", element: <Jobs /> },
+      { path: "/browse", element: <Browse /> },
+      { path: "/saved", element: <SavedJobs /> },
+      { path: "/profile", element: <Profile /> },
+      { path: "/description/:id", element: <JobDescription /> },
+      { 
+        path: "/admin",
+        element: <ProtectedRoute />,
+        children: [
+          { path: "companies", element: <Companies /> },
+          { path: "companies/create", element: <CompanyCreate /> },
+          { path: "companies/:id", element: <CompanySetup /> },
+          { path: "jobs", element: <AdminJobs /> },
+          { path: "job/create", element: <PostJob /> },
+          { path: "jobs/:id/applicants", element: <Applicants /> },
+          { path: "job/update/:id", element: <UpdateJob /> },
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "user", element: <UserTable /> },
+          { path: "user/:id", element: <UserView /> },
+          { path: "chat", element: <ChatTable /> },
+        ],
+      },
+    ],
+  },
 ];
 
 function App() {
@@ -63,11 +93,7 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="flex flex-col min-h-screen">
-        <RouterProvider router={appRouter} />
-        <div className="flex-grow" />
-        <Footer className="flex justify-end sticky" />
-      </div>
+      <RouterProvider router={appRouter} />
     </ThemeProvider>
   );
 }

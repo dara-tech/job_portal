@@ -134,7 +134,7 @@ const UserTable = () => {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="container mx-auto py-10">
         <div className="flex items-center gap-2 mb-6">
           <User2 />

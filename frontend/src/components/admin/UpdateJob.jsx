@@ -128,7 +128,7 @@ const UpdateJob = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>

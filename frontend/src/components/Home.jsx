@@ -20,7 +20,7 @@ const Home = () => {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <HeroSection />
       <LastestJobs />
     </div>

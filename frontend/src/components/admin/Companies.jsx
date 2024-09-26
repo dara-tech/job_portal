@@ -20,7 +20,7 @@ const Companies = () => {
   }, [input])
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="px-2 mt-4">
         <div className="flex justify-between items-center gap-2">
           <div className="flex items-center ring-1 ring-gray-200 rounded-md dark:ring-gray-700 cursor-pointer">  

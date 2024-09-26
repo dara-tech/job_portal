@@ -145,7 +145,7 @@ export default function CompanySetup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-slate-950">
-      <Navbar />
+      {/* <Navbar /> */}
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
