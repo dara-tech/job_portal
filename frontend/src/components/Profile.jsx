@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { motion, AnimatePresence } from "framer-motion"
-import { CiLocationOn, CiMail, CiPhone } from "react-icons/ci"
-import { Clock10, Award, Pickaxe, Edit, Download, ExternalLink, Github, Linkedin, Twitter, Upload, Palette, Copy } from "lucide-react"
+import { Clock10, Award, Pickaxe, Edit, Download, ExternalLink, Github, Linkedin, Twitter, Facebook, Instagram, Youtube, Upload, Palette, Copy, Phone, Mail, LocateIcon } from "lucide-react"
 import { toast, Toaster } from "sonner"
 import Navbar from "./shared/Navbar"
 import AppliedJobTable from "./AppliedJobTable"
@@ -21,17 +20,32 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-// import { setThemeColor } from "@/redux/themeSlice"
+
+const socialIcons = {
+  LinkedIn: Linkedin,
+  Twitter: Twitter,
+  Facebook: Facebook,
+  Instagram: Instagram,
+  GitHub: Github,
+  YouTube: Youtube,
+}
+
+const formatUrl = (url) => {
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`
+  }
+  return url
+}
 
 const Profile = () => {
   useGetAppliedJobs()
   const dispatch = useDispatch()
   const [open, setOpen] = useState(false)
   const user = useSelector((store) => store.auth.user)
-  // const themeColor = useSelector((store) => store.theme.color)
   const skills = user?.profile?.skills || []
   const [skillProgress, setSkillProgress] = useState({})
   const [activeTab, setActiveTab] = useState("skills")
+  const [socialLinks, setSocialLinks] = useState({})
 
   useEffect(() => {
     const progress = skills.reduce((acc, skill) => {
@@ -41,7 +55,15 @@ const Profile = () => {
     setSkillProgress(progress)
   }, [skills])
 
-
+  useEffect(() => {
+    if (user?.profile?.socialLinks) {
+      const formattedLinks = Object.entries(user.profile.socialLinks).reduce((acc, [key, value]) => {
+        acc[key] = formatUrl(value)
+        return acc
+      }, {})
+      setSocialLinks(formattedLinks)
+    }
+  }, [user])
 
   const InfoItem = ({ icon, text, copyable = false }) => (
     <HoverCard>
@@ -84,11 +106,11 @@ const Profile = () => {
       whileTap={{ scale: 0.95 }}
     >
       <Card className="flex-1 bg-gradient-to-br from-primary-100 to-primary-200">
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="p-3 bg-primary-300 rounded-full">{icon}</div>
+        <CardContent className="flex items-center gap-2 p-4">
+          <div className=" bg-primary-300 ">{icon}</div>
           <div>
-            <p className="text-sm font-medium text-primary-700">{title}</p>
-            <h3 className="text-2xl font-bold text-primary-900">{value}</h3>
+            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+            <h3 className="text-xl font-bold text-primary-900">{value}</h3>
           </div>
         </CardContent>
       </Card>
@@ -101,25 +123,6 @@ const Profile = () => {
       description: `${text} has been copied to your clipboard.`,
     })
   }
-
-  const ColorTheme = ({ color, onClick }) => (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-8 h-8 rounded-full p-0 border-2"
-            style={{ backgroundColor: color }}
-            onClick={() => onClick(color)}
-            aria-label={`Set theme color to ${color}`}
-          />
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Set theme color</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
 
   if (!user) {
     return (
@@ -135,7 +138,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      {/* <Navbar /> */}
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -157,29 +159,27 @@ const Profile = () => {
                     </h1>
                     <p className="text-primary-700 mt-2">{user.profile?.bio || "No bio available."}</p>
                   </div>
-                  
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                   <InfoItem 
-                    icon={<CiLocationOn className="h-5 w-5" />} 
+                    icon={<LocateIcon className="h-4 w-4" />} 
                     text={Array.isArray(user.profile?.location) ? user.profile.location.join(", ") : "Location not specified"} 
                   />
-                  <InfoItem icon={<CiPhone className="h-5 w-5" />} text={user.phoneNumber || "N/A"} copyable />
-                  <InfoItem icon={<CiMail className="h-5 w-5" />} text={user.email || "N/A"} copyable />
+                  <InfoItem icon={<Phone className="h-4 w-4" />} text={user.phoneNumber || "N/A"} copyable />
+                  <InfoItem icon={<Mail className="h-4 w-4" />} text={user.email || "N/A"} copyable />
                 </div>
                 <div className="mt-6 flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" className="rounded-full">
-                    <Github className="mr-2 h-4 w-4" />
-                    GitHub
-                  </Button>
-                  <Button variant="outline" size="sm" className="rounded-full">
-                    <Linkedin className="mr-2 h-4 w-4" />
-                    LinkedIn
-                  </Button>
-                  <Button variant="outline" size="sm" className="rounded-full">
-                    <Twitter className="mr-2 h-4 w-4" />
-                    Twitter
-                  </Button>
+                  {Object.entries(socialLinks).map(([platform, link]) => {
+                    const Icon = socialIcons[platform] || ExternalLink
+                    return (
+                      <Button key={platform} variant="outline" size="sm" className="rounded-full" asChild>
+                        <a href={link} target="_blank" rel="noopener noreferrer">
+                          <Icon className="mr-2 h-4 w-4" />
+                          {platform}
+                        </a>
+                      </Button>
+                    )
+                  })}
                 </div>
               </div>
             </CardContent>
@@ -187,13 +187,13 @@ const Profile = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <StatCard icon={<Clock10 className="h-8 w-8 text-primary-600" />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
-          <StatCard icon={<Award className="h-8 w-8 text-primary-600" />} title="Certificates" value="View" />
-          <StatCard icon={<Pickaxe className="h-8 w-8 text-primary-600" />} title="Skills" value={skills.length} />
+          <StatCard icon={<Clock10 className="h-8 w-8 text-primary-400 " />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
+          <StatCard icon={<Award className="h-8 w-8 text-primary-400" />} title="Certificates" value="View" />
+          <StatCard icon={<Pickaxe className="h-8 w-8 text-primary-400" />} title="Skills" value={skills.length} />
         </div>
 
         <Tabs defaultValue="skills" className="mb-8" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-primary-100">
+          <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-primary-100 ">
             <TabsTrigger value="skills" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Skills</TabsTrigger>
             <TabsTrigger value="resume" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Resume</TabsTrigger>
             <TabsTrigger value="portfolio" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Portfolio</TabsTrigger>
@@ -327,7 +327,6 @@ const Profile = () => {
       <UpdateProfileDialog open={open} setOpen={setOpen} />
       <Toaster />
 
-      {/* Floating Action Button for quick edit */}
       <motion.div
         className="fixed bottom-8 right-8"
         initial={{ scale: 0 }}

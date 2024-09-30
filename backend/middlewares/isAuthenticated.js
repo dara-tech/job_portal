@@ -7,7 +7,7 @@ const isAuthenticated = async (req, res, next) => {
     // Check if the token exists
     if (!token) {
       return res.status(401).json({
-        message: "User not authenticated. No token provided.",
+        message: "Authentication failed. No token provided.",
         success: false,
       });
     }
@@ -21,25 +21,29 @@ const isAuthenticated = async (req, res, next) => {
     // Proceed to the next middleware
     next();
   } catch (error) {
-    // Log the error and return an appropriate response
     console.error("Authentication error:", error.message);
 
-    // Differentiate between token expiration and other token errors
+    // Differentiate between token expiration, invalid token, and other errors
     if (error.name === "TokenExpiredError") {
+      // Handle expired token
       return res.status(401).json({
-        message: "Token has expired. Please log in again.",
+        message: "Your session has expired. Please log in again.",
         success: false,
+        error: "TOKEN_EXPIRED",
       });
     } else if (error.name === "JsonWebTokenError") {
+      // Handle other JWT errors (e.g., invalid signature)
       return res.status(401).json({
         message: "Invalid token. Please log in again.",
         success: false,
+        error: "INVALID_TOKEN",
       });
     } else {
-      // General error handling
+      // Handle general server errors
       return res.status(500).json({
-        message: "An internal server error occurred.",
+        message: "An internal server error occurred during authentication.",
         success: false,
+        error: "INTERNAL_SERVER_ERROR",
       });
     }
   }

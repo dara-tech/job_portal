@@ -38,6 +38,11 @@ const userSchema = new mongoose.Schema({
       type: [String],
       default: [],
     },
+    socialLinks: {
+      type: Map,
+      of: String,
+      default: {},
+    },
     experience: [{ type: String }], // Added experience field
     resume: { type: String },
     resumeOriginalName: { type: String },

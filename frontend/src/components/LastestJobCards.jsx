@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { JOB_API_END_POINT } from "@/utils/constant";
+import JobShare from "./JobShare";
 
 export default function JobCard({ job = {} }) {
   const navigate = useNavigate();
@@ -36,7 +37,6 @@ export default function JobCard({ job = {} }) {
       setIsJobSaved(response.data.isSaved);
     } catch (error) {
       console.error("Error checking saved status:", error);
-      // toast.error("Failed to check saved status. Please try again.");
     } finally {
       setIsCheckingSaved(false);
     }
@@ -72,7 +72,7 @@ export default function JobCard({ job = {} }) {
       <CardHeader className="relative pb-0">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-transparent flex items-center justify-center">
               {company.logo ? (
                 <img 
                   src={company.logo} 
@@ -126,8 +126,8 @@ export default function JobCard({ job = {} }) {
                     <span className="sr-only">Share job</span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Share job</p>
+                <TooltipContent side="bottom" align="end" className="w-auto p-0">
+                  <JobShare jobId={_id} jobTitle={title} jobDescription={position} />
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -171,21 +171,6 @@ export default function JobCard({ job = {} }) {
         <div className="flex justify-between w-full space-x-4">
           <Button variant="outline" onClick={() => navigate(`/description/${_id}`)} className="flex-1">
             View Details
-          </Button>
-          <Button 
-            className={`flex-1 ${isJobSaved ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"}`}
-            onClick={handleSaveToggle}
-            disabled={isSaving || isCheckingSaved}
-          >
-            {isCheckingSaved ? (
-              "Checking..."
-            ) : isSaving ? (
-              isJobSaved ? "Removing..." : "Saving..."
-            ) : isJobSaved ? (
-              "Unsaved"
-            ) : (
-              "Save Job"
-            )}
           </Button>
         </div>
       </CardFooter>

@@ -65,7 +65,7 @@ const Browse = () => {
   const hasActiveFilters = searchTerm !== '' || Object.values(filters).some(filter => filter !== '')
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* <Navbar /> */}
       <main className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
         <Card className="mb-8 shadow-lg">

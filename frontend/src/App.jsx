@@ -27,6 +27,11 @@ import UserTable from "./components/sadmin/UserTable";
 import UserView from "./components/sadmin/UserView";
 import ChatTable from "./components/admin/ChatTable";
 import "./App.css";
+import AdminCompanies from "./components/sadmin/AdminCompanies";
+import CompanyAdminSetup from "./components/sadmin/CompanyAdminSetup";
+import Setting from "./components/Setting";
+import AllAdminJobs from "./components/sadmin/AllAdminJobs";
+import ImageGenerator from "./components/ImageGen";
 
 const AppLayout = () => {
   const { user } = useSelector((store) => store.auth);
@@ -57,15 +62,20 @@ const routes = [
       { path: "/browse", element: <Browse /> },
       { path: "/saved", element: <SavedJobs /> },
       { path: "/profile", element: <Profile /> },
+      { path: "/settings", element: <Setting /> },
       { path: "/description/:id", element: <JobDescription /> },
+      { path: "/ai/image", element: <ImageGenerator /> },
       { 
         path: "/admin",
         element: <ProtectedRoute />,
         children: [
           { path: "companies", element: <Companies /> },
+          { path: "allcompanies", element: <AdminCompanies /> },
           { path: "companies/create", element: <CompanyCreate /> },
           { path: "companies/:id", element: <CompanySetup /> },
+          { path: "allcompanies/:id", element: <CompanyAdminSetup /> },
           { path: "jobs", element: <AdminJobs /> },
+          { path: "alljobs", element: <AllAdminJobs /> },
           { path: "job/create", element: <PostJob /> },
           { path: "jobs/:id/applicants", element: <Applicants /> },
           { path: "job/update/:id", element: <UpdateJob /> },
@@ -73,6 +83,7 @@ const routes = [
           { path: "user", element: <UserTable /> },
           { path: "user/:id", element: <UserView /> },
           { path: "chat", element: <ChatTable /> },
+        
         ],
       },
     ],

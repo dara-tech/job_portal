@@ -106,23 +106,33 @@ export const login = async (req, res) => {
 // User logout
 export const logout = async (req, res) => {
   try {
-    return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-      message: "Logged out Successfully",
+    // Clear the token cookie, even if the token is expired
+    res.clearCookie("token", {
+      httpOnly: true, // Ensures it's inaccessible to client-side scripts
+      secure: process.env.NODE_ENV === "production", // Only use HTTPS in production
+      sameSite: "strict", // Protect against CSRF attacks
+    });
+
+    return res.status(200).json({
+      message: "Logged out successfully.",
       success: true,
     });
   } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({
-      message: "Internal Server Error",
+
+    return res.status(500).json({
+      message: "Internal server error during logout.",
       success: false,
     });
   }
 };
 
+
+
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
-    const { fullname, email, location, phoneNumber, bio, skills, experience } = req.body;
+    const { fullname, email, location, phoneNumber, bio, skills, experience, socialLinks } = req.body;
     const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0] : null;
     const resume = req.files["resume"] ? req.files["resume"][0] : null;
 
@@ -160,6 +170,7 @@ export const updateProfile = async (req, res) => {
       });
       if (resumeUploadResponse && resumeUploadResponse.secure_url) {
         user.profile.resume = resumeUploadResponse.secure_url;
+        user.profile.resumeOriginalName = resume.originalname;
       } else {
         return res.status(500).json({
           message: "Failed to upload resume to Cloudinary.",
@@ -173,9 +184,40 @@ export const updateProfile = async (req, res) => {
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
-    if (skills) user.profile.skills = skills.split(",").map((skill) => skill.trim());
+    
+    // Parse skills correctly
+    if (skills) {
+      // Check if it's a stringified JSON array
+      if (typeof skills === 'string' && skills.startsWith('[')) {
+        try {
+          user.profile.skills = JSON.parse(skills);
+        } catch (error) {
+          return res.status(400).json({
+            message: "Invalid skills format.",
+            success: false,
+          });
+        }
+      } else {
+        // Handle plain comma-separated string
+        user.profile.skills = skills.split(",").map(skill => skill.trim()).filter(skill => skill);
+      }
+    }
+
     if (location) user.profile.location = location;
     if (experience) user.profile.experience = experience;
+
+    // Handle social links
+    if (socialLinks) {
+      try {
+        const parsedSocialLinks = typeof socialLinks === 'string' ? JSON.parse(socialLinks) : socialLinks;
+        user.profile.socialLinks = new Map(Object.entries(parsedSocialLinks));
+      } catch (error) {
+        return res.status(400).json({
+          message: "Invalid social links format.",
+          success: false,
+        });
+      }
+    }
 
     // Save updated user profile
     await user.save();
@@ -186,7 +228,10 @@ export const updateProfile = async (req, res) => {
       email: user.email,
       phoneNumber: user.phoneNumber,
       role: user.role,
-      profile: user.profile,
+      profile: {
+        ...user.profile.toObject(),
+        socialLinks: Object.fromEntries(user.profile.socialLinks),
+      },
     };
 
     return res.status(200).json({
@@ -202,6 +247,8 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+
+
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find(); // Fetch all users from the database
@@ -302,6 +349,49 @@ export const deleteUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting user:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+export const changePassword = async (req, res) => {
+  const { id } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Current password is incorrect.",
+        success: false,
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      message: "Password changed successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
     res.status(500).json({
       message: "Internal Server Error",
       success: false,

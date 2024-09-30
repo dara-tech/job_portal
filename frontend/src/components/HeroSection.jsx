@@ -22,7 +22,7 @@ const HeroSection = () => {
   return (
     <div className="text-center">
       <div className="flex-1 mt-10 mb-4">
-        <h1 className="text-2xl font-extrabold text-gray-600 dark:text-gray-200">
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-green-600 to-blue-600 text-transparent bg-clip-text">
           No.1 Job for Fresher Student Website
         </h1>
         <p className="text-gray-600 dark:text-gray-200 text-muted-foreground text-xs">

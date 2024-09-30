@@ -63,7 +63,7 @@ const AppliedJobTable = () => {
   }
 
   return (
-    <Card>
+    <Card className="border-none">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Applied Jobs</CardTitle>
         <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
@@ -96,9 +96,9 @@ const AppliedJobTable = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border dark:border-gray-900">
           <Table>
-            <TableCaption>A list of your job applications</TableCaption>
+            <TableCaption className="mb-2">A list of your job applications</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Date Applied</TableHead>

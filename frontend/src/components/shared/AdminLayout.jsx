@@ -22,6 +22,7 @@ import {
   Bell,
   Search,
   HelpCircle,
+  HomeIcon,
 } from "lucide-react"
 import { ModeToggle } from "../toggle"
 import Logo from "../logo"
@@ -104,18 +105,20 @@ const AdminLayout = () => {
     { to: "/admin/chat", icon: MessageSquare, label: "Chat", badge: "3" },
   ]
   const adminLinks = [
+    { to: "/", icon: HomeIcon, label: "Home" },
     { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
-    { to: "/admin/companies", icon: Building, label: "Companies" },
-    { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs" },
+    { to: "/admin/allcompanies", icon: Building, label: "Companies" },
+    { to: "/admin/alljobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/admin/user", icon: User, label: "Users" },
+    // { to: "/admin/chat", icon: MessageSquare, label: "Chat", badge: "3" },
   ]
 
   const links = user?.role === "admin" ? adminLinks : recruiterLinks
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background ">
       <motion.aside
-        className={`hidden md:flex flex-col border-r transition-all duration-300 ${
+        className={`hidden md:flex flex-col border-r dark:border-gray-900  transition-all duration-300 ${
           isCollapsed ? 'w-16' : 'w-64'
         }`}
         initial={false}
@@ -141,7 +144,7 @@ const AdminLayout = () => {
             ))}
           </ul>
         </nav>
-        <div className="p-4 border-t">
+        <div className="p-4 ">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
               <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
@@ -156,8 +159,8 @@ const AdminLayout = () => {
           </div>
         </div>
       </motion.aside>
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex-1 flex flex-col overflow-hidden ">
+        <header className=" bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b dark:border-gray-900">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <Sheet>
@@ -181,7 +184,7 @@ const AdminLayout = () => {
                 </SheetContent>
               </Sheet>
               <div className="relative">
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 " />
                 <Input 
                   type="search" 
                   placeholder="Search..." 
@@ -231,7 +234,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto lg:p-2 md:p-0 sm:p-0">
           <Outlet />
         </main>
       </div>

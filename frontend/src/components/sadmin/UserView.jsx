@@ -104,12 +104,12 @@ const UserView = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-r from-black to-gray-950 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen dark:bg-gradient-to-r from-black to-gray-950 py-12 px-4 sm:px-6 lg:px-8"
     >
       <Card className="max-w-4xl mx-auto bg-white/100 backdrop-blur-sm shadow-xl rounded-xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-900 to- text-white p-8">
+        <CardHeader className="bg-gradient-to-r from-lime-500 to-blue-500 dark:text-slate-900 text-gray-200 p-8">
           <div className="flex items-center gap-6">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+            <Avatar className="h-24 w-24 border-2 shadow-lg">
               <AvatarImage src={user.profile.profilePhoto} alt={user.fullname} />
               <AvatarFallback ><span className='text-2xl'>{user.fullname}</span>
                </AvatarFallback>
@@ -143,7 +143,7 @@ const UserView = () => {
             { icon: Calendar, label: 'Experience', value: 'experience' },
           ].map((item) => (
             <div key={item.value} className="flex items-center gap-4 text-sm">
-              <item.icon className="h-6 w-6 text-muted-foreground justify-center items-center mt-4" />
+              <item.icon className="h-6 w-6 text-muted-foreground justify-center items-center mt-2" />
               <div className="flex-grow">
                 <Label className="text-sm text-gray-500">{item.label}</Label>
                 {editing ? (
@@ -175,7 +175,7 @@ const UserView = () => {
                     />
                   )
                 ) : (
-                  <p className="text-lg font-medium">
+                  <p className="text-sm font-medium">
                     {item.value === 'skills' || item.value === 'location'
                       ? user.profile[item.value].join(', ') || 'N/A'
                       : item.value === 'experience'
@@ -198,7 +198,7 @@ const UserView = () => {
                 aria-label="Bio"
               />
             ) : (
-              <p className="text-lg">{user.profile.bio || 'No bio provided'}</p>
+              <p className="text-sm">{user.profile.bio || 'No bio provided'}</p>
             )}
           </div>
           {editing && (

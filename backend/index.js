@@ -1,3 +1,4 @@
+// // server.js
 // import express from 'express';
 // import { createServer } from 'http';
 // import { Server } from 'socket.io';
@@ -15,6 +16,7 @@
 // import adminRoutes from './routes/adminRoutes.js';
 // import chatRoutes from './routes/chatRoutes.js';
 // import chatHandler from './middlewares/chatHandler.js';
+// import path from 'path';
 
 // dotenv.config();
 
@@ -22,44 +24,26 @@
 // const httpServer = createServer(app);
 // const PORT = process.env.PORT || 3000;
 
-// // Middleware
+// // Middleware setup
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
+// app.use(helmet());
+// app.use(morgan('dev'));
 
+// // CORS setup
 // const corsOptions = {
-//   origin: 'http://localhost:5173', // Your frontend URL
-//   credentials: true, // Allow cookies for authentication
+//   origin: 'http://localhost:5173', // Adjust to match your client URL
+//   credentials: true,
 // };
-
 // app.use(cors(corsOptions));
 
-// // Use Helmet to protect against common vulnerabilities
-// app.use(helmet({
-//   contentSecurityPolicy: false, // Customize this if using inline styles/scripts
-//   crossOriginResourcePolicy: { policy: 'cross-origin' }, // Adjust for cross-origin image loads
-// }));
-
-// // Use Morgan for request logging, but only in development
-// if (process.env.NODE_ENV === 'development') {
-//   app.use(morgan('dev'));
-// }
-
-// // Global Rate Limiting
-// const globalLimiter = rateLimit({
+// // Rate limiting
+// const limiter = rateLimit({
 //   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100, // limit each IP to 100 requests per windowMs
+//   max: 1000, // Limit each IP to 100 requests per windowMs
 // });
-// app.use(globalLimiter);
-
-// // Apply stricter rate limiting on authentication-related routes
-// const authLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 5, // Stricter limits on login, signup
-//   message: 'Too many requests. Please try again after 15 minutes.',
-// });
-// app.use('/api/v1/user/login', authLimiter);
-// app.use('/api/v1/user/signup', authLimiter);
+// app.use(limiter);
 
 // // API Routes
 // app.use('/api/v1/user', userRoute);
@@ -69,75 +53,59 @@
 // app.use('/api/v1', adminRoutes);
 // app.use('/api/v1/chat', chatRoutes);
 
+// // Serve static files for frontend
+// const __dirname = path.resolve();
+// app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+// app.get('*', (_, res) => {
+//   res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
+// });
+
 // // Socket.IO setup
 // const io = new Server(httpServer, {
 //   cors: corsOptions,
 // });
 
 // io.on('connection', (socket) => {
-//   console.log(`User connected: ${socket.id}`);
-  
-//   // Chat handler
+//   console.log('A user connected');
 //   chatHandler(io, socket);
-
-//   // Handle joining a room
-//   socket.on('joinRoom', (room) => {
-//     socket.join(room);
-//     console.log(`User ${socket.id} joined room ${room}`);
-//   });
-
-//   // Handle messaging in the room
-//   socket.on('message', (room, message) => {
-//     io.to(room).emit('message', message);
-//   });
-
-//   // Handle disconnection
-//   socket.on('disconnect', () => {
-//     console.log(`User disconnected: ${socket.id}`);
-//   });
 // });
 
 // // Global error handling middleware
 // app.use((err, req, res, next) => {
-//   console.error(err.stack);
-
-//   const statusCode = err.statusCode || 500;
-//   const errorMessage = err.message || 'Internal Server Error';
-
+//   console.error('Error:', err);
+//   const statusCode = err.status || 500;
 //   res.status(statusCode).json({
-//     message: errorMessage,
+//     message: err.message || 'Something went wrong!',
 //     success: false,
-//     stack: process.env.NODE_ENV === 'production' ? null : err.stack, // Hide stack trace in production
 //   });
 // });
 
-// // Graceful shutdown for HTTP server and Socket.IO
-// process.on('SIGTERM', () => {
-//   console.log('SIGTERM signal received: closing HTTP server and Socket.IO');
-//   io.close(() => {
-//     console.log('Socket.IO closed');
-//   });
-//   httpServer.close(() => {
-//     console.log('HTTP server closed');
-//   });
-// });
-
-// // Start the server
+// // Start server and connect to the database
 // const startServer = async () => {
 //   try {
-//     await connectDB(); // Establish database connection
+//     await connectDB();
 //     httpServer.listen(PORT, () => {
 //       console.log(`Server running at port ${PORT}`);
 //     });
 //   } catch (error) {
 //     console.error('Failed to connect to the database', error);
-//     process.exit(1); // Exit the process with failure
+//     process.exit(1);
 //   }
 // };
 
+// // Graceful shutdown handling
+// const shutdown = (signal) => {
+//   console.log(`${signal} signal received: closing HTTP server`);
+//   httpServer.close(() => {
+//     console.log('HTTP server closed');
+//     process.exit(0);
+//   });
+// };
+
+// process.on('SIGTERM', () => shutdown('SIGTERM'));
+// process.on('SIGINT', () => shutdown('SIGINT'));
+
 // startServer();
-
-
 
 
 
@@ -154,49 +122,79 @@ import connectDB from './utils/db.js';
 import userRoute from './routes/user.route.js';
 import companyRoute from './routes/company.route.js';
 import jobRoute from './routes/job.route.js';
-import applicationRoute from "./routes/application.route.js";
+import applicationRoute from './routes/application.route.js';
 import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import chatHandler from './middlewares/chatHandler.js';
 import path from 'path';
 
+dotenv.config();
+
 const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.PORT || 3000;
 
-const _dirname = path.resolve()
+const __dirname = path.resolve();
+
+// Middleware setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(helmet()); // Security
+app.use(morgan('dev')); // Logging
 
+// CORS setup
 const corsOptions = {
-  origin: 'https://job-portal-qpq4.onrender.com',
-  credentials: true
+  origin: process.env.NODE_ENV === 'production' ? 'https://job-portal-qpq4.onrender.com' : 'http://localhost:5173',
+  credentials: true,
 };
-
 app.use(cors(corsOptions));
+
+// Rate limiting (for preventing DDoS)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 1000 requests per windowMs
+});
+app.use(limiter);
+
+// API Routes
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/job', jobRoute);
-app.use("/api/v1/application", applicationRoute);
+app.use('/api/v1/application', applicationRoute);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1/chat', chatRoutes);
-app.use(express.static(path.join(_dirname,'/frontend/dist')));
-app.get ('*',(_,res)=>{
-  res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
-})
+
+// Serve static files for frontend
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+app.get('*', (_, res) => {
+  res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
+// Socket.IO setup (if chat or real-time features are needed)
+const io = new Server(httpServer, {
+  cors: corsOptions,
+});
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  chatHandler(io, socket);
+});
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: 'Something went wrong!',
-    success: false
+  console.error('Error:', err);
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
+    message: err.message || 'Something went wrong!',
+    success: false,
   });
 });
 
+// Start server and connect to the database
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`Server running at port ${PORT}`);
     });
   } catch (error) {
@@ -204,5 +202,17 @@ const startServer = async () => {
     process.exit(1); // Exit the process with failure
   }
 };
+
+// Graceful shutdown handling
+const shutdown = (signal) => {
+  console.log(`${signal} signal received: closing HTTP server`);
+  httpServer.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 startServer();

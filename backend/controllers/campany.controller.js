@@ -54,6 +54,32 @@ export const getCompany = async (req, res) => {
     console.log(error);
   }
 };
+export const getAllCompany = async (req, res) => {
+  try {
+    // Fetch all companies and populate the userId field with the user's name
+    const companies = await Company.find().populate('userId', 'fullname');
+
+    if (companies.length === 0) {
+      return res.status(404).json({
+        message: "No companies found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      companies, // Now includes the user name
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error fetching companies:", error);
+    return res.status(500).json({
+      message: "An error occurred while fetching companies.",
+      success: false,
+    });
+  }
+};
+
+
 
 export const getCompanyById = async (req, res) => {
   try {

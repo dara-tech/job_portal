@@ -72,7 +72,7 @@ export default function Job({ job = {} }) {
       <CardHeader className="relative pb-0">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-slate-950 flex items-center justify-center">
               {company.logo ? (
                 <img 
                   src={company.logo} 
@@ -172,7 +172,7 @@ export default function Job({ job = {} }) {
           <Button variant="outline" onClick={() => navigate(`/description/${_id}`)} className="flex-1">
             View Details
           </Button>
-          <Button 
+          {/* <Button 
             className={`flex-1 ${isJobSaved ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"}`}
             onClick={handleSaveToggle}
             disabled={isSaving || isCheckingSaved}
@@ -186,7 +186,7 @@ export default function Job({ job = {} }) {
             ) : (
               "Save Job"
             )}
-          </Button>
+          </Button> */}
         </div>
       </CardFooter>
     </Card>

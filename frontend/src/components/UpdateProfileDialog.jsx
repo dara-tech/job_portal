@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import axios from "axios"
 import { USER_API_END_POINT } from "@/utils/constant"
 import { setUser } from "@/redux/authSlice"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
-import { Loader2, Upload, X } from "lucide-react"
-import { useDropzone } from "react-dropzone"
+import { Loader2, Upload, X, User, Mail, Phone, MapPin, Briefcase, Code, FileText, Plus, Link as LinkIcon, Linkedin, Twitter, Facebook, Instagram, Github, Youtube } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
+import ImageGenerator from "./ImageGen"
+
+const socialPlatforms = [
+  { name: 'LinkedIn', icon: Linkedin },
+  { name: 'Twitter', icon: Twitter },
+  { name: 'Facebook', icon: Facebook },
+  { name: 'Instagram', icon: Instagram },
+  { name: 'GitHub', icon: Github },
+  { name: 'YouTube', icon: Youtube },
+]
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
   const dispatch = useDispatch()
@@ -39,34 +49,94 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     bio: user?.profile?.bio || "",
     location: user?.profile?.location || "",
     experience: user?.profile?.experience || "",
-    skills: user?.profile?.skills?.join(", ") || "",
+    skills: [],
+    socialLinks: user?.profile?.socialLinks || {},
   })
+  const [newSkill, setNewSkill] = useState("")
+  const [newSocialPlatform, setNewSocialPlatform] = useState("")
+  const [newSocialLink, setNewSocialLink] = useState("")
+
+  useEffect(() => {
+    if (user?.profile?.skills) {
+      let parsedSkills = user.profile.skills;
+      
+      if (typeof parsedSkills === 'string') {
+        try {
+          parsedSkills = JSON.parse(parsedSkills);
+        } catch (e) {
+          console.error("Error parsing skills:", e);
+        }
+      }
+      
+      if (Array.isArray(parsedSkills)) {
+        parsedSkills = parsedSkills.map(skill => {
+          if (typeof skill === 'string') {
+            try {
+              return JSON.parse(skill);
+            } catch (e) {
+              return skill;
+            }
+          }
+          return skill;
+        }).flat();
+      }
+      
+      setFormData(prev => ({ ...prev, skills: parsedSkills }));
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const onDrop = useCallback((acceptedFiles, fileType) => {
-    const file = acceptedFiles[0]
-    if (fileType === "profilePhoto") {
-      setProfilePhoto(file)
-    } else if (fileType === "resume") {
-      setResume(file)
+  const handleAddSkill = (e) => {
+    e.preventDefault()
+    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        skills: [...prev.skills, newSkill.trim()]
+      }))
+      setNewSkill("")
     }
-  }, [])
+  }
 
-  const { getRootProps: getProfilePhotoRootProps, getInputProps: getProfilePhotoInputProps } = useDropzone({
-    onDrop: (files) => onDrop(files, "profilePhoto"),
-    accept: "image/*",
-    maxFiles: 1,
-  })
+  const handleRemoveSkill = (skillToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.filter(skill => skill !== skillToRemove)
+    }))
+  }
 
-  const { getRootProps: getResumeRootProps, getInputProps: getResumeInputProps } = useDropzone({
-    onDrop: (files) => onDrop(files, "resume"),
-    accept: "application/pdf",
-    maxFiles: 1,
-  })
+  const handleAddSocialLink = (e) => {
+    e.preventDefault()
+    if (newSocialPlatform && newSocialLink.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
+          [newSocialPlatform]: newSocialLink.trim()
+        }
+      }))
+      setNewSocialPlatform("")
+      setNewSocialLink("")
+    }
+  }
+
+  const handleRemoveSocialLink = (platform) => {
+    setFormData(prev => {
+      const newSocialLinks = { ...prev.socialLinks }
+      delete newSocialLinks[platform]
+      return { ...prev, socialLinks: newSocialLinks }
+    })
+  }
+
+  const handleFileChange = (e, setFile) => {
+    const file = e.target.files[0]
+    if (file) {
+      setFile(file)
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -74,7 +144,11 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     const submitFormData = new FormData()
 
     Object.keys(formData).forEach(key => {
-      submitFormData.append(key, formData[key])
+      if (key === 'skills' || key === 'socialLinks') {
+        submitFormData.append(key, JSON.stringify(formData[key]))
+      } else {
+        submitFormData.append(key, formData[key])
+      }
     })
 
     if (profilePhoto) {
@@ -111,58 +185,85 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     }
   }
 
-  const FileUploadArea = ({ type, file, rootProps, inputProps, onRemove }) => (
-    <div className="relative">
-      <div
-        {...rootProps}
-        className={`mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-10 transition-all duration-300 ease-in-out ${
-          file ? "border-green-500 bg-green-50" : "hover:border-gray-400"
-        }`}
-      >
-        <div className="text-center">
-          <Upload className={`mx-auto h-12 w-12 ${file ? "text-green-500" : "text-gray-400"}`} aria-hidden="true" />
-          <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
-            <label
-              htmlFor="file-upload"
-              className="relative cursor-pointer rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
-            >
-              <span>{file ? `Change ${type}` : `Upload ${type}`}</span>
-              <input {...inputProps} className="sr-only" />
-            </label>
-          </div>
-          <p className="text-xs leading-5 text-gray-600 mt-2">
-            {type === "photo" ? "PNG, JPG, GIF up to 10MB" : "PDF up to 10MB"}
-          </p>
-          {file && (
-            <p className="text-sm text-green-600 mt-2">
-              {file.name}
-            </p>
-          )}
-        </div>
-      </div>
-      {file && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-0 right-0 text-gray-400 hover:text-red-500"
-          onClick={onRemove}
+  const FileUploadArea = ({ type, file, setFile, accept }) => {
+    const fileInputRef = useRef(null)
+
+    const handleClick = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click()
+      }
+    }
+
+    return (
+      <div className="relative">
+        <div
+          className={`mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-10 transition-all duration-300 ease-in-out ${
+            file ? "border-green-500 bg-green-50" : "hover:border-gray-400"
+          }`}
         >
-          <X className="h-4 w-4" />
-        </Button>
-      )}
-    </div>
-  )
+          <div className="text-center">
+            <Upload className={`mx-auto h-12 w-12 ${file ? "text-green-500" : "text-gray-400"}`} aria-hidden="true" />
+            <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
+              <button
+                type="button"
+                className="relative cursor-pointer rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
+                onClick={handleClick}
+              >
+                <span>{file ? `Change ${type}` : `Upload ${type}`}</span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="sr-only"
+                  accept={accept}
+                  onChange={(e) => handleFileChange(e, setFile)}
+                />
+              </button>
+            </div>
+            <p className="text-xs leading-5 text-gray-600 mt-2">
+              {type === "photo" ? "PNG, JPG, GIF up to 10MB" : "PDF up to 10MB"}
+            </p>
+            {file && (
+              <p className="text-sm text-green-600 mt-2">
+                {file.name}
+              </p>
+            )}
+          </div>
+        </div>
+        {file && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute top-0 right-0 text-gray-400 hover:text-red-500"
+            onClick={() => setFile(null)}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Remove file</span>
+          </Button>
+        )}
+      </div>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
+          <div className="mx-auto bg-primary text-primary-foreground p-1 rounded-full mb-4">
+            <Avatar>
+              <AvatarImage src={user.profile?.profilePhoto || "/placeholder.svg?height=128&width=128"} alt={user.fullname || "User"} />
+              <AvatarFallback>{user.fullname?.[0] || "U"}</AvatarFallback>
+            </Avatar>
+          </div>
           <DialogTitle className="text-2xl font-bold text-center">Update Your Profile</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="fullname">Full Name</Label>
+              <Label htmlFor="fullname" className="flex items-center gap-2">
+                <User size={16} />
+                Full Name
+              </Label>
               <Input
                 id="fullname"
                 name="fullname"
@@ -170,10 +271,14 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 onChange={handleInputChange}
                 placeholder="John Doe"
                 className="w-full"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail size={16} />
+                Email
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -182,10 +287,14 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 onChange={handleInputChange}
                 placeholder="john@example.com"
                 className="w-full"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Label htmlFor="phoneNumber" className="flex items-center gap-2">
+                <Phone size={16} />
+                Phone Number
+              </Label>
               <Input
                 id="phoneNumber"
                 name="phoneNumber"
@@ -196,7 +305,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location" className="flex items-center gap-2">
+                <MapPin size={16} />
+                Location
+              </Label>
               <Input
                 id="location"
                 name="location"
@@ -208,7 +320,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="experience">Years of Experience</Label>
+            <Label htmlFor="experience" className="flex items-center gap-2">
+              <Briefcase size={16} />
+              Years of Experience
+            </Label>
             <Select
               value={formData.experience}
               onValueChange={(value) => setFormData(prev => ({ ...prev, experience: value }))}
@@ -226,21 +341,100 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="skills">Skills</Label>
-            <Input
-              id="skills"
-              name="skills"
-              value={formData.skills}
-              onChange={handleInputChange}
-              placeholder="React, Node.js, TypeScript"
-              className="w-full"
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Enter your skills separated by commas.
-            </p>
+            <Label htmlFor="skills" className="flex items-center gap-2">
+              <Code size={16} />
+              Skills
+            </Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.skills.map((skill, index) => (
+                <span key={index} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="ml-2 text-primary-foreground hover:text-red-300 focus:outline-none"
+                    aria-label={`Remove ${skill}`}
+                  >
+                    <X size={14} />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="newSkill"
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+                placeholder="Add a skill"
+                className="flex-grow"
+              />
+              <Button type="button" onClick={handleAddSkill} className="shrink-0">
+                <Plus size={16} className="mr-2" />
+                Add
+              </Button>
+            </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="socialLinks" className="flex items-center gap-2">
+              <LinkIcon size={16} />
+              Social Links
+            </Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {Object.entries(formData.socialLinks).map(([platform, link]) => {
+                const SocialIcon = socialPlatforms.find(p => p.name === platform)?.icon || LinkIcon
+                return (
+                  <span key={platform} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
+                    <SocialIcon size={14} className="mr-1" />
+                    {platform}: {link}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSocialLink(platform)}
+                      className="ml-2 text-primary-foreground hover:text-red-300 focus:outline-none"
+                      aria-label={`Remove ${platform} link`}
+                    >
+                      <X size={14} />
+                    </button>
+                  </span>
+                )
+              })}
+            </div>
+            <div className="flex gap-2">
+              <Select
+                value={newSocialPlatform}
+                onValueChange={setNewSocialPlatform}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  {socialPlatforms.map((platform) => (
+                    <SelectItem key={platform.name} value={platform.name}>
+                      <div className="flex items-center">
+                        <platform.icon size={16} className="mr-2" />
+                        {platform.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                id="newSocialLink"
+                value={newSocialLink}
+                onChange={(e) => setNewSocialLink(e.target.value)}
+                placeholder="Profile URL"
+                className="flex-grow"
+              />
+              <Button type="button" onClick={handleAddSocialLink} className="shrink-0">
+                <Plus size={16} className="mr-2" />
+                Add
+              </Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bio" className="flex items-center gap-2">
+              <FileText size={16} />
+              Bio
+            </Label>
             <Textarea
               id="bio"
               name="bio"
@@ -256,9 +450,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               <FileUploadArea
                 type="photo"
                 file={profilePhoto}
-                rootProps={getProfilePhotoRootProps()}
-                inputProps={getProfilePhotoInputProps()}
-                onRemove={() => setProfilePhoto(null)}
+                setFile={setProfilePhoto}
+                accept="image/*"
               />
             </div>
             <div className="space-y-2">
@@ -266,10 +459,12 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               <FileUploadArea
                 type="resume"
                 file={resume}
-                rootProps={getResumeRootProps()}
-                inputProps={getResumeInputProps()}
-                onRemove={() => setResume(null)}
+                setFile={setResume}
+                accept="application/pdf"
               />
+            </div>
+            <div className="md:col-span-2">
+              <ImageGenerator />
             </div>
           </div>
           <DialogFooter>

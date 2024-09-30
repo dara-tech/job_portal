@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { BriefcaseBusiness, ArrowRight, Loader2 } from "lucide-react";
-import LatestJobCards from "@/components/LastestJobCards";
+// import LatestJobCards from "@/components/LastestJobCards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,7 +68,7 @@ export default function LatestJobs() {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto mt-8">
+    <Card className="w-full max-w-6xl mx-auto mt-8 dark:bg-transparent border-none ">
       <CardHeader>
         <CardTitle className="text-3xl font-extrabold text-center text-gray-800 dark:text-gray-200">
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
