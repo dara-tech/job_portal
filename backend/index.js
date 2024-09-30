@@ -145,7 +145,7 @@ app.use(morgan('dev'));
 
 // CORS setup
 const corsOptions = {
-  origin: 'https://job-portal-qpq4.onrender.com', // Adjust to match your client URL
+  origin: 'https://job-portal-u3t0.onrender.com', // Adjust to match your client URL
   credentials: true,
 };
 app.use(cors(corsOptions));
