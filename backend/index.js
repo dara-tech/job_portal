@@ -109,6 +109,8 @@
 
 
 
+
+
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -122,79 +124,49 @@ import connectDB from './utils/db.js';
 import userRoute from './routes/user.route.js';
 import companyRoute from './routes/company.route.js';
 import jobRoute from './routes/job.route.js';
-import applicationRoute from './routes/application.route.js';
+import applicationRoute from "./routes/application.route.js";
 import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import chatHandler from './middlewares/chatHandler.js';
 import path from 'path';
 
-dotenv.config();
-
 const app = express();
-const httpServer = createServer(app);
 const PORT = process.env.PORT || 3000;
 
-const __dirname = path.resolve();
-
-// Middleware setup
+const _dirname = path.resolve()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(helmet()); // Security
-app.use(morgan('dev')); // Logging
 
-// CORS setup
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? 'https://job-portal-qpq4.onrender.com' : 'http://localhost:5173',
-  credentials: true,
+  origin: 'https://job-portal-qpq4.onrender.com',
+  credentials: true
 };
+
 app.use(cors(corsOptions));
-
-// Rate limiting (for preventing DDoS)
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Limit each IP to 1000 requests per windowMs
-});
-app.use(limiter);
-
-// API Routes
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/job', jobRoute);
-app.use('/api/v1/application', applicationRoute);
+app.use("/api/v1/application", applicationRoute);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1/chat', chatRoutes);
-
-// Serve static files for frontend
-app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
-app.get('*', (_, res) => {
-  res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
-});
-
-// Socket.IO setup (if chat or real-time features are needed)
-const io = new Server(httpServer, {
-  cors: corsOptions,
-});
-io.on('connection', (socket) => {
-  console.log('A user connected');
-  chatHandler(io, socket);
-});
-
+app.use(express.static(path.join(_dirname,'/frontend/dist')));
+app.get ('*',(_,res)=>{
+  res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
+})
 // Global error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  const statusCode = err.status || 500;
-  res.status(statusCode).json({
-    message: err.message || 'Something went wrong!',
-    success: false,
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong!',
+    success: false
   });
 });
 
-// Start server and connect to the database
 const startServer = async () => {
   try {
     await connectDB();
-    httpServer.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`Server running at port ${PORT}`);
     });
   } catch (error) {
@@ -202,17 +174,5 @@ const startServer = async () => {
     process.exit(1); // Exit the process with failure
   }
 };
-
-// Graceful shutdown handling
-const shutdown = (signal) => {
-  console.log(`${signal} signal received: closing HTTP server`);
-  httpServer.close(() => {
-    console.log('HTTP server closed');
-    process.exit(0);
-  });
-};
-
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
 
 startServer();
