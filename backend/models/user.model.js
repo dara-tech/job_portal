@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema({
     resumeOriginalName: { type: String },
     company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
     profilePhoto: { type: String, default: '' },
+    profileCoverPhoto: { type: String, default: '' },
   },
   savedJobs: [{ // Add savedJobs field
     type: mongoose.Schema.Types.ObjectId,

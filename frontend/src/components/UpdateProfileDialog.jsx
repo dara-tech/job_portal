@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useRef, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import axios from "axios"
@@ -36,11 +38,12 @@ const socialPlatforms = [
   { name: 'YouTube', icon: Youtube },
 ]
 
-const UpdateProfileDialog = ({ open, setOpen }) => {
+export default function UpdateProfileDialog({ open, setOpen }) {
   const dispatch = useDispatch()
   const { user } = useSelector((store) => store.auth)
   const [loading, setLoading] = useState(false)
   const [profilePhoto, setProfilePhoto] = useState(null)
+  const [profileCoverPhoto, setProfileCoverPhoto] = useState(null)
   const [resume, setResume] = useState(null)
   const [formData, setFormData] = useState({
     fullname: user?.fullname || "",
@@ -153,6 +156,9 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
     if (profilePhoto) {
       submitFormData.append("profilePhoto", profilePhoto)
+    }
+    if (profileCoverPhoto) {
+      submitFormData.append("profileCoverPhoto", profileCoverPhoto)
     }
     if (resume) {
       submitFormData.append("resume", resume)
@@ -455,6 +461,15 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               />
             </div>
             <div className="space-y-2">
+              <Label>Profile Cover</Label>
+              <FileUploadArea
+                type="photo"
+                file={profileCoverPhoto}
+                setFile={setProfileCoverPhoto}
+                accept="image/*"
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Resume</Label>
               <FileUploadArea
                 type="resume"
@@ -489,5 +504,3 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     </Dialog>
   )
 }
-
-export default UpdateProfileDialog

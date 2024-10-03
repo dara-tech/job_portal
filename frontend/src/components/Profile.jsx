@@ -46,6 +46,14 @@ const Profile = () => {
   const [skillProgress, setSkillProgress] = useState({})
   const [activeTab, setActiveTab] = useState("skills")
   const [socialLinks, setSocialLinks] = useState({})
+  const getCoverPhotoUrl = (coverPhoto) => {
+    if (!coverPhoto) return null;
+    if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
+      return coverPhoto;
+    }
+    // Assuming the cover photo is stored in a public directory
+    return `/images/${coverPhoto}`;
+  };
 
   useEffect(() => {
     const progress = skills.reduce((acc, skill) => {
@@ -145,7 +153,15 @@ const Profile = () => {
           transition={{ duration: 0.5 }}
         >
           <Card className="mb-8 overflow-hidden shadow-lg">
-            <div className="h-48 bg-gradient-to-r from-primary-500 via-primary-400 to-primary-300"></div>
+          <div className="h-48 bg-gradient-to-r from-primary to-primary-foreground relative">
+              {user.profile?.profileCoverPhoto && (
+                <img
+                  src={getCoverPhotoUrl(user.profile.profileCoverPhoto)}
+                  alt="Profile cover"
+                  className="w-full h-full object-cover absolute inset-0"
+                />
+              )}
+            </div>
             <CardContent className="relative p-6">
               <Avatar className="h-32 w-32 absolute -top-16 left-6 ring-4 ring-background shadow-xl">
                 <AvatarImage src={user.profile?.profilePhoto || "/placeholder.svg?height=128&width=128"} alt={user.fullname || "User"} />

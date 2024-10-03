@@ -2,28 +2,31 @@ import jwt from "jsonwebtoken";
 
 const isAuthenticated = async (req, res, next) => {
   try {
+    // Extract the token from the request cookies
     const token = req.cookies.token;
 
     // Check if the token exists
     if (!token) {
+      // If no token is found, return a 401 Unauthorized response
       return res.status(401).json({
         message: "Authentication failed. No token provided.",
         success: false,
       });
     }
 
-    // Verify and decode the token
+    // Verify and decode the token using the SECRET_KEY from environment variables
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-    // Attach user ID from the token to the request object
+    // Attach the user ID from the decoded token to the request object
     req.id = decoded.userId;
 
-    // Proceed to the next middleware
+    // Proceed to the next middleware or route handler
     next();
   } catch (error) {
+    // Log the error for debugging purposes
     console.error("Authentication error:", error.message);
 
-    // Differentiate between token expiration, invalid token, and other errors
+    // Handle different types of authentication errors
     if (error.name === "TokenExpiredError") {
       // Handle expired token
       return res.status(401).json({

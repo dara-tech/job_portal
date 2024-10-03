@@ -134,6 +134,7 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, location, phoneNumber, bio, skills, experience, socialLinks } = req.body;
     const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0] : null;
+    const profileCoverPhoto = req.files["profileCoverPhoto"] ? req.files["profileCoverPhoto"][0] : null; // Add profile cover photo
     const resume = req.files["resume"] ? req.files["resume"][0] : null;
 
     const userId = req.id;
@@ -162,6 +163,22 @@ export const updateProfile = async (req, res) => {
       }
     }
 
+    // Handle profile cover photo upload if provided
+    if (profileCoverPhoto) {
+      const coverUri = getDataUri(profileCoverPhoto);
+      const coverUploadResponse = await cloudinary.uploader.upload(coverUri.content, {
+        resource_type: "image",
+      });
+      if (coverUploadResponse && coverUploadResponse.secure_url) {
+        user.profile.profileCoverPhoto = coverUploadResponse.secure_url;
+      } else {
+        return res.status(500).json({
+          message: "Failed to upload profile cover photo to Cloudinary.",
+          success: false,
+        });
+      }
+    }
+
     // Handle resume upload if provided
     if (resume) {
       const resumeUri = getDataUri(resume);
@@ -184,10 +201,9 @@ export const updateProfile = async (req, res) => {
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
-    
+
     // Parse skills correctly
     if (skills) {
-      // Check if it's a stringified JSON array
       if (typeof skills === 'string' && skills.startsWith('[')) {
         try {
           user.profile.skills = JSON.parse(skills);
@@ -198,7 +214,6 @@ export const updateProfile = async (req, res) => {
           });
         }
       } else {
-        // Handle plain comma-separated string
         user.profile.skills = skills.split(",").map(skill => skill.trim()).filter(skill => skill);
       }
     }
@@ -247,6 +262,7 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+
 
 
 export const getAllUsers = async (req, res) => {
