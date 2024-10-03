@@ -1,4 +1,4 @@
-// // server.js
+// // Import necessary modules
 // import express from 'express';
 // import { createServer } from 'http';
 // import { Server } from 'socket.io';
@@ -18,34 +18,36 @@
 // import chatHandler from './middlewares/chatHandler.js';
 // import path from 'path';
 
+// // Load environment variables
 // dotenv.config();
 
+// // Initialize Express app and create HTTP server
 // const app = express();
 // const httpServer = createServer(app);
 // const PORT = process.env.PORT || 3000;
 
-// // Middleware setup
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
-// app.use(helmet());
-// app.use(morgan('dev'));
+// // Set up middleware
+// app.use(express.json()); // Parse JSON request bodies
+// app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
+// app.use(cookieParser()); // Parse cookies
+// app.use(helmet()); // Set security-related HTTP headers
+// app.use(morgan('dev')); // HTTP request logger
 
-// // CORS setup
+// // Set up CORS
 // const corsOptions = {
-//   origin: 'http://localhost:5173', // Adjust to match your client URL
-//   credentials: true,
+//   origin: 'http://localhost:5173', // Allow requests from this origin
+//   credentials: true, // Allow credentials (cookies, HTTP authentication) to be sent
 // };
 // app.use(cors(corsOptions));
 
-// // Rate limiting
+// // Set up rate limiting
 // const limiter = rateLimit({
 //   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 1000, // Limit each IP to 100 requests per windowMs
+//   max: 1000, // Limit each IP to 1000 requests per windowMs
 // });
 // app.use(limiter);
 
-// // API Routes
+// // Set up API routes
 // app.use('/api/v1/user', userRoute);
 // app.use('/api/v1/company', companyRoute);
 // app.use('/api/v1/job', jobRoute);
@@ -60,7 +62,7 @@
 //   res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
 // });
 
-// // Socket.IO setup
+// // Set up Socket.IO
 // const io = new Server(httpServer, {
 //   cors: corsOptions,
 // });
@@ -80,7 +82,7 @@
 //   });
 // });
 
-// // Start server and connect to the database
+// // Function to start the server and connect to the database
 // const startServer = async () => {
 //   try {
 //     await connectDB();
@@ -105,8 +107,8 @@
 // process.on('SIGTERM', () => shutdown('SIGTERM'));
 // process.on('SIGINT', () => shutdown('SIGINT'));
 
+// // Start the server
 // startServer();
-
 
 
 
