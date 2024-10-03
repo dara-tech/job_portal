@@ -4,7 +4,8 @@
 // export const COMPANY_API_END_POINT = "http://localhost:8000/api/v1/company";
 // export const ADMIN_API_END_POINT = "http://localhost:8000/api/v1/admin";
 // export const CHAT_API_ENDPOINT = "http://localhost:8000";
-
+// export const INITIAL_PAGE = 1;
+// export const JOBS_PER_PAGE = 10;
 
 
 

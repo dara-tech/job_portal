@@ -7,27 +7,25 @@ import { USER_API_END_POINT } from "@/utils/constant"
 import { setUser } from "@/redux/authSlice"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
-import { Loader2, Upload, X, User, Mail, Phone, MapPin, Briefcase, Code, FileText, Plus, Link as LinkIcon, Linkedin, Twitter, Facebook, Instagram, Github, Youtube } from "lucide-react"
+import { Loader2, Upload, X, User, Mail, Phone, MapPin, Briefcase, Code, FileText, Plus, Link as LinkIcon, Linkedin, Twitter, Facebook, Instagram, Github, Youtube, Camera } from "lucide-react"
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+
 import { motion } from "framer-motion"
 import ImageGenerator from "./ImageGen"
+import ExperienceSelect from "./form/ExperienceSelect"
+import SkillsInput from "./form/SkillsInput"
+import SocialLinksInput from "./form/SocialLinksInput"
 
 const socialPlatforms = [
   { name: 'LinkedIn', icon: Linkedin },
@@ -37,6 +35,25 @@ const socialPlatforms = [
   { name: 'GitHub', icon: Github },
   { name: 'YouTube', icon: Youtube },
 ]
+
+const InputField = ({ icon: Icon, name, label, value, onChange, type = "text", required = false }) => (
+  <div className="space-y-2">
+    <Label htmlFor={name} className="flex items-center gap-2 text-primary dark:text-primary-dark">
+      <Icon size={16} />
+      {label}
+    </Label>
+    <Input
+      id={name}
+      name={name}
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={label}
+      className="w-full bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
+      required={required}
+    />
+  </div>
+);
 
 export default function UpdateProfileDialog({ open, setOpen }) {
   const dispatch = useDispatch()
@@ -58,6 +75,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
   const [newSkill, setNewSkill] = useState("")
   const [newSocialPlatform, setNewSocialPlatform] = useState("")
   const [newSocialLink, setNewSocialLink] = useState("")
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (user?.profile?.skills) {
@@ -134,10 +152,14 @@ export default function UpdateProfileDialog({ open, setOpen }) {
     })
   }
 
-  const handleFileChange = (e, setFile) => {
+  const handleFileChange = async (e, setFile) => {
     const file = e.target.files[0]
     if (file) {
+      setIsUploading(true);
+      // Simulate file upload delay (remove this in production)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       setFile(file)
+      setIsUploading(false);
     }
   }
 
@@ -203,16 +225,16 @@ export default function UpdateProfileDialog({ open, setOpen }) {
     return (
       <div className="relative">
         <div
-          className={`mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-10 transition-all duration-300 ease-in-out ${
-            file ? "border-green-500 bg-green-50" : "hover:border-gray-400"
+          className={`mt-2 flex justify-center rounded-2xl border-2 border-dashed border-gray-300/50 dark:border-gray-700/50 px-6 py-10 transition-all duration-300 ease-in-out backdrop-blur-sm ${
+            file ? "border-green-500/50 bg-green-50/30 dark:bg-green-900/30" : "hover:border-gray-400/50 dark:hover:border-gray-600/50"
           }`}
         >
           <div className="text-center">
-            <Upload className={`mx-auto h-12 w-12 ${file ? "text-green-500" : "text-gray-400"}`} aria-hidden="true" />
-            <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
+            <Upload className={`mx-auto h-12 w-12 ${file ? "text-green-500 dark:text-green-400" : "text-gray-400 dark:text-gray-600"}`} aria-hidden="true" />
+            <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600 dark:text-gray-400">
               <button
                 type="button"
-                className="relative cursor-pointer rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
+                className="relative cursor-pointer rounded-full font-semibold text-primary dark:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-primary dark:focus-within:ring-primary-dark focus-within:ring-offset-2 hover:text-primary/80 dark:hover:text-primary-dark/80"
                 onClick={handleClick}
               >
                 <span>{file ? `Change ${type}` : `Upload ${type}`}</span>
@@ -225,11 +247,11 @@ export default function UpdateProfileDialog({ open, setOpen }) {
                 />
               </button>
             </div>
-            <p className="text-xs leading-5 text-gray-600 mt-2">
+            <p className="text-xs leading-5 text-gray-600 dark:text-gray-400 mt-2">
               {type === "photo" ? "PNG, JPG, GIF up to 10MB" : "PDF up to 10MB"}
             </p>
             {file && (
-              <p className="text-sm text-green-600 mt-2">
+              <p className="text-sm text-green-600 dark:text-green-400 mt-2">
                 {file.name}
               </p>
             )}
@@ -240,7 +262,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute top-0 right-0 text-gray-400 hover:text-red-500"
+            className="absolute top-0 right-0 text-gray-400 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 rounded-full"
             onClick={() => setFile(null)}
           >
             <X className="h-4 w-4" />
@@ -253,191 +275,54 @@ export default function UpdateProfileDialog({ open, setOpen }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white/30 dark:bg-gray-900/30 backdrop-blur-md text-gray-900 dark:text-white border border-gray-200/50 dark:border-gray-700/50 shadow-xl rounded-3xl">
         <DialogHeader>
-          <div className="mx-auto bg-primary text-primary-foreground p-1 rounded-full mb-4">
-            <Avatar>
+          <div className="relative w-32 h-32 mx-auto mb-6">
+            <Avatar className="w-full h-full border-4 border-primary dark:border-primary-dark shadow-lg rounded-full">
               <AvatarImage src={user.profile?.profilePhoto || "/placeholder.svg?height=128&width=128"} alt={user.fullname || "User"} />
-              <AvatarFallback>{user.fullname?.[0] || "U"}</AvatarFallback>
+              <AvatarFallback className="bg-primary dark:bg-primary-dark text-4xl rounded-full">{user.fullname?.[0] || "U"}</AvatarFallback>
             </Avatar>
+            <div className="absolute bottom-0 right-0 bg-primary dark:bg-primary-dark rounded-full p-2 cursor-pointer hover:bg-primary-dark dark:hover:bg-primary transition-colors">
+              {isUploading ? (
+                <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
+              ) : (
+                <label htmlFor="profilePhotoInput" className="cursor-pointer">
+                  <Camera size={20} className="dark:text-black"/>
+                  <input
+                    id="profilePhotoInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleFileChange(e, setProfilePhoto)}
+                  />
+                </label>
+              )}
+            </div>
           </div>
-          <DialogTitle className="text-2xl font-bold text-center">Update Your Profile</DialogTitle>
+          <DialogTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary dark:from-primary-dark dark:to-secondary-dark">
+            Update Your Profile
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="fullname" className="flex items-center gap-2">
-                <User size={16} />
-                Full Name
-              </Label>
-              <Input
-                id="fullname"
-                name="fullname"
-                value={formData.fullname}
-                onChange={handleInputChange}
-                placeholder="John Doe"
-                className="w-full"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail size={16} />
-                Email
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="john@example.com"
-                className="w-full"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber" className="flex items-center gap-2">
-                <Phone size={16} />
-                Phone Number
-              </Label>
-              <Input
-                id="phoneNumber"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                placeholder="+1234567890"
-                className="w-full"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location" className="flex items-center gap-2">
-                <MapPin size={16} />
-                Location
-              </Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                placeholder="New York, USA"
-                className="w-full"
-              />
-            </div>
+            <InputField icon={User} name="fullname" label="Full Name" value={formData.fullname} onChange={handleInputChange} required />
+            <InputField icon={Mail} name="email" label="Email" type="email" value={formData.email} onChange={handleInputChange} required />
+            <InputField icon={Phone} name="phoneNumber" label="Phone Number" value={formData.phoneNumber} onChange={handleInputChange} />
+            <InputField icon={MapPin} name="location" label="Location" value={formData.location} onChange={handleInputChange} />
           </div>
+
+          <ExperienceSelect value={formData.experience} onChange={(value) => setFormData(prev => ({ ...prev, experience: value }))} />
+
+          <SkillsInput skills={formData.skills} onAddSkill={handleAddSkill} onRemoveSkill={handleRemoveSkill} />
+
+          <SocialLinksInput 
+            socialLinks={formData.socialLinks} 
+            onAddLink={handleAddSocialLink} 
+            onRemoveLink={handleRemoveSocialLink}
+          />
+
           <div className="space-y-2">
-            <Label htmlFor="experience" className="flex items-center gap-2">
-              <Briefcase size={16} />
-              Years of Experience
-            </Label>
-            <Select
-              value={formData.experience}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, experience: value }))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select your experience" />
-              </SelectTrigger>
-              <SelectContent>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "10+"].map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year} {year === 1 ? "year" : "years"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="skills" className="flex items-center gap-2">
-              <Code size={16} />
-              Skills
-            </Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {formData.skills.map((skill, index) => (
-                <span key={index} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveSkill(skill)}
-                    className="ml-2 text-primary-foreground hover:text-red-300 focus:outline-none"
-                    aria-label={`Remove ${skill}`}
-                  >
-                    <X size={14} />
-                  </button>
-                </span>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                id="newSkill"
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-                placeholder="Add a skill"
-                className="flex-grow"
-              />
-              <Button type="button" onClick={handleAddSkill} className="shrink-0">
-                <Plus size={16} className="mr-2" />
-                Add
-              </Button>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="socialLinks" className="flex items-center gap-2">
-              <LinkIcon size={16} />
-              Social Links
-            </Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {Object.entries(formData.socialLinks).map(([platform, link]) => {
-                const SocialIcon = socialPlatforms.find(p => p.name === platform)?.icon || LinkIcon
-                return (
-                  <span key={platform} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
-                    <SocialIcon size={14} className="mr-1" />
-                    {platform}: {link}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSocialLink(platform)}
-                      className="ml-2 text-primary-foreground hover:text-red-300 focus:outline-none"
-                      aria-label={`Remove ${platform} link`}
-                    >
-                      <X size={14} />
-                    </button>
-                  </span>
-                )
-              })}
-            </div>
-            <div className="flex gap-2">
-              <Select
-                value={newSocialPlatform}
-                onValueChange={setNewSocialPlatform}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select platform" />
-                </SelectTrigger>
-                <SelectContent>
-                  {socialPlatforms.map((platform) => (
-                    <SelectItem key={platform.name} value={platform.name}>
-                      <div className="flex items-center">
-                        <platform.icon size={16} className="mr-2" />
-                        {platform.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                id="newSocialLink"
-                value={newSocialLink}
-                onChange={(e) => setNewSocialLink(e.target.value)}
-                placeholder="Profile URL"
-                className="flex-grow"
-              />
-              <Button type="button" onClick={handleAddSocialLink} className="shrink-0">
-                <Plus size={16} className="mr-2" />
-                Add
-              </Button>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="bio" className="flex items-center gap-2">
+            <Label htmlFor="bio" className="flex items-center gap-2 text-primary dark:text-primary-dark">
               <FileText size={16} />
               Bio
             </Label>
@@ -447,43 +332,22 @@ export default function UpdateProfileDialog({ open, setOpen }) {
               value={formData.bio}
               onChange={handleInputChange}
               placeholder="Tell us about yourself"
-              className="resize-none w-full h-32"
+              className="resize-none w-full h-32 bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
             />
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label>Profile Photo</Label>
-              <FileUploadArea
-                type="photo"
-                file={profilePhoto}
-                setFile={setProfilePhoto}
-                accept="image/*"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Profile Cover</Label>
-              <FileUploadArea
-                type="photo"
-                file={profileCoverPhoto}
-                setFile={setProfileCoverPhoto}
-                accept="image/*"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Resume</Label>
-              <FileUploadArea
-                type="resume"
-                file={resume}
-                setFile={setResume}
-                accept="application/pdf"
-              />
-            </div>
+            <FileUploadArea type="photo" file={profilePhoto} setFile={setProfilePhoto} accept="image/*" label="Profile Photo" />
+            <FileUploadArea type="photo" file={profileCoverPhoto} setFile={setProfileCoverPhoto} accept="image/*" label="Profile Cover" />
+            <FileUploadArea type="resume" file={resume} setFile={setResume} accept="application/pdf" label="Resume" />
             <div className="md:col-span-2">
               <ImageGenerator />
             </div>
           </div>
+
           <DialogFooter>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="dark:text-white shrink-0 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 hover:shadow-lg backdrop-blur-sm"
+         disabled={loading}>
               {loading ? (
                 <motion.div
                   className="flex items-center justify-center"
