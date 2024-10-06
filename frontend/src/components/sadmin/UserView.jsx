@@ -20,6 +20,9 @@ import {
 import { Loader2, Mail, Phone, MapPin, Briefcase, Calendar, Save, X, ChevronDown, Edit } from 'lucide-react'
 import { ADMIN_API_END_POINT } from '@/utils/constant'
 import Navbar from '../shared/Navbar'
+import SkillsInput from '../form/SkillsInput'
+import SocialLinksInput from '../form/SocialLinksInput'
+import { useSelector } from 'react-redux'
 
 const UserView = () => {
   const [user, setUser] = useState(null)
@@ -29,6 +32,7 @@ const UserView = () => {
   const [editedUser, setEditedUser] = useState(null)
   const { id } = useParams()
   const navigate = useNavigate()
+  const currentUser = useSelector((state) => state.auth.user)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,13 +51,24 @@ const UserView = () => {
     fetchUser()
   }, [id])
 
-  const handleEdit = () => setEditing(true)
+  const handleEdit = () => {
+    if (currentUser.role !== 'admin') {
+      toast.error('Only administrators can edit user information.')
+      return
+    }
+    setEditing(true)
+  }
+
   const handleCancel = () => {
     setEditing(false)
     setEditedUser(user)
   }
 
   const handleSave = async () => {
+    if (currentUser.role !== 'admin') {
+      toast.error('Only administrators can save user information.')
+      return
+    }
     setSaving(true)
     try {
       const response = await axios.put(`${ADMIN_API_END_POINT}/user/${id}`, editedUser, { withCredentials: true })
@@ -85,6 +100,65 @@ const UserView = () => {
     })
   }
 
+  const handleAddSkill = (newSkill) => {
+    setEditedUser(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        skills: [...prev.profile.skills, newSkill]
+      }
+    }))
+  }
+
+  const handleRemoveSkill = (skillNameToRemove) => {
+    setEditedUser(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        skills: prev.profile.skills.filter(skill => skill.name !== skillNameToRemove)
+      }
+    }))
+  }
+
+  const handleUpdateSkill = (updatedSkill) => {
+    setEditedUser(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        skills: prev.profile.skills.map(skill => 
+          skill.name === updatedSkill.name ? updatedSkill : skill
+        )
+      }
+    }))
+  }
+
+  const handleAddSocialLink = (platform, link) => {
+    setEditedUser(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        socialLinks: {
+          ...prev.profile.socialLinks,
+          [platform]: link
+        }
+      }
+    }))
+  }
+
+  const handleRemoveSocialLink = (platform) => {
+    setEditedUser(prev => {
+      const newSocialLinks = { ...prev.profile.socialLinks }
+      delete newSocialLinks[platform]
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          socialLinks: newSocialLinks
+        }
+      }
+    })
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-r from-gray-100 to-gray-200">
@@ -99,7 +173,6 @@ const UserView = () => {
 
   return (
     <div>
-      {/* <Navbar/> */}
       <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -139,7 +212,6 @@ const UserView = () => {
             { icon: Mail, label: 'Email', value: 'email' },
             { icon: Phone, label: 'Phone', value: 'phoneNumber' },
             { icon: MapPin, label: 'Location', value: 'location' },
-            { icon: Briefcase, label: 'Skills', value: 'skills' },
             { icon: Calendar, label: 'Experience', value: 'experience' },
           ].map((item) => (
             <div key={item.value} className="flex items-center gap-4 text-sm">
@@ -147,11 +219,11 @@ const UserView = () => {
               <div className="flex-grow">
                 <Label className="text-sm text-gray-500">{item.label}</Label>
                 {editing ? (
-                  item.value === 'skills' || item.value === 'location' ? (
+                  item.value === 'location' ? (
                     <Input
                       name={item.value}
-                      value={editedUser.profile[item.value].join(', ')}
-                      onChange={(e) => handleChange({ target: { name: item.value, value: e.target.value.split(', ') } })}
+                      value={editedUser.profile[item.value]}
+                      onChange={handleChange}
                       className="mt-1"
                       aria-label={item.label}
                     />
@@ -176,8 +248,8 @@ const UserView = () => {
                   )
                 ) : (
                   <p className="text-sm font-medium">
-                    {item.value === 'skills' || item.value === 'location'
-                      ? user.profile[item.value].join(', ') || 'N/A'
+                    {item.value === 'location'
+                      ? user.profile[item.value] || 'N/A'
                       : item.value === 'experience'
                       ? `${user.profile[item.value][0]} years`
                       : user[item.value]}
@@ -186,6 +258,24 @@ const UserView = () => {
               </div>
             </div>
           ))}
+          <div className="flex items-center gap-4 text-sm">
+            <Briefcase className="h-6 w-6 text-muted-foreground justify-center items-center mt-2" />
+            <div className="flex-grow">
+              <Label className="text-sm text-gray-500">Skills</Label>
+              {editing ? (
+                <SkillsInput
+                  skills={editedUser.profile.skills}
+                  onAddSkill={handleAddSkill}
+                  onRemoveSkill={handleRemoveSkill}
+                  onUpdateSkill={handleUpdateSkill}
+                />
+              ) : (
+                <p className="text-sm font-medium">
+                  {user.profile.skills.map(skill => skill.name).join(', ') || 'N/A'}
+                </p>
+              )}
+            </div>
+          </div>
           <div className="mt-6">
             <Label className="text-sm text-gray-500">Bio</Label>
             {editing ? (
@@ -199,6 +289,24 @@ const UserView = () => {
               />
             ) : (
               <p className="text-sm">{user.profile.bio || 'No bio provided'}</p>
+            )}
+          </div>
+          <div className="mt-6">
+            <Label className="text-sm text-gray-500">Social Links</Label>
+            {editing ? (
+              <SocialLinksInput
+                socialLinks={editedUser.profile.socialLinks}
+                onAddLink={handleAddSocialLink}
+                onRemoveLink={handleRemoveSocialLink}
+              />
+            ) : (
+              <div className="flex flex-wrap gap-2 mt-1">
+                {Object.entries(user.profile.socialLinks || {}).map(([platform, link]) => (
+                  <Badge key={platform} variant="secondary">
+                    {platform}: {link}
+                  </Badge>
+                ))}
+              </div>
             )}
           </div>
           {editing && (
@@ -233,9 +341,11 @@ const UserView = () => {
               </Button>
             </>
           ) : (
-            <Button onClick={handleEdit} className="bg-primary hover:bg-primary-dark text-white">
-              <Edit className="mr-2 h-4 w-4" /> Edit User Information
-            </Button>
+            currentUser.role === 'admin' && (
+              <Button onClick={handleEdit} className="bg-primary hover:bg-primary-dark text-white">
+                <Edit className="mr-2 h-4 w-4" /> Edit User Information
+              </Button>
+            )
           )}
         </CardFooter>
       </Card>

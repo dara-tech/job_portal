@@ -10,7 +10,33 @@ import { JOB_API_END_POINT } from '@/utils/constant'
 const JobShare = ({ jobId, jobTitle, jobDescription }) => {
   const [activeTab, setActiveTab] = useState('qr')
   const [copied, setCopied] = useState(false)
-  
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleTabChange = (value) => {
+    setIsAnimating(true);
+    setActiveTab(value);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const AnimatedContent = ({ children }) => (
+    <div className={`transition-all duration-300 ${isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+      {children}
+    </div>
+  );
+
+  const shareOptions = [
+    { name: 'LinkedIn', icon: 'linkedin', color: 'bg-blue-600' },
+    { name: 'Twitter', icon: 'twitter', color: 'bg-sky-500' },
+    { name: 'Facebook', icon: 'facebook', color: 'bg-blue-800' },
+    { name: 'WhatsApp', icon: 'whatsapp', color: 'bg-green-500' },
+  ];
+
+  const handleShare = (platform) => {
+    // Implement sharing logic for each platform
+    toast.success(`Sharing on ${platform}`, {
+      icon: <Share2 className="w-5 h-5 text-green-500" />,
+    });
+  };
   const shareUrl = `${JOB_API_END_POINT}/description/${jobId}`
   const qrContent = `Job: ${jobTitle}\nID: ${jobId}\nDescription: ${jobDescription}\n${shareUrl}`
 

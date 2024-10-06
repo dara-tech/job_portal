@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     index: true,
   },
   phoneNumber: {
-    type: String, // Changed from Number to String
+    type: String,
     required: true,
   },
   password: {
@@ -34,25 +34,98 @@ const userSchema = new mongoose.Schema({
       type: [String],
       default: [],
     },
-    skills: {
-      type: [String],
-      default: [],
-    },
+    skills: [{
+      name: {
+        type: String,
+        required: true
+      },
+      rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+        default: 1
+      }
+    }],
     socialLinks: {
       type: Map,
       of: String,
       default: {},
     },
-    experience: [{ type: String }], // Added experience field
-    resume: { type: String },
-    resumeOriginalName: { type: String },
+    experience: [{ type: String }],
     company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
     profilePhoto: { type: String, default: '' },
     profileCoverPhoto: { type: String, default: '' },
   },
-  savedJobs: [{ // Add savedJobs field
+  savedJobs: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Job', // Reference to the Job model
+    ref: 'Job',
+  }],
+  resumes: [{
+    title: {
+      type: String,
+      required: true,
+    },
+    personalInfo: {
+      name: String,
+      email: String,
+      phone: String,
+      address: String,
+    },
+    summary: {
+      type: String,
+      default: '',
+    },
+    education: {
+      type: [{
+        institution: String,
+        degree: String,
+        fieldOfStudy: String,
+        startDate: Date,
+        endDate: Date,
+      }],
+      default: [],
+    },
+    experience: {
+      type: [{
+        company: String,
+        position: String,
+        startDate: Date,
+        endDate: Date,
+        responsibilities: [String],
+      }],
+      default: [],
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    projects: {
+      type: [{
+        name: String,
+        description: String,
+        technologies: [String],
+      }],
+      default: [],
+    },
+    certifications: {
+      type: [{
+        name: String,
+        issuer: String,
+        date: Date,
+      }],
+      default: [],
+    },
+    languages: {
+      type: [{
+        language: String,
+        proficiency: String,
+      }],
+      default: [],
+    },
+    lastModified: {
+      type: Date,
+      default: Date.now,
+    },
   }],
 }, { timestamps: true });
 

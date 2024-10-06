@@ -32,7 +32,11 @@ import CompanyAdminSetup from "./components/sadmin/CompanyAdminSetup";
 import Setting from "./components/Setting";
 import AllAdminJobs from "./components/sadmin/AllAdminJobs";
 import ImageGenerator from "./components/ImageGen";
-
+import ResumeBuilder from "./components/tool/resume_builder/ResumeBuilder";
+import ResumePage from "./components/tool/resume_builder/Page";
+import Layout from "./components/tool/resume_builder/preview/Layout";
+import PreviewForm from "./components/tool/resume_builder/theme/PreviewForm";
+import ResumeView from "./components/tool/resume_builder/theme/ResumeView";
 const AppLayout = () => {
   const { user } = useSelector((store) => store.auth);
 
@@ -62,9 +66,17 @@ const routes = [
       { path: "/browse", element: <Browse /> },
       { path: "/saved", element: <SavedJobs /> },
       { path: "/profile", element: <Profile /> },
+      { path: "/profile/:id", element: <Profile /> },
       { path: "/settings", element: <Setting /> },
       { path: "/description/:id", element: <JobDescription /> },
-      { path: "/ai/image", element: <ImageGenerator /> },
+      { path: "/resume", element: <ResumeBuilder /> },
+      // { path: "/ai/image", element: <ImageGenerator /> },
+      { path: "/resume/new", element: <ResumePage /> }, 
+      { path: "/resume/:id/edit", element: <Layout /> }, 
+      { path: "/resume/:id/view", element: <ResumeView /> }, 
+      
+       
+ 
       { 
         path: "/admin",
         element: <ProtectedRoute />,

@@ -49,7 +49,7 @@ const InputField = ({ icon: Icon, name, label, value, onChange, type = "text", r
       value={value}
       onChange={onChange}
       placeholder={label}
-      className="w-full bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
+      className="w-full bg-gray-300 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
       required={required}
     />
   </div>
@@ -72,9 +72,6 @@ export default function UpdateProfileDialog({ open, setOpen }) {
     skills: [],
     socialLinks: user?.profile?.socialLinks || {},
   })
-  const [newSkill, setNewSkill] = useState("")
-  const [newSocialPlatform, setNewSocialPlatform] = useState("")
-  const [newSocialLink, setNewSocialLink] = useState("")
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
@@ -86,6 +83,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
           parsedSkills = JSON.parse(parsedSkills);
         } catch (e) {
           console.error("Error parsing skills:", e);
+          parsedSkills = [];
         }
       }
       
@@ -95,11 +93,13 @@ export default function UpdateProfileDialog({ open, setOpen }) {
             try {
               return JSON.parse(skill);
             } catch (e) {
-              return skill;
+              return { name: skill, rating: 1 };
             }
           }
           return skill;
-        }).flat();
+        });
+      } else {
+        parsedSkills = [];
       }
       
       setFormData(prev => ({ ...prev, skills: parsedSkills }));
@@ -111,36 +111,40 @@ export default function UpdateProfileDialog({ open, setOpen }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleAddSkill = (e) => {
-    e.preventDefault()
-    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
+  const handleAddSkill = (newSkill) => {
+    if (newSkill.name && !formData.skills.some(skill => skill.name === newSkill.name)) {
       setFormData(prev => ({
         ...prev,
-        skills: [...prev.skills, newSkill.trim()]
+        skills: [...prev.skills, newSkill]
       }))
-      setNewSkill("")
     }
   }
 
-  const handleRemoveSkill = (skillToRemove) => {
+  const handleRemoveSkill = (skillNameToRemove) => {
     setFormData(prev => ({
       ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
+      skills: prev.skills.filter(skill => skill.name !== skillNameToRemove)
     }))
   }
 
-  const handleAddSocialLink = (e) => {
-    e.preventDefault()
-    if (newSocialPlatform && newSocialLink.trim()) {
+  const handleUpdateSkill = (updatedSkill) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.map(skill => 
+        skill.name === updatedSkill.name ? updatedSkill : skill
+      )
+    }))
+  }
+
+  const handleAddSocialLink = (platform, link) => {
+    if (platform && link.trim()) {
       setFormData(prev => ({
         ...prev,
         socialLinks: {
           ...prev.socialLinks,
-          [newSocialPlatform]: newSocialLink.trim()
+          [platform]: link.trim()
         }
       }))
-      setNewSocialPlatform("")
-      setNewSocialLink("")
     }
   }
 
@@ -156,10 +160,17 @@ export default function UpdateProfileDialog({ open, setOpen }) {
     const file = e.target.files[0]
     if (file) {
       setIsUploading(true);
-      // Simulate file upload delay (remove this in production)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setFile(file)
-      setIsUploading(false);
+      try {
+        // Here you would typically upload the file to your server or cloud storage
+        // For now, we'll just simulate a delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setFile(file)
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        toast.error("Failed to upload file. Please try again.");
+      } finally {
+        setIsUploading(false);
+      }
     }
   }
 
@@ -287,7 +298,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
                 <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
               ) : (
                 <label htmlFor="profilePhotoInput" className="cursor-pointer">
-                  <Camera size={20} className="dark:text-black"/>
+                  <Camera size={20} className="dark:text-black text-white"/>
                   <input
                     id="profilePhotoInput"
                     type="file"
@@ -313,11 +324,16 @@ export default function UpdateProfileDialog({ open, setOpen }) {
 
           <ExperienceSelect value={formData.experience} onChange={(value) => setFormData(prev => ({ ...prev, experience: value }))} />
 
-          <SkillsInput skills={formData.skills} onAddSkill={handleAddSkill} onRemoveSkill={handleRemoveSkill} />
+          <SkillsInput 
+            skills={formData.skills} 
+            onAddSkill={handleAddSkill} 
+            onRemoveSkill={handleRemoveSkill} 
+            onUpdateSkill={handleUpdateSkill} 
+          />
 
-          <SocialLinksInput 
-            socialLinks={formData.socialLinks} 
-            onAddLink={handleAddSocialLink} 
+          <SocialLinksInput
+            socialLinks={formData.socialLinks}
+            onAddLink={handleAddSocialLink}
             onRemoveLink={handleRemoveSocialLink}
           />
 
@@ -332,7 +348,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
               value={formData.bio}
               onChange={handleInputChange}
               placeholder="Tell us about yourself"
-              className="resize-none w-full h-32 bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
+              className="resize-none w-full h-32 bg-gray-300 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
             />
           </div>
 

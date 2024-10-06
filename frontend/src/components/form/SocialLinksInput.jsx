@@ -31,19 +31,21 @@ const SocialLinksInput = ({ socialLinks, onAddLink, onRemoveLink }) => {
             return;
         }
         if (!newSocialLink.trim()) {
+            setError('Please enter a URL');
+            return;
+        }
+
+        // Updated URL validation
+        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+        if (!urlPattern.test(newSocialLink)) {
             setError('Please enter a valid URL');
             return;
         }
 
-        try {
-            new URL(newSocialLink);
-            onAddLink(newSocialPlatform, newSocialLink.trim());
-            setNewSocialPlatform('');
-            setNewSocialLink('');
-            setError('');
-        } catch (e) {
-            setError('Please enter a valid URL');
-        }
+        onAddLink(newSocialPlatform, newSocialLink.trim());
+        setNewSocialPlatform('');
+        setNewSocialLink('');
+        setError('');
     };
 
     return (
@@ -73,14 +75,14 @@ const SocialLinksInput = ({ socialLinks, onAddLink, onRemoveLink }) => {
                         setError('');
                     }}
                 >
-                    <SelectTrigger className="w-full dark:bg-gray-800 dark:border-gray-700">
+                    <SelectTrigger className="w-full bg-gray-300 dark:bg-gray-800 dark:border-gray-700">
                         <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 dark:border-gray-700">
+                    <SelectContent className="dark:bg-gray-800 dark:text-white text-black dark:border-gray-700">
                         {socialPlatforms.map((platform) => (
-                            <SelectItem key={platform.name} value={platform.name} className="text-white hover:bg-gray-700">
+                            <SelectItem key={platform.name} value={platform.name} className="dark:text-white text-black hover:bg-gray-700">
                                 <div className="flex items-center">
-                                    <span className="mr-2">{React.createElement(platform.icon)}</span> {/* Use text instead of icon component */}
+                                    <span className="mr-2">{React.createElement(platform.icon)}</span>
                                     {platform.name}
                                 </div>
                             </SelectItem>
@@ -94,14 +96,13 @@ const SocialLinksInput = ({ socialLinks, onAddLink, onRemoveLink }) => {
                         setNewSocialLink(e.target.value);
                         setError('');
                     }}
-                    placeholder="Profile URL"
-                    className="flex-grow dark:bg-gray-800 dark:border-gray-700 focus:ring-primary"
+                    placeholder={`Enter ${newSocialPlatform || 'social media'} profile URL`}
+                    className="flex-grow bg-gray-300 dark:bg-gray-800 dark:border-gray-700 focus:ring-primary"
                 />
                 <Button
                     type="button"
                     onClick={handleAddLink}
                     className="dark:text-white shrink-0 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 hover:shadow-lg"
-      
                 >
                     <Plus size={16} className="mr-2" />
                     Add

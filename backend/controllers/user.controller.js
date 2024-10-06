@@ -7,7 +7,7 @@ import cloudinary from "../utils/cloudinary.js";
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role, location, experience } = req.body;
-    if (!fullname || !email || !phoneNumber || !password || !role || !location || experience) {
+    if (!fullname || !email || !phoneNumber || !password || !role || !location || !experience) {
       return res.status(400).json({
         message: 'Something is missing',
         success: false,
@@ -33,7 +33,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role,
       profile: {
-        profilePhoto:cloudResponse.secure_url,
+        profilePhoto: cloudResponse.secure_url,
         experience
       }
     });
@@ -44,7 +44,7 @@ export const register = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       message: 'Internal Server Error',
       success: false,
@@ -106,11 +106,10 @@ export const login = async (req, res) => {
 // User logout
 export const logout = async (req, res) => {
   try {
-    // Clear the token cookie, even if the token is expired
     res.clearCookie("token", {
-      httpOnly: true, // Ensures it's inaccessible to client-side scripts
-      secure: process.env.NODE_ENV === "production", // Only use HTTPS in production
-      sameSite: "strict", // Protect against CSRF attacks
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
     return res.status(200).json({
@@ -119,7 +118,6 @@ export const logout = async (req, res) => {
     });
   } catch (error) {
     console.error("Logout error:", error);
-
     return res.status(500).json({
       message: "Internal server error during logout.",
       success: false,
@@ -127,14 +125,12 @@ export const logout = async (req, res) => {
   }
 };
 
-
-
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, location, phoneNumber, bio, skills, experience, socialLinks } = req.body;
     const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0] : null;
-    const profileCoverPhoto = req.files["profileCoverPhoto"] ? req.files["profileCoverPhoto"][0] : null; // Add profile cover photo
+    const profileCoverPhoto = req.files["profileCoverPhoto"] ? req.files["profileCoverPhoto"][0] : null;
     const resume = req.files["resume"] ? req.files["resume"][0] : null;
 
     const userId = req.id;
@@ -147,7 +143,6 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // Handle profile photo upload if provided
     if (profilePhoto) {
       const fileUri = getDataUri(profilePhoto);
       const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
@@ -163,7 +158,6 @@ export const updateProfile = async (req, res) => {
       }
     }
 
-    // Handle profile cover photo upload if provided
     if (profileCoverPhoto) {
       const coverUri = getDataUri(profileCoverPhoto);
       const coverUploadResponse = await cloudinary.uploader.upload(coverUri.content, {
@@ -179,11 +173,10 @@ export const updateProfile = async (req, res) => {
       }
     }
 
-    // Handle resume upload if provided
     if (resume) {
       const resumeUri = getDataUri(resume);
       const resumeUploadResponse = await cloudinary.uploader.upload(resumeUri.content, {
-        resource_type: "raw",  // For non-image files such as PDF, DOCX
+        resource_type: "raw",
       });
       if (resumeUploadResponse && resumeUploadResponse.secure_url) {
         user.profile.resume = resumeUploadResponse.secure_url;
@@ -196,17 +189,19 @@ export const updateProfile = async (req, res) => {
       }
     }
 
-    // Update other user fields
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
 
-    // Parse skills correctly
     if (skills) {
       if (typeof skills === 'string' && skills.startsWith('[')) {
         try {
-          user.profile.skills = JSON.parse(skills);
+          const parsedSkills = JSON.parse(skills);
+          user.profile.skills = parsedSkills.map(skill => ({
+            name: skill.name,
+            rating: skill.rating || 1
+          }));
         } catch (error) {
           return res.status(400).json({
             message: "Invalid skills format.",
@@ -214,14 +209,16 @@ export const updateProfile = async (req, res) => {
           });
         }
       } else {
-        user.profile.skills = skills.split(",").map(skill => skill.trim()).filter(skill => skill);
+        user.profile.skills = skills.split(",").map(skill => ({
+          name: skill.trim(),
+          rating: 1
+        })).filter(skill => skill.name);
       }
     }
 
     if (location) user.profile.location = location;
     if (experience) user.profile.experience = experience;
 
-    // Handle social links
     if (socialLinks) {
       try {
         const parsedSocialLinks = typeof socialLinks === 'string' ? JSON.parse(socialLinks) : socialLinks;
@@ -234,7 +231,6 @@ export const updateProfile = async (req, res) => {
       }
     }
 
-    // Save updated user profile
     await user.save();
 
     const updatedUser = {
@@ -263,11 +259,9 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-
-
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find(); // Fetch all users from the database
+    const users = await User.find();
     if (!users || users.length === 0) {
       return res.status(404).json({
         message: "No users found.",
@@ -275,7 +269,6 @@ export const getAllUsers = async (req, res) => {
       });
     }
 
-    // Return the list of users
     return res.status(200).json({
       message: "Users fetched successfully",
       success: true,
@@ -371,6 +364,7 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
+
 export const changePassword = async (req, res) => {
   const { id } = req.params;
   const { currentPassword, newPassword } = req.body;
@@ -385,7 +379,6 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    // Verify current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -394,11 +387,9 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update password
     user.password = hashedPassword;
     await user.save();
 
@@ -414,3 +405,215 @@ export const changePassword = async (req, res) => {
     });
   }
 };
+
+// Create a new resume
+export const createResume = async (req, res) => {
+  try {
+    const userId = req.id;  // User ID from isAuthenticated middleware
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    const { title, summary, education, experience, skills, projects, certifications, languages, personalInfo } = req.body;
+
+    // Validate input: at least a title should be provided
+    if (!title) {
+      return res.status(400).json({
+        message: "Resume title is required.",
+        success: false,
+      });
+    }
+
+    // Create a new resume object based on the schema structure
+    const newResume = {
+      title,
+      personalInfo: {
+        name: personalInfo?.name || user.fullname,  // Use provided personal info or fallback to user's fullname
+        email: personalInfo?.email || user.email,
+        phone: personalInfo?.phone || user.phoneNumber,
+        address: personalInfo?.address || '',
+      },
+      summary: summary || '',
+      education: education || [],
+      experience: experience || [],
+      skills: skills || [],
+      projects: projects || [],
+      certifications: certifications || [],
+      languages: languages || [],
+      lastModified: new Date(),
+    };
+
+    // Add the new resume to the user's resumes array
+    user.resumes.push(newResume);
+
+    // Save the updated user document
+    await user.save();
+
+    // Respond with success and return the newly created resume
+    res.status(201).json({
+      message: "Resume created successfully.",
+      success: true,
+      resume: newResume,
+    });
+  } catch (error) {
+    console.error("Error creating resume:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+// Get all resumes for a user
+export const getUserResumes = async (req, res) => {
+  try {
+    const userId = req.id;
+    const user = await User.findById(userId).select('resumes');
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "Resumes retrieved successfully.",
+      success: true,
+      resumes: user.resumes
+    });
+  } catch (error) {
+    console.error("Error fetching resumes:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+export const updateResume = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const { title, personalInfo, summary, education, experience, skills, projects, certifications, languages } = req.body;
+    const userId = req.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    const resume = user.resumes.id(resumeId);
+    if (!resume) {
+      return res.status(404).json({
+        message: "Resume not found.",
+        success: false,
+      });
+    }
+
+    resume.title = title;
+    resume.personalInfo = personalInfo;
+    resume.summary = summary;
+    resume.education = education;
+    resume.experience = experience;
+    resume.skills = skills;
+    resume.projects = projects;
+    resume.certifications = certifications;
+    resume.languages = languages;
+    resume.lastModified = new Date();
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Resume updated successfully.",
+      success: true,
+      resume
+    });
+  } catch (error) {
+    console.error("Error updating resume:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+// Delete a resume
+export const deleteResume = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const userId = req.id;
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { resumes: { _id: resumeId } } },
+      { new: true }
+    );
+
+    if (!user) {
+
+      return res.status(404).json({
+        message: "User or resume not found.",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "Resume deleted successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error deleting resume:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+
+
+// Get a single resume by ID
+export const getResumeById = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const userId = req.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    const resume = user.resumes.find(resume => resume._id.toString() === resumeId);
+    if (!resume) {
+      return res.status(404).json({
+        message: "Resume not found.",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "Resume fetched successfully.",
+      success: true,
+      resume
+    });
+  } catch (error) {
+    console.error("Error fetching resume:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+

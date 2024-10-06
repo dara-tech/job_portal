@@ -21,6 +21,7 @@ import {
   HelpCircle,
   User,
   MessageSquare,
+  IdCardIcon,
 } from "lucide-react";
 import { ModeToggle } from "../toggle";
 import Logo from "../logo";
@@ -235,6 +236,14 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="px-2 space-y-1">
+             <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/resume")}
+            >
+              <IdCardIcon className="w-4 h-4 mr-2" />
+              AI Resume Builder
+            </Button>
             <Button
               variant="ghost"
               className="w-full justify-start"

@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { motion } from "framer-motion";
-import { BriefcaseBusiness, ArrowRight, Loader2 } from "lucide-react";
-// import LatestJobCards from "@/components/LastestJobCards";
+import { motion, AnimatePresence } from "framer-motion";
+import { BriefcaseBusiness, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import JobCard from "@/components/LastestJobCards";
 
-export default function LatestJobs() {
+const LatestJobs = () => {
   const { allJobs, loading, error } = useSelector((state) => state.job);
 
   const container = {
-    hidden: { opacity: 1, scale: 0 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      scale: 1,
       transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.2,
+        staggerChildren: 0.1,
       },
     },
   };
@@ -30,6 +27,8 @@ export default function LatestJobs() {
       opacity: 1,
     },
   };
+
+  const displayedJobs = useMemo(() => allJobs.slice(0, 6), [allJobs]);
 
   if (loading) {
     return (
@@ -52,7 +51,7 @@ export default function LatestJobs() {
 
   if (error) {
     return (
-      <Card className="w-full max-w-4xl mx-auto mt-8 bg-red-50 dark:bg-red-900">
+      <Card className="w-full max-w-4xl mx-auto mt-8 bg-red-50 dark:bg-red-900/50">
         <CardHeader>
           <CardTitle className="text-2xl font-extrabold text-center text-red-600 dark:text-red-300">
             Error Loading Jobs
@@ -60,7 +59,7 @@ export default function LatestJobs() {
         </CardHeader>
         <CardContent>
           <p className="text-center text-red-500 dark:text-red-400">
-            {error.message}
+            {error.message || "An unexpected error occurred. Please try again later."}
           </p>
         </CardContent>
       </Card>
@@ -68,7 +67,7 @@ export default function LatestJobs() {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto mt-8 dark:bg-transparent border-none ">
+    <Card className="w-full max-w-6xl mx-auto mt-8 dark:bg-transparent border-none shadow-none">
       <CardHeader>
         <CardTitle className="text-3xl font-extrabold text-center text-gray-800 dark:text-gray-200">
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
@@ -78,34 +77,48 @@ export default function LatestJobs() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {allJobs.length <= 0 ? (
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <BriefcaseBusiness className="mx-auto h-12 w-12 mb-4" />
-            <p>No jobs available at the moment. Check back later!</p>
-          </div>
-        ) : (
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={container}
-            initial="hidden"
-            animate="visible"
-          >
-            {allJobs.slice(0, 6).map((job) => (
-              <motion.div key={job._id} variants={item}>
-                <JobCard job={job} />
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {displayedJobs.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center text-gray-500 dark:text-gray-400"
+            >
+              <BriefcaseBusiness className="mx-auto h-12 w-12 mb-4" />
+              <p>No jobs available at the moment. Check back later!</p>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={container}
+              initial="hidden"
+              animate="visible"
+            >
+              {displayedJobs.map((job) => (
+                <motion.div key={job._id} variants={item} layout>
+                  <JobCard job={job} />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
         {allJobs.length > 6 && (
-          <div className="mt-8 text-center">
-            <Button variant="outline" className="group">
+          <motion.div
+            className="mt-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Button variant="outline" className="group hover:bg-primary hover:text-white transition-colors duration-300">
               View All Jobs
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-          </div>
+          </motion.div>
         )}
       </CardContent>
     </Card>
   );
-}
+};
+
+export default LatestJobs;

@@ -5,7 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clipboard, Download } from 'lucide-react';
+import { ChevronDown, Clipboard, Download, User } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function ApplicantsList({
   companiesWithApplicants,
@@ -14,9 +21,15 @@ export function ApplicantsList({
   isLoadingApplicants,
   handleStatusChange,
   copyEmail,
-  downloadResume
+  downloadResume,
+  handleViewProfile
 }) {
   const [selectedCompany, setSelectedCompany] = useState('all');
+  const navigate = useNavigate();
+
+  const handleViewUser = (userId) => {
+    navigate(`/admin/user/${userId}`);
+  };
 
   return (
     <Card className="mb-6">
@@ -78,7 +91,9 @@ export function ApplicantsList({
                     return (
                       <TableRow key={applicant._id}>
                         <TableCell className="font-medium">
-                          {applicant.applicant.fullname}
+                          <Link to={`/admin/user/${applicant.applicant._id}`} className="hover:underline">
+                            {applicant.applicant.fullname}
+                          </Link>
                         </TableCell>
                         <TableCell>
                           {applicant.applicant.email}
@@ -101,7 +116,7 @@ export function ApplicantsList({
                         </TableCell>
                         <TableCell>{job?.title || "Unknown"}</TableCell>
                         <TableCell>
-                          {applicant.applicant.profile.skills.join(", ")}
+                          {applicant.applicant.profile.skills.map(skill => skill.name).join(", ")}
                         </TableCell>
                         <TableCell>
                           {applicant.applicant.profile.experience[0]} years
@@ -120,48 +135,50 @@ export function ApplicantsList({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleStatusChange(
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                Actions <ChevronDown className="ml-2 h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() => handleViewUser(applicant.applicant._id)}
+                              >
+                                <User className="mr-2 h-4 w-4" />
+                                View Profile
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(
                                   applicant._id,
                                   "accepted"
-                                )
-                              }
-                              disabled={applicant.status === "accepted"}
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleStatusChange(
+                                )}
+                                disabled={applicant.status === "accepted"}
+                              >
+                                Accept
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(
                                   applicant._id,
                                   "rejected"
-                                )
-                              }
-                              disabled={applicant.status === "rejected"}
-                            >
-                              Reject
-                            </Button>
-                            {applicant.applicant.profile.resume && (
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() =>
-                                  downloadResume(
+                                )}
+                                disabled={applicant.status === "rejected"}
+                              >
+                                Reject
+                              </DropdownMenuItem>
+                              {applicant.applicant.profile.resume && (
+                                <DropdownMenuItem
+                                  onClick={() => downloadResume(
                                     applicant.applicant.profile.resume,
                                     applicant.applicant.fullname
-                                  )
-                                }
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
+                                  )}
+                                >
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Download Resume
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     );

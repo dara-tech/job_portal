@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { motion, AnimatePresence } from "framer-motion"
-import { Clock10, Award, Pickaxe, Edit, Download, ExternalLink, Github, Linkedin, Twitter, Facebook, Instagram, Youtube, Upload, Palette, Copy, Phone, Mail, LocateIcon } from "lucide-react"
+import { Clock10, Award, Pickaxe, Edit, Download, ExternalLink, Github, Linkedin, Twitter, Facebook, Instagram, Youtube, Upload, Palette, Copy, Phone, Mail, LocateIcon, Share2 } from "lucide-react"
 import { toast, Toaster } from "sonner"
 import Navbar from "./shared/Navbar"
 import AppliedJobTable from "./AppliedJobTable"
@@ -20,6 +20,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import html2canvas from 'html2canvas'
+import NameCard from './NameCard'
 
 const socialIcons = {
   LinkedIn: Linkedin,
@@ -57,7 +59,7 @@ const Profile = () => {
 
   useEffect(() => {
     const progress = skills.reduce((acc, skill) => {
-      acc[skill] = Math.floor(Math.random() * 100)
+      acc[skill.name] = skill.rating * 20 // Assuming rating is out of 5, multiply by 20 to get percentage
       return acc
     }, {})
     setSkillProgress(progress)
@@ -145,7 +147,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+    <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-background/80">
       <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -153,7 +155,7 @@ const Profile = () => {
           transition={{ duration: 0.5 }}
         >
           <Card className="mb-8 overflow-hidden shadow-lg">
-          <div className="h-48 bg-gradient-to-r from-primary to-primary-foreground relative">
+            <div className="h-48 bg-gradient-to-r from-primary to-primary-foreground relative">
               {user.profile?.profileCoverPhoto && (
                 <img
                   src={getCoverPhotoUrl(user.profile.profileCoverPhoto)}
@@ -179,7 +181,7 @@ const Profile = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                   <InfoItem 
                     icon={<LocateIcon className="h-4 w-4" />} 
-                    text={Array.isArray(user.profile?.location) ? user.profile.location.join(", ") : "Location not specified"} 
+                    text={user.profile?.location || "Location not specified"} 
                   />
                   <InfoItem icon={<Phone className="h-4 w-4" />} text={user.phoneNumber || "N/A"} copyable />
                   <InfoItem icon={<Mail className="h-4 w-4" />} text={user.email || "N/A"} copyable />
@@ -209,10 +211,11 @@ const Profile = () => {
         </div>
 
         <Tabs defaultValue="skills" className="mb-8" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-primary-100 ">
+          <TabsList className="grid w-full grid-cols-4 rounded-full p-1 bg-primary-100 ">
             <TabsTrigger value="skills" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Skills</TabsTrigger>
             <TabsTrigger value="resume" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Resume</TabsTrigger>
             <TabsTrigger value="portfolio" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Portfolio</TabsTrigger>
+            <TabsTrigger value="namecard" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Name Card</TabsTrigger>
           </TabsList>
           <AnimatePresence mode="wait">
             <motion.div
@@ -231,13 +234,13 @@ const Profile = () => {
                     <ScrollArea className="h-[300px]">
                       <div className="space-y-4">
                         {skills.length > 0 ? (
-                          skills.map((item, index) => (
+                          skills.map((skill, index) => (
                             <div key={index} className="space-y-2">
                               <div className="flex justify-between items-center">
-                                <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary-100 text-primary-800">{item}</Badge>
-                                <span className="text-sm font-medium text-primary-700">{skillProgress[item]}%</span>
+                                <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary-100 text-primary-800">{skill.name}</Badge>
+                                <span className="text-sm font-medium text-primary-700">{skillProgress[skill.name]}%</span>
                               </div>
-                              <Progress value={skillProgress[item]} className="w-full h-2" indicatorClassName="bg-primary" />
+                              <Progress value={skillProgress[skill.name]} className="w-full h-2" indicatorClassName="bg-primary" />
                             </div>
                           ))
                         ) : (
@@ -331,11 +334,21 @@ const Profile = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+              <TabsContent value="namecard">
+                <Card>
+                  <CardHeader>
+                    <h3 className="text-2xl font-semibold text-primary-900">Name Card</h3>
+                  </CardHeader>
+                  <CardContent>
+                    <NameCard user={user} socialLinks={socialLinks} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </motion.div>
           </AnimatePresence>
         </Tabs>
 
-        <Card>
+        <Card className="bg-white/10 backdrop-blur-md border-none shadow-lg">
           <AppliedJobTable />
         </Card>
       </main>

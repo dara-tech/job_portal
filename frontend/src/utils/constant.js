@@ -4,6 +4,7 @@
 // export const COMPANY_API_END_POINT = "http://localhost:8000/api/v1/company";
 // export const ADMIN_API_END_POINT = "http://localhost:8000/api/v1/admin";
 // export const CHAT_API_ENDPOINT = "http://localhost:8000";
+// export const RESUME_API_ENDPOINT = "http://localhost:8000/api/v1/user/resumes";
 // export const INITIAL_PAGE = 1;
 // export const JOBS_PER_PAGE = 10;
 
@@ -15,7 +16,8 @@ export const USER_API_END_POINT = "https://job-portal-u3t0.onrender.com/api/v1/u
 export const JOB_API_END_POINT = "https://job-portal-u3t0.onrender.com/api/v1/job";
 export const APPLICATION_API_END_POINT = "https://job-portal-u3t0.onrender.com/api/v1/application";
 export const COMPANY_API_END_POINT = "https://job-portal-u3t0.onrender.com/api/v1/company";
-export const ADMIN_API_END_POINT = "https://job-portal-u3t0.onrender.com/api/v1/admin";
+export const ADMIN_API_END_POINT = "https://job-portal-u3t0.onrender.com/api/v1/admin";                           
 export const CHAT_API_ENDPOINT = "https://job-portal-u3t0.onrender.com";
+export const RESUME_API_ENDPOINT = "https://job-portal-u3t0.onrender.com/api/v1/user/resumes";
 export const INITIAL_PAGE = 1;
 export const JOBS_PER_PAGE = 10;
