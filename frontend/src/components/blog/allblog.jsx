@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import BlogCard from './BlogCard';
+import BlogCard from './blogcard';
 import { Skeleton } from "@/components/ui/skeleton"
 import { BLOG_API_ENDPOINT } from '../../utils/constant';
 import { Input } from "@/components/ui/input"
