@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Wand2 } from "lucide-react"
-import useAIResumeAssistant from '../../hook/Aigen';
+import { generateProfessionalSummary } from '../../hook/ProfessionalSummary';
 
 // Helper function to strip HTML tags
 const stripHtmlTags = (html) => {
@@ -15,35 +15,45 @@ const stripHtmlTags = (html) => {
 };
 
 export default function BasicInfoForm({ resume, onChange }) {
-  const handleInputChange = (e, field, subfield) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState(null);
+  const [generatedContent, setGeneratedContent] = useState(null);
+
+  const handleInputChange = useCallback((e, field, subfield) => {
     const { value } = e.target;
-    if (field === 'personalInfo') {
+    if (subfield) {
       onChange('personalInfo', { ...resume.personalInfo, [subfield]: value });
     } else if (field === 'summary') {
-      // Strip HTML tags when updating the summary
       onChange(field, stripHtmlTags(value));
     } else {
       onChange(field, value);
     }
-  };
+  }, [resume.personalInfo, onChange]);
 
-  const handleAIUpdate = (aiGeneratedContent) => {
-    onChange('summary', aiGeneratedContent.summary);
-  };
+  const handleAIUpdate = useCallback((aiGeneratedContent) => {
+    onChange('summary', aiGeneratedContent);
+  }, [onChange]);
 
-  const {
-    isGenerating,
-    error,
-    generatedContent,
-    generateContent
-  } = useAIResumeAssistant(resume, handleAIUpdate, { summary: resume.summary });
+  const generateContent = useCallback(async () => {
+    setIsGenerating(true);
+    setError(null);
+    try {
+      const content = await generateProfessionalSummary(resume, 0.5);
+      setGeneratedContent(content);
+    } catch (err) {
+      console.error("Error generating content:", err);
+      setError("Failed to generate summary. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [resume]);
 
   return (
-    <Card>
+    <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>Basic Information</CardTitle>
+        <CardTitle className="text-2xl font-bold">Basic Information</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="title">Resume Title</Label>
           <Input
@@ -52,6 +62,7 @@ export default function BasicInfoForm({ resume, onChange }) {
             value={resume.title}
             onChange={(e) => handleInputChange(e, 'title')}
             required
+            placeholder="e.g., Senior Software Engineer"
           />
         </div>
         <div className="space-y-2">
@@ -62,9 +73,10 @@ export default function BasicInfoForm({ resume, onChange }) {
             value={resume.personalInfo.name}
             onChange={(e) => handleInputChange(e, 'personalInfo', 'name')}
             required
+            placeholder="John Doe"
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -74,6 +86,7 @@ export default function BasicInfoForm({ resume, onChange }) {
               value={resume.personalInfo.email}
               onChange={(e) => handleInputChange(e, 'personalInfo', 'email')}
               required
+              placeholder="johndoe@example.com"
             />
           </div>
           <div className="space-y-2">
@@ -84,6 +97,7 @@ export default function BasicInfoForm({ resume, onChange }) {
               value={resume.personalInfo.phone}
               onChange={(e) => handleInputChange(e, 'personalInfo', 'phone')}
               required
+              placeholder="+1 (555) 123-4567"
             />
           </div>
         </div>
@@ -94,6 +108,7 @@ export default function BasicInfoForm({ resume, onChange }) {
             name="address"
             value={resume.personalInfo.address}
             onChange={(e) => handleInputChange(e, 'personalInfo', 'address')}
+            placeholder="123 Main St, City, State, ZIP"
           />
         </div>
         <div className="space-y-4">
@@ -115,26 +130,27 @@ export default function BasicInfoForm({ resume, onChange }) {
                   variant="outline" 
                   size="icon" 
                   title="Generate with AI"
-                  onClick={() => generateContent('summary')}
+                  onClick={generateContent}
                   disabled={isGenerating}
                   className="absolute right-2 top-2"
+                  aria-label="Generate summary with AI"
                 >
                   <Wand2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-red-500 text-sm" role="alert">{error}</p>}
             {isGenerating && <p className="text-blue-500 text-sm">Generating summary...</p>}
-            {generatedContent && generatedContent.summary && (
+            {generatedContent && (
               <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
                 <h4 className="text-sm font-semibold mb-2">AI-Generated Suggestion:</h4>
-                <p className="text-sm italic">{stripHtmlTags(generatedContent.summary)}</p>
+                <p className="text-sm italic">{stripHtmlTags(generatedContent)}</p>
                 <div className="flex space-x-2 mt-3">
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleInputChange({ target: { value: generatedContent.summary } }, 'summary')}
+                    onClick={() => handleAIUpdate(generatedContent)}
                   >
                     Use This Summary
                   </Button>
@@ -142,7 +158,7 @@ export default function BasicInfoForm({ resume, onChange }) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => generateContent('summary')}
+                    onClick={generateContent}
                     disabled={isGenerating}
                   >
                     Regenerate
@@ -156,7 +172,6 @@ export default function BasicInfoForm({ resume, onChange }) {
             <span>Recommended: 50-100 words</span>
           </div>
         </div>
-     
       </CardContent>
     </Card>
   );

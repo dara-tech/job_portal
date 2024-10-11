@@ -18,7 +18,7 @@ const handleAddSkill = () => {
 };
 
 return (
-  <div className="space-y-6 p-6 rounded-lg shadow-md bg-white dark:bg-transparent ring-1 ring-gray-300 dark:ring-gray-800">
+  <div className="space-y-6 p-6 rounded-lg shadow-md bg-white dark:bg-transparent ring-1 ring-gray-200 dark:ring-gray-800">
     <Label htmlFor="skills" className="flex items-center gap-2 text-primary text-xl font-semibold">
       <Code size={24} className="text-blue-500" />
       Skills

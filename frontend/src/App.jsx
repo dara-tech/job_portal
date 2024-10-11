@@ -31,12 +31,20 @@ import AdminCompanies from "./components/sadmin/AdminCompanies";
 import CompanyAdminSetup from "./components/sadmin/CompanyAdminSetup";
 import Setting from "./components/Setting";
 import AllAdminJobs from "./components/sadmin/AllAdminJobs";
-import ImageGenerator from "./components/ImageGen";
+// import ImageGenerator from "./components/ImageGen";
 import ResumeBuilder from "./components/tool/resume_builder/ResumeBuilder";
 import ResumePage from "./components/tool/resume_builder/Page";
 import Layout from "./components/tool/resume_builder/preview/Layout";
 import PreviewForm from "./components/tool/resume_builder/theme/PreviewForm";
 import ResumeView from "./components/tool/resume_builder/theme/ResumeView";
+import AdminDashboard from "./components/sadmin/AdminDashboard";
+import BlogTable from "./components/sadmin/AdminBlog/components/blogTable";
+import BlogCreate from "./components/sadmin/AdminBlog/components/blogCreate";
+import BlogUpdate from "./components/sadmin/AdminBlog/components/blogUpdate";
+import AllBlog from "./components/blog/allblog";
+import BlogDetail from "./components/blog/blogdetail";
+import BlogDashboard from "./components/sadmin/AdminBlog/components/dasbaord";
+
 const AppLayout = () => {
   const { user } = useSelector((store) => store.auth);
 
@@ -74,9 +82,8 @@ const routes = [
       { path: "/resume/new", element: <ResumePage /> }, 
       { path: "/resume/:id/edit", element: <Layout /> }, 
       { path: "/resume/:id/view", element: <ResumeView /> }, 
-      
-       
- 
+      { path: "/blog", element: <AllBlog /> },
+      { path: "/blog/:id", element: <BlogDetail /> },
       { 
         path: "/admin",
         element: <ProtectedRoute />,
@@ -92,10 +99,14 @@ const routes = [
           { path: "jobs/:id/applicants", element: <Applicants /> },
           { path: "job/update/:id", element: <UpdateJob /> },
           { path: "dashboard", element: <Dashboard /> },
+          { path: "admindashboard", element: <AdminDashboard /> },
           { path: "user", element: <UserTable /> },
           { path: "user/:id", element: <UserView /> },
           { path: "chat", element: <ChatTable /> },
-        
+          { path: "bloglist", element: <BlogTable /> },
+          { path: "blog/create", element: <BlogCreate /> },
+          { path: "blog/update/:id", element: <BlogUpdate /> },
+          { path: "blogdashboard", element: <BlogDashboard /> },
         ],
       },
     ],

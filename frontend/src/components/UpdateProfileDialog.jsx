@@ -49,7 +49,7 @@ const InputField = ({ icon: Icon, name, label, value, onChange, type = "text", r
       value={value}
       onChange={onChange}
       placeholder={label}
-      className="w-full bg-gray-300 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
+      className="w-full dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
       required={required}
     />
   </div>
@@ -286,7 +286,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white/30 dark:bg-gray-900/30 backdrop-blur-md text-gray-900 dark:text-white border border-gray-200/50 dark:border-gray-700/50 shadow-xl rounded-3xl">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900/30 backdrop-blur-md text-gray-900 dark:text-white border border-gray-200/50 dark:border-gray-700/50 shadow-xl rounded-3xl">
         <DialogHeader>
           <div className="relative w-32 h-32 mx-auto mb-6">
             <Avatar className="w-full h-full border-4 border-primary dark:border-primary-dark shadow-lg rounded-full">
@@ -348,7 +348,7 @@ export default function UpdateProfileDialog({ open, setOpen }) {
               value={formData.bio}
               onChange={handleInputChange}
               placeholder="Tell us about yourself"
-              className="resize-none w-full h-32 bg-gray-300 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
+              className="resize-none w-full h-32 dark:bg-gray-800/10 backdrop-blur-md border-gray-300/50 dark:border-gray-700/50 focus:ring-primary dark:focus:ring-primary-dark rounded-xl"
             />
           </div>
 

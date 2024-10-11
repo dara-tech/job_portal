@@ -9,10 +9,14 @@ import { layouts } from './theme'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { RESUME_API_ENDPOINT } from '@/utils/constant'
-import { Download, Share } from 'lucide-react'
+import { Download, ExternalLink, Share } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+import { useMediaQuery } from '@/components/tool/resume_builder/hook/useMediaQuery'
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function ResumeView({ onResumeChange }) {
   const [selectedTheme, setSelectedTheme] = useState('Classic')
@@ -22,9 +26,11 @@ export default function ResumeView({ onResumeChange }) {
   const [downloadFormat, setDownloadFormat] = useState('pdf')
   const [fileName, setFileName] = useState('')
   const [downloadProgress, setDownloadProgress] = useState(0)
+  const [scale, setScale] = useState(1)
   const { id } = useParams()
   const navigate = useNavigate()
   const resumeRef = useRef(null)
+  const isMobile = useMediaQuery('(max-width: 640px)')
 
   const fetchResume = useCallback(async () => {
     try {
@@ -56,11 +62,26 @@ export default function ResumeView({ onResumeChange }) {
     }
   }, [resume, onResumeChange])
 
+  useEffect(() => {
+    const updateScale = () => {
+      if (resumeRef.current) {
+        const containerWidth = resumeRef.current.offsetWidth
+        const contentWidth = 800 // Assuming a standard resume width
+        const newScale = containerWidth / contentWidth
+        setScale(Math.min(newScale, 1)) // Ensure scale is not greater than 1
+      }
+    }
+
+    updateScale()
+    window.addEventListener('resize', updateScale)
+    return () => window.removeEventListener('resize', updateScale)
+  }, [])
+
   const handleThemeChange = (value) => {
     setSelectedTheme(value)
   }
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setShowDownloadOptions(true)
   }
 
@@ -80,13 +101,33 @@ export default function ResumeView({ onResumeChange }) {
       const imageDataUrl = canvas.toDataURL('image/png')
 
       if (downloadFormat === 'pdf') {
-        const pdf = new jsPDF({
-          orientation: 'p',
-          unit: 'px',
-          format: 'a4'
-        })
-        pdf.addImage(imageDataUrl, 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight())
-        pdf.save(`${fileName}.pdf`)
+        const pdfWidth = 595.28;  // A4 width in points
+        const pdfHeight = 841.89; // A4 height in points
+        const imageWidth = canvas.width;
+        const imageHeight = canvas.height;
+        const aspectRatio = imageWidth / imageHeight;
+
+        let fitWidth = pdfWidth - 40; // Subtracting margins
+        let fitHeight = fitWidth / aspectRatio;
+
+        if (fitHeight > pdfHeight - 40) { // Check if it exceeds page height
+          fitHeight = pdfHeight - 40;
+          fitWidth = fitHeight * aspectRatio;
+        }
+
+        const docDefinition = {
+          pageSize: 'A4',
+          pageMargins: [20, 20, 20, 20],
+          content: [
+            {
+              image: imageDataUrl,
+              width: fitWidth,
+              height: fitHeight,
+              alignment: 'center'
+            }
+          ]
+        };
+        pdfMake.createPdf(docDefinition).download(`${fileName}.pdf`);
       } else if (downloadFormat === 'png') {
         const link = document.createElement('a')
         link.href = imageDataUrl
@@ -101,6 +142,7 @@ export default function ResumeView({ onResumeChange }) {
     } finally {
       clearInterval(intervalId)
       setShowDownloadOptions(false)
+      setDownloadProgress(0)
     }
   }
 
@@ -110,7 +152,7 @@ export default function ResumeView({ onResumeChange }) {
         withCredentials: true
       })
       if (response.data && response.data.shareUrl) {
-        navigator.clipboard.writeText(response.data.shareUrl)
+        await navigator.clipboard.writeText(response.data.shareUrl)
         toast.success("Share link copied to clipboard")
       }
     } catch (error) {
@@ -132,11 +174,11 @@ export default function ResumeView({ onResumeChange }) {
   }
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto p-4">
-      <div className="flex justify-between items-center flex-wrap gap-4">
-        <h2 className="text-3xl font-bold">{resume.title || 'Resume Preview'}</h2>
-        <div className="flex gap-2">
-          <Select onValueChange={handleThemeChange} defaultValue={selectedTheme}>
+    <div className="space-y-4 max-w-4xl mx-auto mt-4 ">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h2 className="text-3xl font-bold">{resume?.title || 'Resume Preview'}</h2>
+        <div className="flex flex-wrap justify-center sm:justify-end gap-2">
+          <Select onValueChange={handleThemeChange} value={selectedTheme}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select a theme" />
             </SelectTrigger>
@@ -150,20 +192,22 @@ export default function ResumeView({ onResumeChange }) {
           </Select>
           <Button onClick={handleEdit} variant="outline">Edit</Button>
           <Button onClick={handleDownload} variant="outline"><Download className="mr-2 h-4 w-4" /> Download</Button>
-          <Button onClick={handleShare} variant="outline"><Share className="mr-2 h-4 w-4" /> Share</Button>
+          <Button onClick={handleShare} variant="outline"><Share className="h-4 w-4" /></Button>
         </div>
       </div>
-      <Card className="overflow-hidden shadow-lg rounded-none">
+      <Card className="overflow-hidden rounded-none border-none shadow-none">
         <CardContent className="p-0" id="resume-content" ref={resumeRef}>
-          {SelectedLayout && isResumeValid ? (
-            <SelectedLayout resume={resume} />
-          ) : (
-            <div className="p-8 text-center">
-              <p className="text-xl text-gray-600">
-                {isResumeValid ? "Selected theme not found." : "Resume data is incomplete or invalid."}
-              </p>
-            </div>
-          )}
+          <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: `${100 / scale}%` }}>
+            {SelectedLayout && isResumeValid ? (
+              <SelectedLayout resume={resume} />
+            ) : (
+              <div className="p-2 text-center">
+                <p>
+                  {isResumeValid ? "Selected theme not found." : "Resume data is incomplete or invalid."}
+                </p>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
       <Dialog open={showDownloadOptions} onOpenChange={setShowDownloadOptions}>
@@ -183,7 +227,7 @@ export default function ResumeView({ onResumeChange }) {
             </div>
             <div>
               <label htmlFor="downloadFormat" className="block text-sm font-medium text-gray-700">Format</label>
-              <Select onValueChange={setDownloadFormat} defaultValue={downloadFormat}>
+              <Select onValueChange={setDownloadFormat} value={downloadFormat}>
                 <SelectTrigger id="downloadFormat" className="w-full mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -200,9 +244,9 @@ export default function ResumeView({ onResumeChange }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* {downloadProgress > 0 && (
+      {downloadProgress > 0 && (
         <Progress value={downloadProgress} className="w-full mt-4" />
-      )} */}
+      )}
     </div>
   )
 }

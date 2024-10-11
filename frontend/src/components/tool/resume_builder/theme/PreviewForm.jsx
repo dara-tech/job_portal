@@ -42,7 +42,7 @@ export default function PreviewForm({ resume, onThemeChange }) {
           </SelectContent>
         </Select>
       </div>
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border-none">
         <CardContent className="p-0">
           {SelectedLayout && isResumeValid ? (
             <SelectedLayout resume={resume} />

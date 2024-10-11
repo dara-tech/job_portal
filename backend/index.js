@@ -16,6 +16,7 @@
 // import adminRoutes from './routes/adminRoutes.js';
 // import chatRoutes from './routes/chatRoutes.js';
 // import chatHandler from './middlewares/chatHandler.js';
+// import blogRoute from './routes/blog.route.js';
 // import path from 'path';
 
 // // Load environment variables
@@ -54,6 +55,7 @@
 // app.use('/api/v1/application', applicationRoute);
 // app.use('/api/v1', adminRoutes);
 // app.use('/api/v1/chat', chatRoutes);
+// app.use('/api/v1/blog', blogRoute);
 
 // // Serve static files for frontend
 // const __dirname = path.resolve();
@@ -129,6 +131,7 @@ import applicationRoute from "./routes/application.route.js";
 import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import chatHandler from './middlewares/chatHandler.js';
+import blogRoute from './routes/blog.route.js';
 import path from 'path';
 
 const app = express();
@@ -151,6 +154,8 @@ app.use('/api/v1/job', jobRoute);
 app.use("/api/v1/application", applicationRoute);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/blog', blogRoute);
+
 app.use(express.static(path.join(_dirname,'/frontend/dist')));
 app.get ('*',(_,res)=>{
   res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))

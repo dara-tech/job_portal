@@ -75,7 +75,7 @@ const SocialLinksInput = ({ socialLinks, onAddLink, onRemoveLink }) => {
                         setError('');
                     }}
                 >
-                    <SelectTrigger className="w-full bg-gray-300 dark:bg-gray-800 dark:border-gray-700">
+                    <SelectTrigger className="w-full dark:bg-gray-800 dark:border-gray-700">
                         <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
                     <SelectContent className="dark:bg-gray-800 dark:text-white text-black dark:border-gray-700">
@@ -97,7 +97,7 @@ const SocialLinksInput = ({ socialLinks, onAddLink, onRemoveLink }) => {
                         setError('');
                     }}
                     placeholder={`Enter ${newSocialPlatform || 'social media'} profile URL`}
-                    className="flex-grow bg-gray-300 dark:bg-gray-800 dark:border-gray-700 focus:ring-primary"
+                    className="flex-grow dark:bg-gray-800 dark:border-gray-700 focus:ring-primary"
                 />
                 <Button
                     type="button"

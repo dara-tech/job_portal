@@ -1,11 +1,9 @@
-'use client'
-
-import React, { useState } from "react"
-import { Link, useNavigate, useLocation, Outlet } from "react-router-dom"
-import { useDispatch, useSelector } from "react-redux"
-import axios from "axios"
-import { toast } from "sonner"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Building,
   BriefcaseBusiness,
@@ -23,12 +21,16 @@ import {
   Search,
   HelpCircle,
   HomeIcon,
-} from "lucide-react"
-import { ModeToggle } from "../toggle"
-import Logo from "../logo"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
+  FileText,
+  ListChecks,
+  SquarePen,
+  CircleGauge,
+} from "lucide-react";
+import { ModeToggle } from "../toggle";
+import Logo from "../logo";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +38,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -44,76 +46,138 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { USER_API_END_POINT } from "@/utils/constant"
-import { setUser } from "@/redux/authSlice"
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { USER_API_END_POINT } from "@/utils/constant";
+import { setUser } from "@/redux/authSlice";
 
 const AdminLayout = () => {
-  const { user } = useSelector((store) => store.auth)
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+
+  useEffect(() => {
+    // Close submenu when sidebar collapses
+    if (isCollapsed) {
+      setOpenSubmenu(null);
+    }
+  }, [isCollapsed]);
 
   const logoutHandler = async () => {
     try {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
         withCredentials: true,
-      })
+      });
       if (res.data.success) {
-        dispatch(setUser(null))
-        navigate("/")
-        toast.success(res.data.message)
+        dispatch(setUser(null));
+        navigate("/");
+        toast.success(res.data.message);
       } else {
-        toast.error("Logout failed. Please try again.")
+        toast.error("Logout failed. Please try again.");
       }
     } catch (error) {
-      console.log("Logout Error: ", error)
+      console.log("Logout Error: ", error);
       const errorMessage =
-        error.response?.data?.message || "An unexpected error occurred"
-      toast.error(errorMessage)
+        error.response?.data?.message || "An unexpected error occurred";
+      toast.error(errorMessage);
     }
-  }
+  };
 
-  const NavLink = ({ to, icon: Icon, label, badge }) => (
-    <Link
-      to={to}
-      className={`flex items-center justify-between px-3 py-2 rounded-md transition-all duration-200 ${
-        location.pathname === to
-          ? "bg-primary text-primary-foreground"
-          : "hover:bg-accent hover:text-accent-foreground"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <Icon className="w-5 h-5" />
-        {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
-      </div>
-      {badge && !isCollapsed && (
-        <Badge variant="secondary" className="ml-auto">
-          {badge}
-        </Badge>
-      )}
-    </Link>
-  )
+  const NavLink = ({ to, icon: Icon, label, badge, submenu, index }) => {
+    const isSubmenuOpen = openSubmenu === index;
+
+    const handleSubmenuToggle = (e) => {
+      e.preventDefault();
+      setOpenSubmenu(isSubmenuOpen ? null : index);
+    };
+
+    if (submenu) {
+      return (
+        <div key={label}>
+          <button
+            onClick={handleSubmenuToggle}
+            className={`flex items-center justify-between w-full px-3 py-2 rounded-md transition-all duration-200 hover:bg-accent hover:text-accent-foreground ${
+              isSubmenuOpen ? 'bg-accent text-accent-foreground' : ''
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Icon className="w-5 h-5" />
+              {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
+            </div>
+            {!isCollapsed && (
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isSubmenuOpen ? 'rotate-180' : ''}`} />
+            )}
+          </button>
+          <AnimatePresence>
+            {isSubmenuOpen && !isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="ml-6 mt-2 space-y-2 overflow-hidden"
+              >
+                {submenu.map((item) => (
+                  <NavLink key={item.to} {...item} />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        key={to}
+        to={to}
+        className={`flex items-center justify-between px-3 py-2 rounded-md transition-all duration-200 ${
+          location.pathname === to
+            ? "bg-primary text-primary-foreground"
+            : "hover:bg-accent hover:text-accent-foreground"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          {Icon && <Icon className="w-5 h-5" />}
+          {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
+        </div>
+        {badge && !isCollapsed && (
+          <Badge variant="secondary" className="ml-auto">
+            {badge}
+          </Badge>
+        )}
+      </Link>
+    );
+  };
 
   const recruiterLinks = [
     { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
     { to: "/admin/companies", icon: Building, label: "Companies" },
     { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/admin/chat", icon: MessageSquare, label: "Chat", badge: "3" },
-  ]
+  ];
   const adminLinks = [
     { to: "/", icon: HomeIcon, label: "Home" },
-    { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
+    { to: "/admin/admindashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
     { to: "/admin/allcompanies", icon: Building, label: "Companies" },
     { to: "/admin/alljobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/admin/user", icon: User, label: "Users" },
-    // { to: "/admin/chat", icon: MessageSquare, label: "Chat", badge: "3" },
-  ]
+    {
+      icon: FileText,
+      label: "Blog",
+      submenu: [
+        { to: "/admin/bloglist", icon: ListChecks, label: "Blog List" },
+        { to: "/admin/blogdashboard", icon: CircleGauge, label: "Blog Dashboard" },
+        { to: "/admin/blog/create", icon: SquarePen, label: "Create Blog" },
+      ],
+    },
+  ];
 
-  const links = user?.role === "admin" ? adminLinks : recruiterLinks
+  const links = user?.role === "admin" ? adminLinks : recruiterLinks;
 
   return (
     <div className="flex h-screen bg-background ">
@@ -137,9 +201,9 @@ const AdminLayout = () => {
         </div>
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-2 px-2">
-            {links.map((link) => (
-              <li key={link.to}>
-                <NavLink {...link} />
+            {links.map((link, index) => (
+              <li key={link.to || `submenu-${index}`}>
+                <NavLink {...link} index={index} />
               </li>
             ))}
           </ul>
@@ -177,8 +241,8 @@ const AdminLayout = () => {
                     </SheetDescription>
                   </SheetHeader>
                   <nav className="flex flex-col gap-4 mt-4">
-                    {links.map((link) => (
-                      <NavLink key={link.to} {...link} />
+                    {links.map((link, index) => (
+                      <NavLink key={link.to || `mobile-submenu-${index}`} {...link} />
                     ))}
                   </nav>
                 </SheetContent>
@@ -239,7 +303,7 @@ const AdminLayout = () => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminLayout
+export default AdminLayout;

@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 
 const ExperienceSelect = ({ value, onChange }) => (
   <motion.div
-    className="space-y-4 p-6  rounded-lg shadow-sm ring-1 ring-gray-100 dark:ring-gray-800"
+    className="space-y-4 p-6  rounded-lg shadow-md ring-1 ring-gray-200 dark:ring-gray-800"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
@@ -22,7 +22,7 @@ const ExperienceSelect = ({ value, onChange }) => (
       Years of Experience
     </Label>
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-full bg-gray-100 border-gray-300 text-gray-900 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-700">
+      <SelectTrigger className="w-full border-gray-300 text-gray-900 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-700">
         <SelectValue placeholder="Select your experience" />
       </SelectTrigger>
       <SelectContent className="bg-white border-gray-200 rounded-md shadow-lg">

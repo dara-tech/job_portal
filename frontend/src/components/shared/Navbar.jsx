@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -110,7 +108,6 @@ const Navbar = () => {
     { to: "/", icon: HomeIcon, label: "Home" },
     { to: "/jobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/browse", icon: Globe, label: "Browse" },
-    
   ];
 
   const links =
@@ -168,6 +165,10 @@ const Navbar = () => {
                 <DropdownMenuContent className="w-56" align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/resume/new")}>
+                    <IdCardIcon className="w-4 h-4 mr-2" />
+                    AI Resume Builder
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <UserRound className="w-4 h-4 mr-2" />
                     Profile
@@ -176,13 +177,10 @@ const Navbar = () => {
                     <Settings className="w-4 h-4 mr-2" />
                     Settings
                   </DropdownMenuItem>
-                  {user.role !== "admin" && user.role === "recruiter" && (
-                    <DropdownMenuItem onClick={() => navigate("/saved")}>
-                      <HelpCircle className="w-4 h-4 mr-2" />
-                      Save jobs
-                    </DropdownMenuItem>
-                  )}
-
+                  <DropdownMenuItem onClick={() => navigate("/saved")}>
+                    <HelpCircle className="w-4 h-4 mr-2" />
+                    Save jobs
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={logoutHandler}
@@ -211,79 +209,77 @@ const Navbar = () => {
         </div>
       </div>
       <AnimatePresence>
-  {mobileMenuOpen && (
-    <motion.div
-      className="md:hidden"
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-        {links.map((link) => (
-          <NavLink key={link.to} {...link} />
-        ))}
-      </div>
-      <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-        {!user ? (
-          <div className="px-2">
-            <Link to="/signup">
-              <Button className="w-full">
-                <UserRound className="w-4 h-4 mr-2" />
-                Sign Up
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="px-2 space-y-1">
-             <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => navigate("/resume")}
-            >
-              <IdCardIcon className="w-4 h-4 mr-2" />
-              AI Resume Builder
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => navigate("/profile")}
-            >
-              <UserRound className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => navigate('/settings')}
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-            {/* {user.role !== "admin" && user.role === "recruiter" && ( */}
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => navigate("/saved")}
-              >
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Saved Jobs
-              </Button>
-            {/* )} */}
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={logoutHandler}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
+        {mobileMenuOpen && (
+          <motion.div
+            className="md:hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              {links.map((link) => (
+                <NavLink key={link.to} {...link} />
+              ))}
+            </div>
+            <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+              {!user ? (
+                <div className="px-2">
+                  <Link to="/signup">
+                    <Button className="w-full">
+                      <UserRound className="w-4 h-4 mr-2" />
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="px-2 space-y-1">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate("/resume")}
+                  >
+                    <IdCardIcon className="w-4 h-4 mr-2" />
+                    AI Resume Builder
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate("/profile")}
+                  >
+                    <UserRound className="w-4 h-4 mr-2" />
+                    Profile
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate('/settings')}
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate("/saved")}
+                  >
+                    <HelpCircle className="w-4 h-4 mr-2" />
+                    Saved Jobs
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={logoutHandler}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
-      </div>
-    </motion.div>
-  )}
-</AnimatePresence>
+      </AnimatePresence>
     </motion.nav>
   );
 };

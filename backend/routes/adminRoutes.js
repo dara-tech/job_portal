@@ -16,4 +16,6 @@ router.delete('/admin/user/:id', isAuthenticated, isAdmin, deleteUser);
 router.get('/admin/companies', isAuthenticated,isAdmin, getAllCompany);
 router.get('/admin/alljobs', isAuthenticated,isAdmin, getAllJobs);
 
+
+
 export default router;

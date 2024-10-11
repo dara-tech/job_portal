@@ -48,18 +48,17 @@ const Profile = () => {
   const [skillProgress, setSkillProgress] = useState({})
   const [activeTab, setActiveTab] = useState("skills")
   const [socialLinks, setSocialLinks] = useState({})
-  const getCoverPhotoUrl = (coverPhoto) => {
+  const getCoverPhotoUrl = useCallback((coverPhoto) => {
     if (!coverPhoto) return null;
     if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
       return coverPhoto;
     }
-    // Assuming the cover photo is stored in a public directory
     return `/images/${coverPhoto}`;
-  };
+  }, []);
 
   useEffect(() => {
     const progress = skills.reduce((acc, skill) => {
-      acc[skill.name] = skill.rating * 20 // Assuming rating is out of 5, multiply by 20 to get percentage
+      acc[skill.name] = skill.rating * 20
       return acc
     }, {})
     setSkillProgress(progress)
@@ -76,9 +75,9 @@ const Profile = () => {
   }, [user])
 
   const InfoItem = ({ icon, text, copyable = false }) => (
-    <HoverCard>
+    <HoverCard >
       <HoverCardTrigger asChild>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-primary transition-colors duration-200">
+        <div className="flex ring-1 ring-gray-300 dark:ring-gray-800 rounded-full px-2 items-center gap-2 text-sm font-bold text-muted-foreground cursor-pointer hover:text-primary transition-colors duration-200">
           {icon}
           <span>{text}</span>
           {copyable && (
@@ -117,7 +116,7 @@ const Profile = () => {
     >
       <Card className="flex-1 bg-gradient-to-br from-primary-100 to-primary-200">
         <CardContent className="flex items-center gap-2 p-4">
-          <div className=" bg-primary-300 ">{icon}</div>
+          <div className="bg-primary-300">{icon}</div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <h3 className="text-xl font-bold text-primary-900">{value}</h3>
@@ -127,12 +126,12 @@ const Profile = () => {
     </motion.div>
   )
 
-  const handleCopyToClipboard = (text) => {
+  const handleCopyToClipboard = useCallback((text) => {
     navigator.clipboard.writeText(text)
     toast.success("Copied to clipboard", {
       description: `${text} has been copied to your clipboard.`,
     })
-  }
+  }, [])
 
   if (!user) {
     return (
@@ -178,12 +177,12 @@ const Profile = () => {
                     <p className="text-primary-700 mt-2">{user.profile?.bio || "No bio available."}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div className="flex gap-3  mt-2 border-t-2 border-primary-200 pt-4">
                   <InfoItem 
                     icon={<LocateIcon className="h-4 w-4" />} 
                     text={user.profile?.location || "Location not specified"} 
                   />
-                  <InfoItem icon={<Phone className="h-4 w-4" />} text={user.phoneNumber || "N/A"} copyable />
+                  <InfoItem icon={<Phone className="h-4 w-4 " />} text={user.phoneNumber || "N/A"} copyable />
                   <InfoItem icon={<Mail className="h-4 w-4" />} text={user.email || "N/A"} copyable />
                 </div>
                 <div className="mt-6 flex flex-wrap gap-2">
@@ -205,13 +204,13 @@ const Profile = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <StatCard icon={<Clock10 className="h-8 w-8 text-primary-400 " />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
+          <StatCard icon={<Clock10 className="h-8 w-8 text-primary-400" />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
           <StatCard icon={<Award className="h-8 w-8 text-primary-400" />} title="Certificates" value="View" />
           <StatCard icon={<Pickaxe className="h-8 w-8 text-primary-400" />} title="Skills" value={skills.length} />
         </div>
 
         <Tabs defaultValue="skills" className="mb-8" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 rounded-full p-1 bg-primary-100 ">
+          <TabsList className="grid w-full grid-cols-4 rounded-full p-1 bg-primary-100">
             <TabsTrigger value="skills" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Skills</TabsTrigger>
             <TabsTrigger value="resume" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Resume</TabsTrigger>
             <TabsTrigger value="portfolio" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Portfolio</TabsTrigger>
@@ -240,7 +239,7 @@ const Profile = () => {
                                 <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary-100 text-primary-800">{skill.name}</Badge>
                                 <span className="text-sm font-medium text-primary-700">{skillProgress[skill.name]}%</span>
                               </div>
-                              <Progress value={skillProgress[skill.name]} className="w-full h-2" indicatorClassName="bg-primary" />
+                              <Progress value={skillProgress[skill.name]} className="w-full h-2"  />
                             </div>
                           ))
                         ) : (
