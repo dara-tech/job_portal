@@ -7,21 +7,26 @@ import cloudinary from "../utils/cloudinary.js";
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role, location, experience } = req.body;
-    if (!fullname || !email || !phoneNumber || !password || !role || !location || !experience) {
+    if (!fullname || !email || !phoneNumber || !password || !role || !location || experience) {
       return res.status(400).json({
-        message: 'Something is missing',
+        message: 'All fields are required',
         success: false,
       });
     }
-    const file = req.file;
-    const fileUri = getDataUri(file)
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         message: 'User already exists with this email',
         success: false,
       });
+    }
+
+    let profilePhotoUrl = '';
+    if (req.file) {
+      const fileUri = getDataUri(req.file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      profilePhotoUrl = cloudResponse.secure_url;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,7 +38,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role,
       profile: {
-        profilePhoto: cloudResponse.secure_url,
+        profilePhoto: profilePhotoUrl,
         experience
       }
     });

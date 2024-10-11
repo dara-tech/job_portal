@@ -9,17 +9,13 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Loader2, User2Icon, Mail, MapPin, Phone, Lock, Upload, CheckCircle2 } from "lucide-react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Environment, Text } from "@react-three/drei";
-import * as THREE from "three";
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Card,
-  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -31,8 +27,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import Navbar from "../shared/Navbar";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setLoading } from "@/redux/authSlice";
 
@@ -114,11 +108,14 @@ const Signup = () => {
 
   const changeFileHandler = (e) => {
     const file = e.target.files?.[0];
-    setInput(prev => ({ ...prev, file }));
-
     if (file) {
+
+      setInput(prev => ({ ...prev, file }));
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
+    } else {
+      setInput(prev => ({ ...prev, file: null }));
+      setPreview(null);
     }
   };
 
@@ -127,15 +124,18 @@ const Signup = () => {
   };
 
   const submitHandler = async (e) => {
+    console.log(input);
     e.preventDefault();
 
     const formData = new FormData();
     Object.keys(input).forEach(key => {
       if (key !== 'file') {
         formData.append(key, input[key]);
+
       }
     });
     if (input.file) {
+
       formData.append("file", input.file);
     }
 
