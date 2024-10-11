@@ -9,14 +9,10 @@ import { layouts } from './theme'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { RESUME_API_ENDPOINT } from '@/utils/constant'
-import { Download, ExternalLink, Share } from 'lucide-react'
+import { Download, Share } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import html2canvas from 'html2canvas'
-import pdfMake from 'pdfmake/build/pdfmake'
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 import { useMediaQuery } from '@/components/tool/resume_builder/hook/useMediaQuery'
-
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function ResumeView({ onResumeChange }) {
   const [selectedTheme, setSelectedTheme] = useState('Classic')
@@ -101,6 +97,10 @@ export default function ResumeView({ onResumeChange }) {
       const imageDataUrl = canvas.toDataURL('image/png')
 
       if (downloadFormat === 'pdf') {
+        const { default: pdfMake } = await import('pdfmake/build/pdfmake')
+        const { default: pdfFonts } = await import('pdfmake/build/vfs_fonts')
+        pdfMake.vfs = pdfFonts.pdfMake.vfs
+
         const pdfWidth = 595.28;  // A4 width in points
         const pdfHeight = 841.89; // A4 height in points
         const imageWidth = canvas.width;
