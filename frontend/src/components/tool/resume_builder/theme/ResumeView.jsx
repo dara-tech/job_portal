@@ -13,7 +13,7 @@ import { Download, ExternalLink, Share } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import html2canvas from 'html2canvas'
 import pdfMake from 'pdfmake/build/pdfmake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
+import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 import { useMediaQuery } from '@/components/tool/resume_builder/hook/useMediaQuery'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
