@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Minus, Plus, Trash2 } from 'lucide-react';
 import { removeFromCart, updateQuantity } from '@/redux/cartSlice';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import Checkout from './Checkout';
+import Checkout from './checkout';
 
 const Cart = () => {
   const dispatch = useDispatch();
