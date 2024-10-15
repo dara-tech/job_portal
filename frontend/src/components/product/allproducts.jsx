@@ -6,7 +6,7 @@ import axios from 'axios';
 import Cart from './Cart';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import ProductBanner from './ProductBanner';
+import ProductBanner from './productbanner';
 import { Button } from "@/components/ui/button";
 
 const AllProducts = () => {
