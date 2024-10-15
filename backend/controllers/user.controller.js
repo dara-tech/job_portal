@@ -584,8 +584,6 @@ export const deleteResume = async (req, res) => {
   }
 };
 
-
-
 // Get a single resume by ID
 export const getResumeById = async (req, res) => {
   try {
@@ -621,4 +619,5 @@ export const getResumeById = async (req, res) => {
     });
   }
 };
+
 

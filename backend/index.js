@@ -17,9 +17,10 @@
 // import chatRoutes from './routes/chatRoutes.js';
 // import chatHandler from './middlewares/chatHandler.js';
 // import blogRoute from './routes/blog.route.js';
+// import pageRoutes from './routes/pageRoutes.js';
 // import path from 'path';
-
-// // Load environment variables
+// import productRoute from './routes/productRoutes.js';
+// // Load environment variables 
 // dotenv.config();
 
 // // Initialize Express app and create HTTP server
@@ -56,6 +57,8 @@
 // app.use('/api/v1', adminRoutes);
 // app.use('/api/v1/chat', chatRoutes);
 // app.use('/api/v1/blog', blogRoute);
+// app.use('/api/v1/page', pageRoutes);
+// app.use('/api/v1/product', productRoute);
 
 // // Serve static files for frontend
 // const __dirname = path.resolve();
@@ -90,6 +93,15 @@
 //     await connectDB();
 //     httpServer.listen(PORT, () => {
 //       console.log(`Server running at port ${PORT}`);
+      
+//       // Set up auto-reload mechanism
+//       setInterval(() => {
+//         https.get('https://job-portal-u3t0.onrender.com', (res) => {
+//           console.log('Auto-reload request sent. Status:', res.statusCode);
+//         }).on('error', (err) => {
+//           console.error('Error during auto-reload request:', err.message);
+//         });
+//       }, 60000); // 60000 ms = 1 minute
 //     });
 //   } catch (error) {
 //     console.error('Failed to connect to the database', error);
@@ -132,7 +144,9 @@ import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import chatHandler from './middlewares/chatHandler.js';
 import blogRoute from './routes/blog.route.js';
+import productRoute from './routes/productRoutes.js';
 import path from 'path';
+import https from 'https';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -155,6 +169,7 @@ app.use("/api/v1/application", applicationRoute);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/blog', blogRoute);
+app.use('/api/v1/product', productRoute);
 
 app.use(express.static(path.join(_dirname,'/frontend/dist')));
 app.get ('*',(_,res)=>{
@@ -174,6 +189,15 @@ const startServer = async () => {
     await connectDB();
     app.listen(PORT, () => {
       console.log(`Server running at port ${PORT}`);
+      
+      // Set up auto-reload mechanism
+      setInterval(() => {
+        https.get('https://job-portal-u3t0.onrender.com', (res) => {
+          console.log('Auto-reload request sent. Status:', res.statusCode);
+        }).on('error', (err) => {
+          console.error('Error during auto-reload request:', err.message);
+        });
+      }, 60000); // 60000 ms = 1 minute
     });
   } catch (error) {
     console.error('Failed to connect to the database', error);

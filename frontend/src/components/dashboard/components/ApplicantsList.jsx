@@ -116,10 +116,10 @@ export function ApplicantsList({
                         </TableCell>
                         <TableCell>{job?.title || "Unknown"}</TableCell>
                         <TableCell>
-                          {applicant.applicant.profile.skills.map(skill => skill.name).join(", ")}
+                          {applicant.applicant.profile?.skills?.map(skill => skill.name).join(", ") || "N/A"}
                         </TableCell>
                         <TableCell>
-                          {applicant.applicant.profile.experience[0]} years
+                          {applicant.applicant.profile?.experience?.[0] || "N/A"} years
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -166,7 +166,7 @@ export function ApplicantsList({
                               >
                                 Reject
                               </DropdownMenuItem>
-                              {applicant.applicant.profile.resume && (
+                              {applicant.applicant.profile?.resume && (
                                 <DropdownMenuItem
                                   onClick={() => downloadResume(
                                     applicant.applicant.profile.resume,

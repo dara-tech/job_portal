@@ -25,6 +25,10 @@ import {
   ListChecks,
   SquarePen,
   CircleGauge,
+  Earth,
+  Plus,
+  Package,
+  ShoppingCart,
 } from "lucide-react";
 import { ModeToggle } from "../toggle";
 import Logo from "../logo";
@@ -156,15 +160,39 @@ const AdminLayout = () => {
 
   const recruiterLinks = [
     { to: "/admin/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
-    { to: "/admin/companies", icon: Building, label: "Companies" },
-    { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs" },
+    { to: "/admin/companies", icon: Building, label: "Companies",
+      submenu: [
+      { to: "/admin/allcompanies", icon: ListChecks, label: "Companies List" },
+      { to: "/admin/companies/create", icon: Plus, label: "Create Company" },
+
+    ], },
+    { to: "/admin/jobs", icon: BriefcaseBusiness, label: "Jobs",
+      submenu: [
+        { to: "/admin/jobs", icon: ListChecks, label: "Jobs List" },
+        { to: "/admin/job/create", icon: Plus, label: "Create Job" },
+
+      ],
+     },
     { to: "/admin/chat", icon: MessageSquare, label: "Chat", badge: "3" },
   ];
   const adminLinks = [
     { to: "/", icon: HomeIcon, label: "Home" },
     { to: "/admin/admindashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
-    { to: "/admin/allcompanies", icon: Building, label: "Companies" },
+    { to: "/admin/allcompanies", icon: Building, label: "Companies",
+      submenu: [
+        { to: "/admin/allcompanies", icon: ListChecks, label: "Companies List" },
+        { to: "/admin/companies/create", icon: Plus, label: "Create Company" },
+
+      ],
+     },
     { to: "/admin/alljobs", icon: BriefcaseBusiness, label: "Jobs" },
+    { to: "/admin/products", icon: Package, label: "Products",
+      submenu: [
+        { to: "/admin/products", icon: ListChecks, label: "Products List" },
+        { to: "/admin/products/add", icon: Plus, label: "Create Product" },
+        { to: "/admin/pos", icon: ShoppingCart, label: "POS" },
+      ],
+    },
     { to: "/admin/user", icon: User, label: "Users" },
     {
       icon: FileText,
@@ -175,6 +203,9 @@ const AdminLayout = () => {
         { to: "/admin/blog/create", icon: SquarePen, label: "Create Blog" },
       ],
     },
+    { to: "/admin/page", icon: Earth, label: "Pages"},
+    
+
   ];
 
   const links = user?.role === "admin" ? adminLinks : recruiterLinks;

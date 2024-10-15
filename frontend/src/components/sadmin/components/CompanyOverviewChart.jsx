@@ -77,7 +77,7 @@ export function CompanyOverviewChart({ companyData }) {
   }, [companyData, filters]);
 
   return (
-    <Card className="bg-white dark:bg-gray-800">
+    <Card className="bg-white dark:bg-gray-950">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200 flex items-center justify-between">
           <div className="flex items-center space-x-2">

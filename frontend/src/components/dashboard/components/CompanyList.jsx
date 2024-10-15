@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Building, Search } from "lucide-react";
+import { Building, Search, Users, Briefcase } from "lucide-react";
 
 export function CompanyList({ companies, applicants, allAdminJobs, isLoading, searchTerm, setSearchTerm }) {
   return (
@@ -45,8 +45,18 @@ export function CompanyList({ companies, applicants, allAdminJobs, isLoading, se
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50%]">Company Name</TableHead>
-                    <TableHead className="text-right">Applicants</TableHead>
-                    <TableHead className="text-right">Jobs</TableHead>
+                    <TableHead className="text-right">
+                      <div className="flex items-center justify-end">
+                        <Users className="h-4 w-4 mr-2" />
+                        Applicants
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <div className="flex items-center justify-end">
+                        <Briefcase className="h-4 w-4 mr-2" />
+                        Jobs
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -54,11 +64,11 @@ export function CompanyList({ companies, applicants, allAdminJobs, isLoading, se
                     <TableRow key={company._id}>
                       <TableCell className="font-medium">{company.name}</TableCell>
                       <TableCell className="text-right">
-                        {applicants.filter((applicant) =>
+                        {Array.isArray(applicants) ? applicants.filter((applicant) =>
                           allAdminJobs.find(
                             (job) => job._id === applicant.job && job.company?._id === company._id
                           )
-                        ).length}
+                        ).length : 0}
                       </TableCell>
                       <TableCell className="text-right">
                         {allAdminJobs.filter((job) => job.company?._id === company._id).length}

@@ -141,14 +141,6 @@ export default function CompanyCreate() {
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-between gap-4">
               <Button
-                variant="outline"
-                onClick={() => navigate("/admin/companies")}
-                className="w-full sm:w-auto"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              <Button
                 onClick={registerNewCompany}
                 disabled={isLoading}
                 className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"

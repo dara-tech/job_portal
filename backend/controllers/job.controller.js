@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Job } from '../models/job.model.js';
 import { Application } from "../models/application.model.js";
 import { User } from '../models/user.model.js';
+import { Company } from '../models/company.model.js';
 
 export const postJob = async (req, res) => {
   try {
@@ -102,28 +103,6 @@ export const getAllJobs = async (req, res) => {
   }
 };
 
-
-
-
-  // export const getJobById = async (req, res) => {
-
-
-  //     try {
-//         const jobId = req.params.id;
-//         const job = await Job.findById(jobId).populate({
-//             path:"applications"
-//         });
-//         if (!job) {
-//             return res.status(404).json({
-//                 message: "Jobs not found.",
-//                 success: false
-//             })
-//         };
-//         return res.status(200).json({ job, success: true });
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
 export const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
@@ -297,7 +276,6 @@ export const deleteJob = async (req, res) => {
     session.endSession();
   }
 };
-
 export const saveJob = async (req, res) => {
   try {
     const jobId = req.params.id; // Job ID from the route parameters
@@ -420,3 +398,44 @@ export const isJobSaved = async (req, res) => {
   }
 };
 
+export const getAllApplicants = async (req, res) => {
+  try {
+    const { companyId } = req.query;
+
+    let query = {};
+    if (companyId) {
+      query = { 'job.company': mongoose.Types.ObjectId(companyId) };
+    }
+
+    const applications = await Application.find(query)
+      .populate('applicant', 'name email')
+      .populate({
+        path: 'job',
+        select: 'title company',
+        populate: {
+          path: 'company',
+          select: 'name'
+        }
+      });
+
+    if (!applications || applications.length === 0) {
+      return res.status(404).json({
+        message: "No applications found.",
+        success: false,
+      });
+    }
+
+    const validApplications = applications.filter(app => app.job && app._id);
+
+    return res.status(200).json({
+      applications: validApplications,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error fetching all applications:", error);
+    return res.status(500).json({
+      message: "Internal server error.",
+      success: false,
+    });
+  }
+};

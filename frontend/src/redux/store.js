@@ -14,6 +14,7 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import applicationSlice from "./applicationSlice";
+import cartReducer from "./cartSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -27,8 +28,8 @@ const rootReducer = combineReducers({
     auth: authSlice,
     job: jobSlice,
     company: companySlice,
-    application: applicationSlice
-    // Add other slices here if needed
+    application: applicationSlice,
+    cart: cartReducer  // Add cart reducer
 });
 
 // Create persisted reducer

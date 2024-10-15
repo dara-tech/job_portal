@@ -30,7 +30,7 @@ import { CompanyOverviewChart } from "./components/CompanyOverviewChart";
 import { ApplicationStatusChart } from "./components/ApplicationStatusChart";
 import { CompanyList } from "./components/CompanyList";
 import { ApplicantsList } from "./components/ApplicantsList";
-import AdminLayout from "../shared/AdminLayout";
+
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -68,11 +68,14 @@ const Dashboard = () => {
       ]);
 
       if (companiesRes.data.success) {
+        
         dispatch(setCompanies(companiesRes.data.companies));
         setFilteredCompanies(companiesRes.data.companies);
       }
       if (applicantsRes.data.success) {
+        
         dispatch(setAllApplicants(applicantsRes.data.applicants));
+        console.log(applicantsRes.data.applicants);
       }
       if (jobsRes.data.success) {
         dispatch(setAllAdminJobs(jobsRes.data.jobs));
@@ -244,19 +247,14 @@ const Dashboard = () => {
           Dashboard
         </motion.h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <StatCard
             title="Total Companies"
             value={companies.length}
             icon={Building}
             trend={calculateTrend(companies.length, previousStats.companies)}
           />
-          <StatCard
-            title="Total Applicants"
-            value={Array.isArray(applicants) ? applicants.length : 0}
-            icon={Users}
-            trend={calculateTrend(Array.isArray(applicants) ? applicants.length : 0, previousStats.applicants)}
-          />
+         
           <StatCard
             title="Total Jobs"
             value={allAdminJobs.length}
@@ -271,9 +269,9 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-6">
           <CompanyOverviewChart companyData={companyData} />
-          <ApplicationStatusChart applicationStatusData={applicationStatusData} />
+          {/* <ApplicationStatusChart applicationStatusData={applicationStatusData} /> */}
         </div>
 
         <CompanyList

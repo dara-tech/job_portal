@@ -222,9 +222,9 @@ export const deleteCompany = async (req, res) => {
 
     // Check user role
     const user = await User.findById(userId);
-    if (!user || user.role !== 'recruiter') {
+    if (!user || (user.role !== 'recruiter' && user.role !== 'admin')) {
       return res.status(403).json({
-        message: "Access denied. Only recruiters can delete companies.",
+        message: "Access denied. Only recruiters and admins can delete companies.",
         success: false,
       });
     }

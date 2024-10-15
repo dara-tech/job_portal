@@ -1,5 +1,6 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import { User } from "../models/user.model.js";
 
 export const applyJob = async (req, res) => {
     try {
@@ -95,8 +96,6 @@ export const getApplicants = async (req,res) => {
         console.log(error);
     }
 }
-
-
 export const getAllApplicants = async (req, res) => {
     try {
         const applicants = await Application.find().populate({
@@ -149,3 +148,5 @@ export const updateStatus = async (req,res) => {
         console.log(error);
     }
 }
+
+

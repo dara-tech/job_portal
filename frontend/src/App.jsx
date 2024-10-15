@@ -44,7 +44,17 @@ import BlogUpdate from "./components/sadmin/AdminBlog/components/blogUpdate";
 import AllBlog from "./components/blog/allblog";
 import BlogDetail from "./components/blog/blogdetail";
 import BlogDashboard from "./components/sadmin/AdminBlog/components/dasbaord";
-
+import MainBlogPage from "./components/blog/mainblogpage";
+import PageTable from "./components/sadmin/Page/pageTable";
+import EditPage from "./components/sadmin/Page/EditPage";
+import PageDetail from "./components/sadmin/Page/PageDetail";
+import CreatePage from "./components/sadmin/Page/CreatePage";
+import ProductTable from "./components/sadmin/AdminProducts/productTable";
+import AddProduct from "./components/sadmin/AdminProducts/addProduct";
+import UpdateProduct from "./components/sadmin/AdminProducts/updateProduct";
+import POS from "./components/sadmin/AdminProducts/POS/pos";
+import AllProducts from "./components/product/allproducts";
+import ProductDetail from "./components/product/productdetail";
 const AppLayout = () => {
   const { user } = useSelector((store) => store.auth);
 
@@ -82,8 +92,13 @@ const routes = [
       { path: "/resume/new", element: <ResumePage /> }, 
       { path: "/resume/:id/edit", element: <Layout /> }, 
       { path: "/resume/:id/view", element: <ResumeView /> }, 
-      { path: "/blog", element: <AllBlog /> },
+      { path: "/blog", element: <MainBlogPage /> },
+      { path: "/blog/allblogs", element: <AllBlog /> },
       { path: "/blog/:id", element: <BlogDetail /> },
+      { path: "/page/:slug", element: <PageDetail /> },
+      { path: "/products", element: <AllProducts /> },
+      { path: "/products/:id", element: <ProductDetail /> },
+
       { 
         path: "/admin",
         element: <ProtectedRoute />,
@@ -107,6 +122,13 @@ const routes = [
           { path: "blog/create", element: <BlogCreate /> },
           { path: "blog/update/:id", element: <BlogUpdate /> },
           { path: "blogdashboard", element: <BlogDashboard /> },
+          { path: "page", element: <PageTable /> },
+          { path: "page/edit/:slug", element: <EditPage /> },
+          { path: "page/create", element: <CreatePage /> },
+          { path: "products", element: <ProductTable /> },
+          { path: "products/add", element: <AddProduct /> },
+          { path: "products/update/:id", element: <UpdateProduct /> },
+          { path: "pos", element: <POS /> },
         ],
       },
     ],

@@ -74,7 +74,7 @@ export default function Logo() {
       style={{ transformStyle: 'preserve-3d' }}
     >
       <div className="relative flex items-center">
-        {"Job".split('').map((letter, index) => (
+        {"Gen".split('').map((letter, index) => (
           <motion.span
             key={index}
             className="text-4xl font-extrabold text-primary"
@@ -110,7 +110,7 @@ export default function Logo() {
             fontFamily="Arial, sans-serif"
             style={{ letterSpacing: '-0.02em' }}
           >
-            F
+            Z
           </text>
         </motion.svg>
         <AnimatePresence>

@@ -1,0 +1,46 @@
+.backgroundContainer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  
+  .gridOverlay {
+    position: absolute;
+    inset: 0;
+    background-image: url('/path/to/futuristic-grid.svg');
+    opacity: 0.2;
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .gradientOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.3), rgba(167, 139, 250, 0.3), rgba(236, 72, 153, 0.3));
+    animation: gradientX 15s ease infinite;
+  }
+  
+  .fadeOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(15, 23, 42), transparent, transparent);
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 0.1;
+    }
+  }
+  
+  @keyframes gradientX {
+    0%, 100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }

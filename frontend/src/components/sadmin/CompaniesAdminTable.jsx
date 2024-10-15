@@ -41,30 +41,31 @@ const CompaniesAdminTable = () => {
           'Authorization': `Bearer ${authToken}`
         },
         withCredentials: true
-      })
+      });
 
       if (response.status === 200) {
-        setFilterCompany(filterCompany.filter((company) => company._id !== companyId))
+        setFilterCompany(filterCompany.filter((company) => company._id !== companyId));
         toast.success("Company deleted", {
           description: "The company has been successfully removed.",
-        })
+        });
       } else {
-        throw new Error("Failed to delete company")
+        throw new Error("Failed to delete company");
       }
     } catch (error) {
-      console.error("Error deleting company", error.response ? error.response.data : error.message)
+      console.error("Error deleting company", error.response ? error.response.data : error.message);
       toast.error("Error", {
         description: "Failed to delete the company. Please try again.",
-      })
+      });
     }
-  }
+  };
+
 
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-bold">Companies</CardTitle>
-          <Button onClick={() => navigate("/admin/companies/new")} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button onClick={() => navigate("/admin/companies/create")} className="bg-primary text-primary-foreground hover:bg-primary/90">
             <Plus className="mr-2 h-4 w-4" /> Add Company
           </Button>
         </div>

@@ -11,5 +11,6 @@ export const uploadFields = multer({ storage }).fields([
     { name: 'profilePhoto', maxCount: 1 },
     { name: 'profileCoverPhoto', maxCount: 1 },
     { name: 'resume', maxCount: 1 },
-    { name: 'picture', maxCount: 1 }
+    { name: 'picture', maxCount: 1 },
+    { name: 'image', maxCount: 1 }
   ]);

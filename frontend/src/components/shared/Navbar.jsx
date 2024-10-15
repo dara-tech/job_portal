@@ -20,6 +20,7 @@ import {
   User,
   MessageSquare,
   IdCardIcon,
+  ShoppingCart,
 } from "lucide-react";
 import { ModeToggle } from "../toggle";
 import Logo from "../logo";
@@ -108,6 +109,7 @@ const Navbar = () => {
     { to: "/", icon: HomeIcon, label: "Home" },
     { to: "/jobs", icon: BriefcaseBusiness, label: "Jobs" },
     { to: "/browse", icon: Globe, label: "Browse" },
+    { to: "/products", icon: ShoppingCart, label: "Products" },
   ];
 
   const links =

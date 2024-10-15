@@ -220,7 +220,7 @@ export default function BlogCreate() {
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100 dark:bg-gray-950">
       <div className="flex-1 p-8 overflow-auto">
         <Card className="w-full max-w-4xl mx-auto shadow-lg">
-          <CardHeader className="bg-primary text-white dark:bg-gradient-to-r from-blue-600 to-pink-600 rounded-t-lg">
+          <CardHeader className="bg-gradient-to-r from-gray-500 to-gray-700 text-white dark:bg-gradient-to-r dark:from-blue-900 dark:to-slate-950 rounded-t-lg">
             <CardTitle className="text-3xl font-bold">Create New Blog Post</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -394,9 +394,7 @@ export default function BlogCreate() {
         </Card>
       </div>
       <div className="flex-1 p-8 overflow-auto">
-        <Card className="w-full max-w-4xl mx-auto shadow-lg">
-          <CardHeader className="bg-primary text-white dark:bg-gradient-to-r from-blue-600 to-pink-600 rounded-t-lg">
-            <CardTitle className="text-3xl font-bold">Preview</CardTitle>
+        <Card className="w-full max-w-4xl mx-auto shadow-lg">          <CardHeader className="bg-gradient-to-r from-gray-500 to-gray-700 text-white dark:bg-gradient-to-r dark:from-blue-900 dark:to-slate-950 rounded-t-lg">            <CardTitle className="text-3xl font-bold">Preview</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <Tabs defaultValue="desktop" className="w-full">

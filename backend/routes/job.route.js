@@ -9,7 +9,8 @@ import {
   saveJob,
   getSavedJobs, // Make sure to import deleteJob if you add the delete route
   unsaveJob,
-  isJobSaved
+  isJobSaved,
+  getAllApplicants
 } from "../controllers/job.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 
@@ -37,5 +38,6 @@ router.post('/save/:id', isAuthenticated, saveJob);
 router.get('/saved', isAuthenticated, getSavedJobs);
 router.get('/unsaved/:id', isAuthenticated, unsaveJob);
 router.get('/is-saved/:id', isAuthenticated, isJobSaved);
+router.get('/applicants', isAuthenticated, getAllApplicants);
 
 export default router;

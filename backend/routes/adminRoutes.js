@@ -2,7 +2,7 @@ import express from 'express';
 import { deleteUser, editUser, getAllUsers, getUserById } from '../controllers/user.controller.js';
 import isAuthenticated from '../middlewares/isAuthenticated.js';
 import { isAdmin } from '../middlewares/authMiddleware.js';
-import {getAllCompany, getCompany} from '../controllers/campany.controller.js'
+import {getAllCompany} from '../controllers/campany.controller.js'
 import { getAllJobs } from '../controllers/job.controller.js';
 
 const router = express.Router();
