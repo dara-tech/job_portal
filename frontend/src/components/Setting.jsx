@@ -8,8 +8,8 @@ import Profile from './Profile'
 
 const Setting = () => {
   return (
-    <div className="p-4">
-      <Card>
+    <div >
+      <Card className="border-0 -p-2 -mt-2">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Account Settings</CardTitle>
           <CardDescription>Manage your account settings and set email preferences.</CardDescription>
@@ -31,9 +31,9 @@ const Setting = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="profile">
-              <Card className="border-0 -p-2 -mt-2">
+              
                 <Profile/>
-              </Card>
+          
             </TabsContent>
             <TabsContent value="password">
               <PasswordChange />

@@ -129,22 +129,15 @@ function ProductTable() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const responses = await Promise.all(
-        productToDelete.map(id => 
-          fetch(`${PRODUCT_API_ENDPOINT}/${id}`, {
-            method: 'DELETE',
-            credentials: 'include'
-          })
-        )
-      );
-      
-      if (responses.every(response => response.ok)) {
-        toast.success('Selected products deleted successfully');
-        fetchProducts();
-        setSelectedProducts([]);
-      } else {
-        throw new Error('Failed to delete some products');
+      const response = await fetch(`${PRODUCT_API_ENDPOINT}/${productToDelete}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
       }
+      toast.success('Product deleted successfully');
+      fetchProducts();
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -217,24 +210,23 @@ function ProductTable() {
   }
 
   const handleSelectProduct = (productId) => {
-    setSelectedProducts(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
+    if (selectedProducts.includes(productId)) {
+      setSelectedProducts(selectedProducts.filter(id => id !== productId));
+    } else {
+      setSelectedProducts([...selectedProducts, productId]);
+    }
   };
 
-  const handleSelectAllProducts = (event) => {
-    if (event.target.checked) {
-      setSelectedProducts(currentProducts.map(product => product._id));
-    } else {
+  const handleSelectAllProducts = () => {
+    if (selectedProducts.length === currentProducts.length) {
       setSelectedProducts([]);
+    } else {
+      setSelectedProducts(currentProducts.map(product => product._id));
     }
   };
 
   const handleDeleteSelected = () => {
-    setProductToDelete(selectedProducts);
-    setDeleteDialogOpen(true);
+    // Implement delete selected products logic
   };
 
   if (loading) return <ProductTableSkeleton />;
@@ -246,22 +238,22 @@ function ProductTable() {
   return (
     <>
       <div className="mb-6 space-y-4">
-        <div className="flex items-center justify-between space-x-4">
-          <div className="relative flex-grow max-w-md">
+        <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4">
+          <div className="relative w-full sm:max-w-md">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
             <Input
               placeholder="Search products..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="pl-8"
+              className="pl-8 w-full"
             />
           </div>
-          <Button onClick={handleAddNew}>
+          <Button onClick={handleAddNew} className="w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
             Add New
           </Button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label htmlFor="category-filter">Category</Label>
             <Select value={filterCategory} onValueChange={handleCategoryChange}>
@@ -329,12 +321,12 @@ function ProductTable() {
           </div>
         </div>
         {selectedProducts.length > 0 && (
-          <Button variant="destructive" onClick={handleDeleteSelected}>
+          <Button variant="destructive" onClick={handleDeleteSelected} className="w-full sm:w-auto">
             Delete Selected ({selectedProducts.length})
           </Button>
         )}
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -345,11 +337,11 @@ function ProductTable() {
                 />
               </TableHead>
               <TableHead className="w-[100px]">Image</TableHead>
-              <TableHead className="w-[300px]">Product</TableHead>
-              <TableHead>Category</TableHead>
+              <TableHead className="w-[200px] sm:w-[300px]">Product</TableHead>
+              <TableHead className="hidden sm:table-cell">Category</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead className="text-right">Seller</TableHead>
+              <TableHead className="hidden sm:table-cell">Quantity</TableHead>
+              <TableHead className="hidden sm:table-cell text-right">Seller</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -363,18 +355,18 @@ function ProductTable() {
                   />
                 </TableCell>
                 <TableCell>
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                     <AvatarImage src={product.image} alt={product.name} />
                     <AvatarFallback>{product.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <Badge variant="secondary">{product.category}</Badge>
                 </TableCell>
                 <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-                <TableCell className="text-right">{product.seller}</TableCell>
+                <TableCell className="hidden sm:table-cell">{product.quantity}</TableCell>
+                <TableCell className="hidden sm:table-cell text-right">{product.seller}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -410,24 +402,15 @@ function ProductTable() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 space-y-2 sm:space-y-0">
+        <div className="text-sm text-muted-foreground text-center sm:text-left">
           Showing {indexOfFirstProduct + 1} to {Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} entries
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
+        <div className="flex items-center space-x-2 sm:space-x-6">
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
             Page {currentPage} of {pageNumbers.length}
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => paginate(1)}
-              disabled={currentPage === 1}
-            >
-              <span className="sr-only">Go to first page</span>
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
             <Button
               variant="outline"
               className="h-8 w-8 p-0"
@@ -446,15 +429,6 @@ function ProductTable() {
               <span className="sr-only">Go to next page</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => paginate(pageNumbers.length)}
-              disabled={currentPage === pageNumbers.length}
-            >
-              <span className="sr-only">Go to last page</span>
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
@@ -463,12 +437,7 @@ function ProductTable() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete 
-              {productToDelete && productToDelete.length > 1 
-                ? ` ${productToDelete.length} products `
-                : ' the selected product '
-              }
-              from our servers.
+              This action cannot be undone. This will permanently delete the product from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

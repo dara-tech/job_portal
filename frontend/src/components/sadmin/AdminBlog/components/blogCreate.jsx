@@ -218,7 +218,7 @@ export default function BlogCreate() {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100 dark:bg-gray-950">
-      <div className="flex-1 p-8 overflow-auto">
+      <div className="flex-1 p-2 overflow-auto">
         <Card className="w-full max-w-4xl mx-auto shadow-lg">
           <CardHeader className="bg-gradient-to-r from-gray-500 to-gray-700 text-white dark:bg-gradient-to-r dark:from-blue-900 dark:to-slate-950 rounded-t-lg">
             <CardTitle className="text-3xl font-bold">Create New Blog Post</CardTitle>
@@ -230,7 +230,7 @@ export default function BlogCreate() {
                   <AccordionTrigger className="text-xl font-semibold">Title and Tags</AccordionTrigger>
                   <AccordionContent className="pt-4 space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="title" className="text-lg font-semibold">Title</Label>
+                      <Label htmlFor="title" className="text-lg font-light">Title</Label>
                       <div className="flex items-center space-x-2">
                         <Input
                           id="title"
@@ -238,13 +238,13 @@ export default function BlogCreate() {
                           onChange={(e) => setTitle(e.target.value)}
                           required
                           placeholder="Enter blog title"
-                          className="text-lg py-3 flex-grow"
+                          className=" py-3 flex-grow"
                         />
 
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="tags" className="text-lg font-semibold">Tags</Label>
+                      <Label htmlFor="tags" className="text-lg font-light">Tags</Label>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {tags.map((tag, index) => (
                           <span key={index} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm flex items-center">
@@ -262,7 +262,7 @@ export default function BlogCreate() {
                       </div>
                       <div className="flex justify-between ">
                         <div className="flex items-center space-x-2 w-full">
-                          <Tag className="text-gray-500" />
+                          <Tag className="text-muted-foreground" />
                           <Input
                           id="tags"
                           value={tagInput}
@@ -393,7 +393,7 @@ export default function BlogCreate() {
           </CardContent>
         </Card>
       </div>
-      <div className="flex-1 p-8 overflow-auto">
+      <div className="flex-1 p-2 overflow-auto">
         <Card className="w-full max-w-4xl mx-auto shadow-lg">          <CardHeader className="bg-gradient-to-r from-gray-500 to-gray-700 text-white dark:bg-gradient-to-r dark:from-blue-900 dark:to-slate-950 rounded-t-lg">            <CardTitle className="text-3xl font-bold">Preview</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -436,7 +436,7 @@ export default function BlogCreate() {
                 </ScrollArea>
               </TabsContent>
               <TabsContent value="mobile">
-                <div className="w-[375px] h-[667px] mx-auto border dark:border-gray-700 rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-950">
+                <div className="w-full mx-auto border dark:border-gray-700 rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-950">
                   <ScrollArea className="h-full w-full p-4">
                     <div className="max-w-[343px] mx-auto">
                       <h1 className="text-2xl font-bold mb-4">{title || 'Your Blog Title'}</h1>

@@ -92,7 +92,7 @@ const ProductDetail = () => {
             <span className="text-sm text-gray-500">({product.numReviews} reviews)</span>
           </div>
           <p className="text-2xl font-semibold">${product.price.toFixed(2)}</p>
-          <p className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
+          <p className="text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
           <div className="flex items-center space-x-4">
             <div className="flex items-center border rounded-md">
               <button 
@@ -121,7 +121,7 @@ const ProductDetail = () => {
             </Button>
             <Button variant="outline" className="flex items-center space-x-2">
               <Heart className="h-5 w-5" />
-              <span>Wishlist</span>
+  
             </Button>
           </div>
           {product.countInStock > 0 && (
@@ -138,10 +138,10 @@ const ProductDetail = () => {
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
         </TabsList>
         <TabsContent value="description" className="mt-4">
-          <p className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
+          <p className="text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
         </TabsContent>
         <TabsContent value="specifications" className="mt-4">
-          <ul className="list-disc pl-5 space-y-2 text-gray-700">
+          <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
             <li>Brand: {product.brand}</li>
             <li>Category: {product.category}</li>
             <li>In Stock: {product.countInStock > 0 ? 'Yes' : 'No'}</li>

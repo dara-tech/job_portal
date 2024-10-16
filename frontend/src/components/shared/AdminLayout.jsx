@@ -56,20 +56,63 @@ import { Separator } from "@/components/ui/separator";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 
+const NavLink = ({ to, icon: Icon, label, badge, submenu, isCollapsed }) => {
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (submenu) {
+    return (
+      <div>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`flex items-center justify-between w-full px-3 py-2 rounded-md transition-all duration-200 hover:bg-accent hover:text-accent-foreground ${
+            isOpen ? 'bg-accent text-accent-foreground' : ''
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <Icon className="w-5 h-5" />
+            {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
+          </div>
+          {!isCollapsed && <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />}
+        </button>
+        {isOpen && !isCollapsed && (
+          <div className="ml-6 mt-2 space-y-2">
+            {submenu.map((item) => (
+              <NavLink key={item.to} {...item} isCollapsed={isCollapsed} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={to}
+      className={`flex items-center justify-between px-3 py-2 rounded-md transition-all duration-200 ${
+        location.pathname === to
+          ? "bg-primary text-primary-foreground"
+          : "hover:bg-accent hover:text-accent-foreground"
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        {Icon && <Icon className="w-5 h-5" />}
+        {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
+      </div>
+      {!isCollapsed && badge && (
+        <Badge variant="secondary" className="ml-auto">
+          {badge}
+        </Badge>
+      )}
+    </Link>
+  );
+};
+
 const AdminLayout = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openSubmenu, setOpenSubmenu] = useState(null);
-
-  useEffect(() => {
-    // Close submenu when sidebar collapses
-    if (isCollapsed) {
-      setOpenSubmenu(null);
-    }
-  }, [isCollapsed]);
 
   const logoutHandler = async () => {
     try {
@@ -89,73 +132,6 @@ const AdminLayout = () => {
         error.response?.data?.message || "An unexpected error occurred";
       toast.error(errorMessage);
     }
-  };
-
-  const NavLink = ({ to, icon: Icon, label, badge, submenu, index }) => {
-    const isSubmenuOpen = openSubmenu === index;
-
-    const handleSubmenuToggle = (e) => {
-      e.preventDefault();
-      setOpenSubmenu(isSubmenuOpen ? null : index);
-    };
-
-    if (submenu) {
-      return (
-        <div key={label}>
-          <button
-            onClick={handleSubmenuToggle}
-            className={`flex items-center justify-between w-full px-3 py-2 rounded-md transition-all duration-200 hover:bg-accent hover:text-accent-foreground ${
-              isSubmenuOpen ? 'bg-accent text-accent-foreground' : ''
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <Icon className="w-5 h-5" />
-              {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
-            </div>
-            {!isCollapsed && (
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isSubmenuOpen ? 'rotate-180' : ''}`} />
-            )}
-          </button>
-          <AnimatePresence>
-            {isSubmenuOpen && !isCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="ml-6 mt-2 space-y-2 overflow-hidden"
-              >
-                {submenu.map((item) => (
-                  <NavLink key={item.to} {...item} />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      );
-    }
-
-    return (
-      <Link
-        key={to}
-        to={to}
-        className={`flex items-center justify-between px-3 py-2 rounded-md transition-all duration-200 ${
-          location.pathname === to
-            ? "bg-primary text-primary-foreground"
-            : "hover:bg-accent hover:text-accent-foreground"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-5 h-5" />}
-          {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
-        </div>
-        {badge && !isCollapsed && (
-          <Badge variant="secondary" className="ml-auto">
-            {badge}
-          </Badge>
-        )}
-      </Link>
-    );
   };
 
   const recruiterLinks = [
@@ -211,9 +187,9 @@ const AdminLayout = () => {
   const links = user?.role === "admin" ? adminLinks : recruiterLinks;
 
   return (
-    <div className="flex h-screen bg-background ">
+    <div className="flex h-screen bg-background">
       <motion.aside
-        className={`hidden md:flex flex-col border-r dark:border-gray-900  transition-all duration-300 ${
+        className={`hidden md:flex flex-col border-r dark:border-gray-900 transition-all duration-300 ${
           isCollapsed ? 'w-16' : 'w-64'
         }`}
         initial={false}
@@ -234,12 +210,12 @@ const AdminLayout = () => {
           <ul className="space-y-2 px-2">
             {links.map((link, index) => (
               <li key={link.to || `submenu-${index}`}>
-                <NavLink {...link} index={index} />
+                <NavLink {...link} isCollapsed={isCollapsed} />
               </li>
             ))}
           </ul>
         </nav>
-        <div className="p-4 ">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
               <AvatarImage src={user?.profile?.profilePhoto} alt="avatar" />
@@ -273,19 +249,19 @@ const AdminLayout = () => {
                   </SheetHeader>
                   <nav className="flex flex-col gap-4 mt-4">
                     {links.map((link, index) => (
-                      <NavLink key={link.to || `mobile-submenu-${index}`} {...link} />
+                      <NavLink key={link.to || `mobile-submenu-${index}`} {...link} isCollapsed={isCollapsed} />
                     ))}
                   </nav>
                 </SheetContent>
               </Sheet>
-              <div className="relative">
+              {/* <div className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 " />
                 <Input 
                   type="search" 
                   placeholder="Search..." 
                   className="w-[200px] sm:w-[300px] pl-8"
                 />
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center gap-4">
               <ModeToggle />

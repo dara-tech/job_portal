@@ -103,7 +103,7 @@ const CreatePage = () => {
       </Button>
       <Card className="backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Create New Page</CardTitle>
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Create</CardTitle>
           <CardDescription className="text-gray-500 dark:text-gray-400">Craft a new page for your website with ease and precision.</CardDescription>
         </CardHeader>
         <CardContent>

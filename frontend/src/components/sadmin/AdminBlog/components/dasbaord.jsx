@@ -56,9 +56,9 @@ const DateFilter = ({ onFilterChange }) => {
   };
 
   return (
-    <div className="flex space-x-2 mb-4">
+    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
       <Select value={selectedMonth} onValueChange={handleMonthChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="Select month" />
         </SelectTrigger>
         <SelectContent>
@@ -70,7 +70,7 @@ const DateFilter = ({ onFilterChange }) => {
         </SelectContent>
       </Select>
       <Select value={selectedYear} onValueChange={handleYearChange}>
-        <SelectTrigger className="w-[120px]">
+        <SelectTrigger className="w-full sm:w-[120px]">
           <SelectValue placeholder="Select year" />
         </SelectTrigger>
         <SelectContent>
@@ -161,33 +161,31 @@ export default function BlogDashboard() {
   ];
 
   return (
-    <div className="space-y-6 mt-4 px-2">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Blog Dashboard</h1>
-        <div className="flex justify-between items-center gap-4">
-        <Button variant="outline" onClick={() => navigate('/admin/bloglist')}>
-          <Calendar className="mr-2 h-4 w-4" /> View All Posts
-        </Button>
-        <Button onClick={() => navigate('/admin/blog/create')}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Create New Post
-        </Button>
-      </div>
+    <div className="space-y-6 mt-4 px-2 sm:px-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Blog Dashboard</h1>
+        <div className="flex flex-wrap justify-start sm:justify-end items-center gap-2 sm:gap-4 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => navigate('/admin/bloglist')} className="w-full sm:w-auto">
+            <Calendar className="mr-2 h-4 w-4" /> Posts
+          </Button>
+          <Button onClick={() => navigate('/admin/blog/create')} className="w-full sm:w-auto">
+            <PlusCircle className="mr-2 h-4 w-4" /> Post
+          </Button>
+        </div>
       </div>
       
-   
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((item, index) => (
           <motion.div key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-semibold">{item.title}</CardTitle>
-                <div className={`${item.color} rounded-full p-3`}>
-                  <item.icon className="h-6 w-6 text-white" />
+                <CardTitle className="text-base sm:text-lg font-semibold">{item.title}</CardTitle>
+                <div className={`${item.color} rounded-full p-2 sm:p-3`}>
+                  <item.icon className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{item.value}</div>
+                <div className="text-xl sm:text-2xl font-bold">{item.value}</div>
                 <p className="text-xs text-muted-foreground">
                   {getGrowthRate(item.title.toLowerCase().split(' ')[1]).toFixed(2)}% from previous period
                 </p>
@@ -205,18 +203,18 @@ export default function BlogDashboard() {
         <TabsContent value="overview">
           <Card>
             <CardHeader>
-            <div className="flex justify-end">
-        <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select date range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 90 days</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+              <div className="flex justify-end">
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Select date range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 days</SelectItem>
+                    <SelectItem value="30">Last 30 days</SelectItem>
+                    <SelectItem value="90">Last 90 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <CardTitle>Trend Overview</CardTitle>
             </CardHeader>
             <CardContent>
@@ -236,7 +234,7 @@ export default function BlogDashboard() {
           </Card>
         </TabsContent>
         <TabsContent value="analytics" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle>Engagement Rate</CardTitle>
@@ -280,10 +278,10 @@ export default function BlogDashboard() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="views">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="views">Views</TabsTrigger>
-                  <TabsTrigger value="likes">Likes</TabsTrigger>
-                  <TabsTrigger value="comments">Comments</TabsTrigger>
+                <TabsList className="mb-4 flex flex-wrap">
+                  <TabsTrigger value="views" className="flex-1">Views</TabsTrigger>
+                  <TabsTrigger value="likes" className="flex-1">Likes</TabsTrigger>
+                  <TabsTrigger value="comments" className="flex-1">Comments</TabsTrigger>
                 </TabsList>
                 <TabsContent value="views">
                   <TopPerformingPosts blogs={processedBlogs} metric="views" />
@@ -301,8 +299,6 @@ export default function BlogDashboard() {
       </Tabs>
 
       <Separator />
-
-      
     </div>
   );
 }
@@ -393,55 +389,55 @@ const TopPerformingPosts = ({ blogs, metric }) => {
   return (
     <>
       <DateFilter onFilterChange={handleFilterChange} />
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {sortedBlogs.map((blog, index) => (
           <motion.div 
             key={blog._id}
-            className="bg-card text-card-foreground rounded-lg shadow-md p-6 relative overflow-hidden"
+            className="bg-card text-card-foreground rounded-lg shadow-md p-4 sm:p-6 relative overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
             <div className={`absolute top-0 left-0 w-2 h-full bg-gradient-to-b ${getRankColor(index)}`} />
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-4">
-                <div className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-secondary">
-                  <span className="text-2xl">{getRankIcon(index)}</span>
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+              <div className="flex items-start space-x-4 w-full sm:w-auto">
+                <div className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary">
+                  <span className="text-xl sm:text-2xl">{getRankIcon(index)}</span>
                   <span className="text-xs font-bold mt-1">#{index + 1}</span>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">{blog.title}</h3>
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-2">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base sm:text-lg mb-2">{blog.title}</h3>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-2">
                     <div className="flex items-center">
-                      <User className="mr-1 h-4 w-4" />
+                      <User className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                       {blog.author?.fullname || 'Unknown'}
                     </div>
                     <div className="flex items-center">
-                      <Calendar className="mr-1 h-4 w-4" />
+                      <Calendar className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                       {format(new Date(blog.createdAt), 'MMM dd, yyyy')}
                     </div>
                     <div className="flex items-center">
-                      <Clock className="mr-1 h-4 w-4" />
+                      <Clock className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                       {format(new Date(blog.createdAt), 'HH:mm')}
                     </div>
                   </div>
-                  <div className="flex space-x-3">
-                    <Badge variant="secondary" className="flex items-center">
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                    <Badge variant="secondary" className="flex items-center text-xs">
                       <Eye className="mr-1 h-3 w-3" /> {blog.views || 0}
                     </Badge>
-                    <Badge variant="secondary" className="flex items-center">
+                    <Badge variant="secondary" className="flex items-center text-xs">
                       <ThumbsUp className="mr-1 h-3 w-3" /> {blog.likes.length}
                     </Badge>
-                    <Badge variant="secondary" className="flex items-center">
+                    <Badge variant="secondary" className="flex items-center text-xs">
                       <MessageSquare className="mr-1 h-3 w-3" /> {blog.comments.length}
                     </Badge>
-                    <Badge variant="secondary" className="flex items-center">
-                      <TrendingUp className="mr-1 h-3 w-3" /> {getEngagementRate(blog)}%
+                    <Badge variant="secondary" className="flex items-center text-xs">
+                      <TrendingUp className="mr-1 h-3 w-3" /> {getEngagementRate(blog).toFixed(2)}%
                     </Badge>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end space-y-2">
+              <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -462,7 +458,7 @@ const TopPerformingPosts = ({ blogs, metric }) => {
                 </DropdownMenu>
                 <div className="flex items-center space-x-2 bg-secondary rounded-full px-3 py-1">
                   {getMetricIcon(metric)}
-                  <span className="font-semibold text-lg">{getMetricValue(blog)}</span>
+                  <span className="font-semibold text-base sm:text-lg">{getMetricValue(blog)}</span>
                 </div>
               </div>
             </div>
@@ -477,7 +473,7 @@ const TopPerformingPosts = ({ blogs, metric }) => {
               </div>
             </div>
             <div className="mt-4 flex justify-end">
-              <Button variant="outline" size="sm" onClick={() => handleViewPost(blog._id)}>
+              <Button variant="outline" size="sm" onClick={() => handleViewPost(blog._id)} className="w-full sm:w-auto">
                 Read More <ExternalLink className="ml-1 h-3 w-3" />
               </Button>
             </div>
@@ -552,7 +548,7 @@ const TopAuthors = ({ blogs }) => {
           No author data available for the selected period.
           {selectedMonth !== 'all' && (
             <div className="mt-2">
-              <Button variant="outline" onClick={() => handleFilterChange('all', selectedYear)}>
+              <Button variant="outline" onClick={() => handleFilterChange('all', selectedYear)} className="w-full sm:w-auto">
                 <Calendar className="mr-2 h-4 w-4" /> View All Months in {selectedYear}
               </Button>
             </div>
@@ -563,12 +559,12 @@ const TopAuthors = ({ blogs }) => {
           {sortedAuthors.map(([authorId, stats], index) => (
             <motion.div 
               key={authorId}
-              className="flex items-center space-x-4"
+              className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <div className={`text-sm font-medium w-6 text-center ${
+              <div className={`text-sm font-medium w-full sm:w-6 text-left sm:text-center ${
                 index === 0 ? 'text-yellow-500' : 
                 index === 1 ? 'text-gray-400' : 
                 index === 2 ? 'text-orange-400' : 
@@ -576,51 +572,55 @@ const TopAuthors = ({ blogs }) => {
               }`}>
                 {index + 1}
               </div>
-              <div className="flex-shrink-0">
-                {stats.profilePhoto ? (
-                  <img 
-                    src={stats.profilePhoto} 
-                    alt={`${stats.name}'s avatar`}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <User className="h-6 w-6 text-gray-500" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium truncate">{stats.name}</p>
-                <p className="text-xs text-muted-foreground">{stats.posts} posts</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Eye className="h-4 w-4 text-blue-500" />
-                <span className="text-sm font-medium">{stats.views}</span>
-              </div>
-              <div className="w-16">
-                <div className="h-1 bg-muted rounded-full">
-                  <motion.div 
-                    className="h-full bg-primary rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(stats.posts / sortedAuthors[0][1].posts) * 100}%` }}
-                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                  />
+              <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+                <div className="flex-shrink-0">
+                  {stats.profilePhoto ? (
+                    <img 
+                      src={stats.profilePhoto} 
+                      alt={`${stats.name}'s avatar`}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                      <User className="h-6 w-6 text-gray-500" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium truncate">{stats.name}</p>
+                  <p className="text-xs text-muted-foreground">{stats.posts} posts</p>
                 </div>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleViewAuthorPosts(authorId)}>
-                    View all posts
-                  </DropdownMenuItem>
-                  {/* Add more dropdown items here if needed */}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+                <div className="flex items-center space-x-2">
+                  <Eye className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium">{stats.views}</span>
+                </div>
+                <div className="w-16 sm:w-24">
+                  <div className="h-1 bg-muted rounded-full">
+                    <motion.div 
+                      className="h-full bg-primary rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(stats.posts / sortedAuthors[0][1].posts) * 100}%` }}
+                      transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+                    />
+                  </div>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleViewAuthorPosts(authorId)}>
+                      View all posts
+                    </DropdownMenuItem>
+                    {/* Add more dropdown items here if needed */}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </motion.div>
           ))}
         </div>

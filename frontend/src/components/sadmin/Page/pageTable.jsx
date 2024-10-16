@@ -28,10 +28,11 @@ const PageTable = () => {
     setLoading(true);
     try {
       const response = await axios.get(`${PAGE_API_ENDPOINT}/pages`, { withCredentials: true });
-      setPages(response.data.pages);
+      setPages(response.data.pages || []); // Ensure pages is always an array
     } catch (error) {
       console.error('Error fetching pages:', error);
       toast.error('Failed to fetch pages');
+      setPages([]); // Set to empty array in case of error
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,7 @@ const PageTable = () => {
     }
   };
 
-  const filteredPages = pages
+  const filteredPages = Array.isArray(pages) ? pages
     .filter(page =>
       page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       page.slug.toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,15 +75,15 @@ const PageTable = () => {
       if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
       if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
       return 0;
-    });
+    }) : [];
 
   if (loading) return <div className="flex justify-center items-center h-screen">Loading pages...</div>;
 
   return (
-    <Card className="container mx-auto py-10 shadow-none border-none">
+    <Card className=" shadow-none border-none">
       <CardHeader>
         <CardTitle className="text-3xl font-bold mb-4">Pages Management</CardTitle>
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center gap-4 mt-4">
           <Input
             placeholder="Search pages..."
             value={searchTerm}
@@ -90,7 +91,7 @@ const PageTable = () => {
             className="max-w-sm"
           />
           <Button onClick={handleCreate} className="bg-green-600 hover:bg-green-700">
-            <Plus className="mr-2 h-4 w-4" /> Create New Page
+            <Plus className="mr-2 h-4 w-4" /> Create
           </Button>
         </div>
       </CardHeader>

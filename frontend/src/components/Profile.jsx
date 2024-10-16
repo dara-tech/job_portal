@@ -75,17 +75,17 @@ const Profile = () => {
   }, [user])
 
   const InfoItem = ({ icon, text, copyable = false }) => (
-    <HoverCard >
+    <HoverCard>
       <HoverCardTrigger asChild>
-        <div className="flex ring-1 ring-gray-300 dark:ring-gray-800 rounded-full px-2 items-center gap-2 text-sm font-bold text-muted-foreground cursor-pointer hover:text-primary transition-colors duration-200">
+        <div className="flex ring-1 ring-gray-300 dark:ring-gray-800 rounded-full px-2 py-1 items-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground cursor-pointer hover:text-primary transition-colors duration-200">
           {icon}
-          <span>{text}</span>
+          <span className="truncate max-w-[100px] sm:max-w-none">{text}</span>
           {copyable && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(text)} aria-label={`Copy ${text}`}>
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -115,11 +115,11 @@ const Profile = () => {
       whileTap={{ scale: 0.95 }}
     >
       <Card className="flex-1 bg-gradient-to-br from-primary-100 to-primary-200">
-        <CardContent className="flex items-center gap-2 p-4">
+        <CardContent className="flex items-center gap-2 p-2 sm:p-4">
           <div className="bg-primary-300">{icon}</div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <h3 className="text-xl font-bold text-primary-900">{value}</h3>
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</p>
+            <h3 className="text-sm sm:text-xl font-bold text-primary-900">{value}</h3>
           </div>
         </CardContent>
       </Card>
@@ -154,7 +154,7 @@ const Profile = () => {
           transition={{ duration: 0.5 }}
         >
           <Card className="mb-8 overflow-hidden shadow-lg">
-            <div className="h-48 bg-gradient-to-r from-primary to-primary-foreground relative">
+            <div className="h-32 sm:h-48 bg-gradient-to-r from-primary to-primary-foreground relative">
               {user.profile?.profileCoverPhoto && (
                 <img
                   src={getCoverPhotoUrl(user.profile.profileCoverPhoto)}
@@ -163,36 +163,36 @@ const Profile = () => {
                 />
               )}
             </div>
-            <CardContent className="relative p-6">
-              <Avatar className="h-32 w-32 absolute -top-16 left-6 ring-4 ring-background shadow-xl">
+            <CardContent className="relative p-4 sm:p-6">
+              <Avatar className="h-24 w-24 sm:h-32 sm:w-32 absolute -top-12 sm:-top-16 left-4 sm:left-6 ring-4 ring-background shadow-xl">
                 <AvatarImage src={user.profile?.profilePhoto || "/placeholder.svg?height=128&width=128"} alt={user.fullname || "User"} />
                 <AvatarFallback>{user.fullname?.[0] || "U"}</AvatarFallback>
               </Avatar>
-              <div className="mt-20">
+              <div className="mt-16 sm:mt-20">
                 <div className="flex flex-col md:flex-row justify-between items-start mb-4">
                   <div>
-                    <h1 className="text-4xl font-bold text-primary-900">
+                    <h1 className="text-2xl sm:text-4xl font-bold text-primary-900">
                       {user.fullname || "User Name"}
                     </h1>
-                    <p className="text-primary-700 mt-2">{user.profile?.bio || "No bio available."}</p>
+                    <p className="text-sm sm:text-base text-primary-700 mt-2">{user.profile?.bio || "No bio available."}</p>
                   </div>
                 </div>
-                <div className="flex gap-3  mt-2 border-t-2 border-primary-200 pt-4">
+                <div className="flex flex-wrap gap-2 mt-2 border-t-2 border-primary-200 pt-4">
                   <InfoItem 
                     icon={<LocateIcon className="h-4 w-4" />} 
                     text={user.profile?.location || "Location not specified"} 
                   />
-                  <InfoItem icon={<Phone className="h-4 w-4 " />} text={user.phoneNumber || "N/A"} copyable />
+                  <InfoItem icon={<Phone className="h-4 w-4" />} text={user.phoneNumber || "N/A"} copyable />
                   <InfoItem icon={<Mail className="h-4 w-4" />} text={user.email || "N/A"} copyable />
                 </div>
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   {Object.entries(socialLinks).map(([platform, link]) => {
                     const Icon = socialIcons[platform] || ExternalLink
                     return (
                       <Button key={platform} variant="outline" size="sm" className="rounded-full" asChild>
                         <a href={link} target="_blank" rel="noopener noreferrer">
                           <Icon className="mr-2 h-4 w-4" />
-                          {platform}
+                          <span className="hidden sm:inline">{platform}</span>
                         </a>
                       </Button>
                     )
@@ -203,18 +203,18 @@ const Profile = () => {
           </Card>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <StatCard icon={<Clock10 className="h-8 w-8 text-primary-400" />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
-          <StatCard icon={<Award className="h-8 w-8 text-primary-400" />} title="Certificates" value="View" />
-          <StatCard icon={<Pickaxe className="h-8 w-8 text-primary-400" />} title="Skills" value={skills.length} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-8">
+          <StatCard icon={<Clock10 className="h-6 w-6 sm:h-8 sm:w-8 text-primary-400" />} title="Experience" value={`${user.profile?.experience || "N/A"} Years`} />
+          <StatCard icon={<Award className="h-6 w-6 sm:h-8 sm:w-8 text-primary-400" />} title="Certificates" value="View" />
+          <StatCard icon={<Pickaxe className="h-6 w-6 sm:h-8 sm:w-8 text-primary-400" />} title="Skills" value={skills.length} />
         </div>
 
-        <Tabs defaultValue="skills" className="mb-8" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 rounded-full p-1 bg-primary-100">
-            <TabsTrigger value="skills" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Skills</TabsTrigger>
-            <TabsTrigger value="resume" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Resume</TabsTrigger>
-            <TabsTrigger value="portfolio" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Portfolio</TabsTrigger>
-            <TabsTrigger value="namecard" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Name Card</TabsTrigger>
+        <Tabs defaultValue="skills" className="" onValueChange={setActiveTab}>
+          <TabsList className=" w-full bg-primary-100 rounded-full">
+            <TabsTrigger value="skills" className="w-24 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Skills</TabsTrigger>
+            <TabsTrigger value="resume" className="w-24 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Resume</TabsTrigger>
+            <TabsTrigger value="portfolio" className="w-24 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Portfolio</TabsTrigger>
+            <TabsTrigger value="namecard" className="w-24 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Name Card</TabsTrigger>
           </TabsList>
           <AnimatePresence mode="wait">
             <motion.div
@@ -334,14 +334,10 @@ const Profile = () => {
                 </Card>
               </TabsContent>
               <TabsContent value="namecard">
-                <Card>
-                  <CardHeader>
-                    <h3 className="text-2xl font-semibold text-primary-900">Name Card</h3>
-                  </CardHeader>
-                  <CardContent>
+           
+                
                     <NameCard user={user} socialLinks={socialLinks} />
-                  </CardContent>
-                </Card>
+               
               </TabsContent>
             </motion.div>
           </AnimatePresence>

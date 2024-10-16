@@ -230,34 +230,42 @@ function AddProduct() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className=" mx-auto  sm:px-2 lg:px-2 py-2"
     >
-      <Card className="w-full">
-        <CardHeader className="bg-gray-100">
-          <CardTitle className="text-2xl font-bold flex items-center text-gray-800">
-            <FiPackage className="mr-2" /> Add New Product
+      <Card className="w-full overflow-hidden border-none">
+        <CardHeader className="text-muted-foreground">
+          <CardTitle className="text-3xl font-bold flex items-center">
+            <FiPackage className="mr-3 text-4xl text-muted-foreground" /> Add New Product
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-2">
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main content (left and center columns) */}
-              <div className="md:col-span-1 space-y-8">
+              <div className="lg:col-span-2 space-y-8">
                 {/* Basic Information */}
-                <Card className="shadow-sm">
-                  <CardHeader className="bg-gray-50">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Basic Information</CardTitle>
+                <Card >
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-blue-600 rounded-t-md ">
+                    <CardTitle className="text-2xl font-semibold text-white">Basic Information</CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4 space-y-4">
+                  <CardContent className="p-6 space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-lg">Product Name</Label>
-                      <Input id="name" name="name" value={product.name} onChange={handleChange} required 
-                             className="border-2 border-slate-200 focus:border-slate-500 transition-colors" />
+                      <Label htmlFor="name" className="text-lg font-light text-muted-foreground">Product Name</Label>
+                      <Input 
+                        id="name" 
+                        name="name" 
+                        value={product.name} 
+                        placeholder="Enter product name"
+                        onChange={handleChange} 
+                        required 
+                        className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                      />
                       {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
+                      <Label htmlFor="category" className="text-lg font-light text-muted-foreground">Category</Label>
                       <Select value={product.category} onValueChange={handleCategoryChange}>
-                        <SelectTrigger id="category">
+                        <SelectTrigger id="category" className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                         <SelectContent>
@@ -278,7 +286,7 @@ function AddProduct() {
                       {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="description" className="text-lg">Description</Label>
+                      <Label htmlFor="description" className="text-lg font-light text-muted-foreground">Description</Label>
                       <ReactQuill
                         theme="snow"
                         value={product.description}
@@ -298,7 +306,7 @@ function AddProduct() {
                           'list', 'bullet', 'indent',
                           'link', 'image'
                         ]}
-                        className="bg-white"
+                        
                       />
                       {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                     </div>
@@ -306,43 +314,48 @@ function AddProduct() {
                 </Card>
 
                 {/* Pricing and Inventory */}
-                <Card className="shadow-sm">
-                  <CardHeader className="bg-gray-50">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Pricing and Inventory</CardTitle>
+                <Card >
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-blue-600 rounded-t-md">
+                    <CardTitle className="text-2xl font-semibold text-white">Pricing and Inventory</CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="price" className="text-lg flex items-center">
-                        <FiDollarSign className="mr-2" /> Price
-                      </Label>
-                      <Input
-                        id="price"
-                        name="price"
-                        type="number"
-                        step="0.01"
-                        value={product.price}
-                        onChange={handleChange}
-                        required 
-                        className="border-2 border-gray-200 focus:border-gray-400 transition-colors"
-                      />
-                      {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="discount">Discount (%)</Label>
-                      <Input
-                        id="discount"
-                        name="discount"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={product.discount}
-                        onChange={handleChange}
-                      />
-                      {errors.discount && <p className="text-red-500 text-sm mt-1">{errors.discount}</p>}
+                  <CardContent className="p-6 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="price" className="text-lg font-light text-muted-foreground flex items-center">
+                          <FiDollarSign className="mr-2 text-green-500" /> Price
+                        </Label>
+                        <Input
+                          id="price"
+                          name="price"
+                          type="number"
+                          step="0.01"
+                          placeholder="Enter product price"
+                          value={product.price}
+                          onChange={handleChange}
+                          required 
+                          className="border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
+                        />
+                        {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="discount" className="text-lg font-light text-muted-foreground">Discount (%)</Label>
+                        <Input
+                          id="discount"
+                          name="discount"
+                          type="number"
+                          placeholder="Enter discount percentage"
+                          min="0"
+                          max="100"
+                          value={product.discount}
+                          onChange={handleChange}
+                          className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                        />
+                        {errors.discount && <p className="text-red-500 text-sm mt-1">{errors.discount}</p>}
+                      </div>
                     </div>
                     {salePrice > 0 && (
-                      <div className="mt-4 p-3 bg-green-100 rounded-md">
-                        <p className="text-green-800 font-semibold">
+                      <div className="mt-4 p-4 bg-green-100 rounded-md border border-green-300">
+                        <p className="text-green-800 font-semibold text-lg">
                           Sale Price: ${salePrice}
                         </p>
                         <p className="text-sm text-green-600">
@@ -351,8 +364,17 @@ function AddProduct() {
                       </div>
                     )}
                     <div className="space-y-2">
-                      <Label htmlFor="quantity">Quantity</Label>
-                      <Input id="quantity" name="quantity" type="number" value={product.quantity} onChange={handleChange} required />
+                      <Label htmlFor="quantity" className="text-lg font-light text-muted-foreground">Quantity</Label>
+                      <Input 
+                        id="quantity" 
+                        name="quantity" 
+                        type="number" 
+                        placeholder="Enter product quantity"
+                        value={product.quantity} 
+                        onChange={handleChange} 
+                        required 
+                        className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                      />
                       {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
                     </div>
                   </CardContent>
@@ -362,36 +384,44 @@ function AddProduct() {
               {/* Review and Submit (right column) */}
               <div className="space-y-6">
                 {/* Image Upload */}
-                <Card className="shadow-sm">
-                  <CardHeader className="bg-gray-50">
-                    <CardTitle className="text-xl font-semibold text-gray-700 flex items-center">
-                      <FiImage className="mr-2" /> Product Image
+                <Card >
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-blue-600 rounded-t-md">
+                    <CardTitle className="text-2xl font-semibold text-white flex items-center">
+                      <FiImage className="mr-2 text-white" /> Product Image
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4">
-                    <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer ${isDragActive ? 'border-gray-400 bg-gray-50' : 'border-gray-300'}`}>
+                  <CardContent className="p-6">
+                    <div 
+                      {...getRootProps()} 
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors duration-300 ${
+                        isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                      }`}
+                    >
                       <input {...getInputProps()} />
                       {product.image ? (
                         <div className="relative">
-                          <img src={URL.createObjectURL(product.image)} alt="Product preview" className="mx-auto max-h-48 rounded-lg" />
-                          <button onClick={removeImage} className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1">
+                          <img src={URL.createObjectURL(product.image)} alt="Product preview" className="mx-auto max-h-48 rounded-lg shadow-md" />
+                          <button 
+                            onClick={removeImage} 
+                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1 hover:bg-red-600 transition-colors duration-300"
+                          >
                             <FiX />
                           </button>
                         </div>
                       ) : (
                         <div>
-                          <FiUploadCloud className="mx-auto h-12 w-12 text-indigo-400" />
-                          <p className="mt-2">Drag 'n' drop an image here, or click to select one</p>
+                          <FiUploadCloud className="mx-auto h-12 w-12 text-blue-400" />
+                          <p className="mt-2 text-sm text-gray-600">Drag 'n' drop an image here, or click to select one</p>
                         </div>
                       )}
                     </div>
                     {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
                     
-                    <Separator className="my-4" />
+                    <Separator className="my-6" />
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="imageUrl" className="text-lg flex items-center">
-                        <FiLink className="mr-2" /> Image URL
+                    <div className="space-y-4">
+                      <Label htmlFor="imageUrl" className="text-lg font-light text-muted-foreground flex items-center">
+                        <FiLink className="mr-2 text-blue-500" /> Image URL
                       </Label>
                       <div className="flex">
                         <Input
@@ -400,9 +430,13 @@ function AddProduct() {
                           placeholder="https://example.com/image.jpg"
                           value={imageUrl}
                           onChange={handleImageUrlChange}
-                          className="flex-grow mr-2"
+                          className="flex-grow mr-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                         />
-                        <Button onClick={handleImageUrlSubmit} type="button">
+                        <Button 
+                          onClick={handleImageUrlSubmit} 
+                          type="button"
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition-colors duration-300"
+                        >
                           Add Image
                         </Button>
                       </div>
@@ -412,36 +446,45 @@ function AddProduct() {
                       <Button
                         onClick={removeBackground}
                         disabled={isRemovingBg}
-                        className="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
+                        className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300"
                       >
                         {isRemovingBg ? 'Removing Background...' : 'Remove Background'}
                       </Button>
                     )}
                   </CardContent>
                 </Card>
-                <Card className="shadow-sm sticky top-4">
-                  <CardHeader className="bg-gray-50">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Review and Submit</CardTitle>
+                <Card className="transition-shadow duration-300 sticky top-4">
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-blue-600 rounded-t-md">
+                    <CardTitle className="text-2xl font-semibold text-white">Review and Submit</CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4">
-                    <div className="bg-gray-50 p-4 rounded-lg shadow-inner mb-4">
-                      <h4 className="font-medium mb-2 text-lg text-gray-700">Product Summary</h4>
+                  <CardContent className="p-6">
+                    <div className="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
+                      <h4 className="font-semibold mb-4 text-xl text-gray-800">Product Summary</h4>
                       {product.image && (
                         <img 
                           src={URL.createObjectURL(product.image)} 
                           alt="Product preview" 
-                          className="mx-auto max-h-48 rounded-lg mb-4"
+                          className="mx-auto max-h-48 rounded-lg shadow-md mb-6"
                         />
                       )}
-                      <p><strong>Name:</strong> {product.name}</p>
-                      <p><strong>Category:</strong> {product.category}</p>
-                      <p><strong>Price:</strong> ${parseFloat(product.price).toFixed(2)}</p>
-                      <p><strong>Discounted Price:</strong> ${(parseFloat(product.price) * (1 - parseFloat(product.discount) / 100)).toFixed(2)}</p>
-                      <p><strong>Quantity:</strong> {product.quantity}</p>
-                      <p><strong>Discount:</strong> {product.discount}%</p>
-                      <p><strong>Description:</strong> <span dangerouslySetInnerHTML={{ __html: product.description }} /></p>
+                      <div className="space-y-2 text-sm">
+                        <p><strong className="text-gray-700">Name:</strong> {product.name}</p>
+                        <p><strong className="text-gray-700">Category:</strong> {product.category}</p>
+                        <p><strong className="text-gray-700">Price:</strong> ${parseFloat(product.price).toFixed(2)}</p>
+                        <p><strong className="text-gray-700">Discounted Price:</strong> ${(parseFloat(product.price) * (1 - parseFloat(product.discount) / 100)).toFixed(2)}</p>
+                        <p><strong className="text-gray-700">Quantity:</strong> {product.quantity}</p>
+                        <p><strong className="text-gray-700">Discount:</strong> {product.discount}%</p>
+                        <div>
+                          <strong className="text-gray-700">Description:</strong>
+                          <div className="mt-2 text-muted-foreground" dangerouslySetInnerHTML={{ __html: product.description }} />
+                        </div>
+                      </div>
                     </div>
-                    <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all duration-300" disabled={loading}>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-105" 
+                      disabled={loading}
+                    >
                       {loading ? 'Adding Product...' : 'Add Product'}
                     </Button>
                   </CardContent>

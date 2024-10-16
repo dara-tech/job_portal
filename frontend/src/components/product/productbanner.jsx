@@ -79,7 +79,7 @@ const ProductBanner = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
               >
-                <div className='text-muted-foreground font-light' dangerouslySetInnerHTML={{ __html: currentProduct.description.substring(0, 100) + '...' }} />
+                <div className='text-muted-foreground font-light' dangerouslySetInnerHTML={{ __html: currentProduct.description.substring(0, 100) }} />
               </motion.p>
               <motion.div 
                 className="flex items-center justify-center md:justify-start mb-8"

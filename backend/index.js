@@ -92,16 +92,7 @@
 //   try {
 //     await connectDB();
 //     httpServer.listen(PORT, () => {
-//       console.log(`Server running at port ${PORT}`);
-      
-//       // Set up auto-reload mechanism
-//       setInterval(() => {
-//         https.get('https://job-portal-u3t0.onrender.com', (res) => {
-//           console.log('Auto-reload request sent. Status:', res.statusCode);
-//         }).on('error', (err) => {
-//           console.error('Error during auto-reload request:', err.message);
-//         });
-//       }, 60000); // 60000 ms = 1 minute
+//       console.log(`Server running at http://localhost:${PORT}`);
 //     });
 //   } catch (error) {
 //     console.error('Failed to connect to the database', error);

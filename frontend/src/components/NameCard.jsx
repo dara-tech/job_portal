@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useInView } from 'react-intersection-observer';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 const socialIcons = {
     LinkedIn: Linkedin,
@@ -61,6 +62,7 @@ const NameCard = ({ user, socialLinks }) => {
         triggerOnce: true,
     });
     const controls = useAnimation();
+    const [showQRCode, setShowQRCode] = useState(false);
 
     useEffect(() => {
         if (inView) {
@@ -69,8 +71,8 @@ const NameCard = ({ user, socialLinks }) => {
     }, [controls, inView]);
 
     useEffect(() => {
-        setQrValue(`${window.location.origin}/profile`);
-    }, []);
+        setQrValue(`${window.location.origin}/profile/${user?.id || ''}`);
+    }, [user?.id]);
 
     const exportNameCard = useCallback(() => {
         const nameCardElement = document.getElementById('name-card');
@@ -89,9 +91,9 @@ const NameCard = ({ user, socialLinks }) => {
 
     return (
         <Card ref={ref} className="mt-8 shadow-xl transition-all duration-300 hover:shadow-2xl font-sans">
-            <CardHeader className="flex justify-between items-center">
+            <CardHeader className="flex flex-col sm:flex-row justify-between items-center">
                 <motion.h3
-                    className="text-3xl font-bold flex items-center tracking-tight text-black dark:text-white mb-2"
+                    className="text-2xl sm:text-3xl font-bold flex items-center tracking-tight text-black dark:text-white mb-4 sm:mb-2"
                     initial={{ opacity: 0, y: -20 }}
                     animate={controls}
                     variants={{
@@ -99,10 +101,10 @@ const NameCard = ({ user, socialLinks }) => {
                     }}
                 >
                     Digital Business Card
-                    <Sparkles className="ml-2 h-6 w-6 text-yellow-400 animate-pulse" />
+                    <Sparkles className="ml-2 h-5 w-5 sm:h-6 sm:w-6 text-yellow-400 animate-pulse" />
                 </motion.h3>
                 <motion.div
-                    className="flex items-center space-x-4"
+                    className="flex items-center"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
@@ -114,7 +116,7 @@ const NameCard = ({ user, socialLinks }) => {
                         }}
                         defaultValue={localStorage.getItem('preferredTheme') || theme}
                     >
-                        <SelectTrigger className="w-[180px] transition-all duration-300 hover:shadow-md">
+                        <SelectTrigger className="w-[150px] sm:w-[180px] transition-all duration-300 hover:shadow-md">
                             <Palette className="mr-2 h-4 w-4 animate-pulse" />
                             <SelectValue placeholder="Select theme" />
                         </SelectTrigger>
@@ -144,7 +146,7 @@ const NameCard = ({ user, socialLinks }) => {
             <CardContent>
                 <motion.div
                     id="name-card"
-                    className={`${themes[theme].primary} p-8 rounded-lg shadow-2xl max-w-md mx-auto text-white relative overflow-hidden`}
+                    className={`${themes[theme].primary} p-4 sm:p-8 rounded-lg shadow-2xl max-w-md mx-auto text-white relative overflow-hidden`}
                     initial="hidden"
                     animate={controls}
                     variants={{
@@ -170,14 +172,14 @@ const NameCard = ({ user, socialLinks }) => {
                     >
                         {randomEmoji}
                     </motion.div>
-                    <motion.div className="flex items-center mb-8" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
-                        <Avatar className="h-32 w-32 mr-6 ring-4 ring-white shadow-xl">
+                    <motion.div className="flex flex-col sm:flex-row items-center mb-6 sm:mb-8" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
+                        <Avatar className="h-24 w-24 sm:h-32 sm:w-32 mb-4 sm:mb-0 sm:mr-6 ring-4 ring-white shadow-xl">
                             <AvatarImage src={user?.profile?.profilePhoto || "/placeholder.svg?height=128&width=128"} alt={user?.fullname || "User"} />
                             <AvatarFallback>{user?.fullname?.[0] || "U"}</AvatarFallback>
                         </Avatar>
-                        <div>
-                            <h2 className="text-4xl font-extrabold mb-2 tracking-tight">{user?.fullname || "User Name"}</h2>
-                            <p className="text-lg opacity-90 mb-3 leading-relaxed">{user?.profile?.bio || "Professional Bio"}</p>
+                        <div className="text-center sm:text-left">
+                            <h2 className="text-3xl sm:text-4xl font-extrabold mb-2 tracking-tight">{user?.fullname || "User Name"}</h2>
+                            <p className="text-base sm:text-lg opacity-90 mb-3 leading-relaxed">{user?.profile?.bio || "Professional Bio"}</p>
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger>
@@ -196,7 +198,7 @@ const NameCard = ({ user, socialLinks }) => {
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-                            <div className="flex flex-wrap items-center mt-3">
+                            <div className="flex flex-wrap justify-center sm:justify-start items-center mt-3">
                                 <div className="flex flex-wrap gap-2">
                                     {user?.profile?.skills ? (
                                         (Array.isArray(user.profile.skills) 
@@ -227,21 +229,32 @@ const NameCard = ({ user, socialLinks }) => {
                             )}
                         </div>
                     </motion.div>
-                    <motion.div className="flex justify-between items-start mb-8" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
-                        <div className="space-y-4 flex-1">
-                            <motion.p whileHover={{ x: 5 }} className="flex items-center text-lg"><MapPin className="mr-3 h-6 w-6" />{Array.isArray(user?.profile?.location) ? user.profile.location.join(", ") : "Location not specified"}</motion.p>
-                            <motion.p whileHover={{ x: 5 }} className="flex items-center text-lg"><Phone className="mr-3 h-6 w-6" /><a href={`tel:${user?.phoneNumber}`} className="hover:underline">{user?.phoneNumber || "Phone number"}</a></motion.p>
-                            <motion.p whileHover={{ x: 5 }} className="flex items-center text-lg"><Mail className="mr-3 h-6 w-6" /><a href={`mailto:${user?.email}`} className="hover:underline">{user?.email || "Email address"}</a></motion.p>
+                    <motion.div className="flex flex-col sm:flex-row justify-between items-start mb-6 sm:mb-8" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
+                        <div className="space-y-3 sm:space-y-4 flex-1 w-full sm:w-auto mb-4 sm:mb-0">
+                            <motion.p whileHover={{ x: 5 }} className="flex items-center text-base sm:text-lg"><MapPin className="mr-3 h-5 w-5 sm:h-6 sm:w-6" />{Array.isArray(user?.profile?.location) ? user.profile.location.join(", ") : "Location not specified"}</motion.p>
+                            <motion.p whileHover={{ x: 5 }} className="flex items-center text-base sm:text-lg"><Phone className="mr-3 h-5 w-5 sm:h-6 sm:w-6" /><a href={`tel:${user?.phoneNumber}`} className="hover:underline">{user?.phoneNumber || "Phone number"}</a></motion.p>
+                            <motion.p whileHover={{ x: 5 }} className="flex items-center text-base sm:text-lg"><Mail className="mr-3 h-5 w-5 sm:h-6 sm:w-6" /><a href={`mailto:${user?.email}`} className="hover:underline">{user?.email || "Email address"}</a></motion.p>
                         </div>
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                            className="ml-6"
-                        >
-                            <QRCodeSVG value={qrValue} size={140} level="H" includeMargin={true} />
-                        </motion.div>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button 
+                                    variant="outline" 
+                                    className="mt-4 sm:mt-0 bg-white/10 hover:bg-white/20 text-white border-white/30"
+                                    onClick={() => setShowQRCode(true)}
+                                >
+                                    <QRCodeSVG value={qrValue} size={24} className="mr-2" />
+                                    Show QR Code
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <div className="flex flex-col items-center justify-center p-6">
+                                    <QRCodeSVG value={qrValue} size={200} level="H" includeMargin={true} />
+                                    <p className="mt-4 text-sm text-gray-500">Scan this QR code to view the profile</p>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </motion.div>
-                    <motion.div className="flex flex-wrap justify-center gap-6 mt-8 pt-6 border-t border-white/30" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
+                    <motion.div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/30" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                         <AnimatePresence>
                             {Object.entries(socialLinks).map(([platform, link], index) => {
                                 const Icon = socialIcons[platform] || ExternalLink
@@ -259,8 +272,8 @@ const NameCard = ({ user, socialLinks }) => {
                                         exit={{ opacity: 0, y: -20 }}
                                         transition={{ delay: index * 0.1 }}
                                     >
-                                        <Icon className="h-8 w-8 mr-2" />
-                                        <span className="text-lg">{platform}</span>
+                                        <Icon className="h-6 w-6 sm:h-8 sm:w-8 mr-2" />
+                                        <span className="text-base sm:text-lg">{platform}</span>
                                     </motion.a>
                                 )
                             })}
@@ -268,10 +281,23 @@ const NameCard = ({ user, socialLinks }) => {
                     </motion.div>
                 </motion.div>
             </CardContent>
-            <CardFooter>
-                <Button onClick={exportNameCard} className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 group text-lg py-6">
-                    <Download className="mr-3 h-6 w-6 group-hover:animate-bounce" />
-                    Export Digital Business Card
+            <CardFooter className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={exportNameCard} className="w-full sm:w-1/2 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 group text-base sm:text-lg py-4 sm:py-6">
+                    <Download className="mr-3 h-5 w-5 sm:h-6 sm:w-6 group-hover:animate-bounce" />
+                    Export Card
+                </Button>
+                <Button 
+                    className="w-full sm:w-1/2 bg-green-600 hover:bg-green-700 text-white transition-colors duration-300 group text-base sm:text-lg py-4 sm:py-6"
+                    onClick={() => {
+                        navigator.share({
+                            title: `${user?.fullname}'s Digital Business Card`,
+                            text: 'Check out my digital business card!',
+                            url: `${window.location.origin}/profile/${user?.id || ''}`,
+                        }).catch((error) => console.log('Error sharing', error));
+                    }}
+                >
+                    <Share2 className="mr-3 h-5 w-5 sm:h-6 sm:w-6" />
+                    Share Card
                 </Button>
             </CardFooter>
         </Card>
