@@ -74,7 +74,7 @@ export default function Logo() {
       style={{ transformStyle: 'preserve-3d' }}
     >
       <div className="relative flex items-center">
-        {"Gen".split('').map((letter, index) => (
+        {"Gen".split(' ').map((letter, index) => (
           <motion.span
             key={index}
             className="text-4xl font-extrabold text-primary"
@@ -103,12 +103,12 @@ export default function Logo() {
           </defs>
           <text
             x="0"
-            y="38"
+            y="37.5"
             className="text-4xl"
             fontWeight="800"
             fill="url(#gradient)"
             fontFamily="Arial, sans-serif"
-            style={{ letterSpacing: '-0.02em' }}
+            style={{ letterSpacing: '-0.05em' }}
           >
             Z
           </text>

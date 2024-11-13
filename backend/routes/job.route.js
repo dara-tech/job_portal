@@ -38,6 +38,7 @@ router.post('/save/:id', isAuthenticated, saveJob);
 router.get('/saved', isAuthenticated, getSavedJobs);
 router.get('/unsaved/:id', isAuthenticated, unsaveJob);
 router.get('/is-saved/:id', isAuthenticated, isJobSaved);
+
 router.get('/applicants', isAuthenticated, getAllApplicants);
 
 export default router;

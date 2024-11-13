@@ -33,7 +33,7 @@ export function ModeToggle() {
         <Button
           variant="outline"
           size="icon"
-          className={`relative overflow-hidden w-10 h-10 rounded-full bg-gradient-to-br ${currentTheme.bgClass} shadow-md hover:shadow-lg transition-shadow duration-300`}
+          className={`relative overflow-hidden w-10 h-10 rounded-full bg-gradient-to-br ${currentTheme.bgClass} hover:shadow-lg transition-shadow duration-300`}
         >
           <AnimatePresence mode="wait">
             <motion.div

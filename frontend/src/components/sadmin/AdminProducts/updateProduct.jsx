@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "react-hot-toast";
 import { PRODUCT_API_ENDPOINT } from "../../../utils/constant";
 import { motion } from "framer-motion";
-import { FiPackage, FiX, FiDollarSign, FiImage, FiUploadCloud } from "react-icons/fi";
+import { FiPackage, FiX, FiDollarSign, FiImage, FiUploadCloud, FiLink } from "react-icons/fi";
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
@@ -31,6 +31,7 @@ function UpdateProduct() {
   const [salePrice, setSalePrice] = useState(0);
   const [errors, setErrors] = useState({});
   const [isRemovingBg, setIsRemovingBg] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     fetchProduct();
@@ -100,6 +101,70 @@ function UpdateProduct() {
 
   const removeImage = () => {
     setProduct(prev => ({ ...prev, image: null }));
+  };
+
+  const handleImageUrlChange = (e) => {
+    setImageUrl(e.target.value);
+  };
+
+  const handleImageUrlSubmit = async () => {
+    if (!imageUrl) return;
+
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "product_image.jpg", { type: blob.type });
+      setProduct(prev => ({ ...prev, image: file }));
+      setErrors(prev => ({ ...prev, image: "" }));
+      setImageUrl("");
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      toast.error('Failed to fetch the image from the provided URL');
+    }
+  };
+
+  const removeBackground = async () => {
+    if (!product.image) {
+      toast.error("No image to remove background from");
+      return;
+    }
+
+    setIsRemovingBg(true);
+    const formData = new FormData();
+
+    try {
+      let imageBlob;
+      if (product.image instanceof File) {
+        imageBlob = product.image;
+      } else {
+        const response = await fetch(product.image);
+        imageBlob = await response.blob();
+      }
+
+      formData.append('image_file', imageBlob, 'image.jpg');
+      formData.append('size', 'auto');
+
+      const response = await axios({
+        method: 'post',
+        url: 'https://api.remove.bg/v1.0/removebg',
+        data: formData,
+        responseType: 'arraybuffer',
+        headers: {
+          'X-Api-Key': 'YqztAGpNGqCEmZbg3BDboxmA',
+        },
+      });
+
+      const blob = new Blob([response.data], { type: 'image/png' });
+      const file = new File([blob], 'removed-bg.png', { type: 'image/png' });
+      setProduct(prev => ({ ...prev, image: file }));
+
+      toast.success('Background removed successfully');
+    } catch (error) {
+      console.error('Error removing background:', error);
+      toast.error('Failed to remove background');
+    } finally {
+      setIsRemovingBg(false);
+    }
   };
 
   const validateForm = () => {
@@ -178,42 +243,7 @@ function UpdateProduct() {
       setLoading(false);
     }
   };
-
-  const removeBackground = async () => {
-    if (!product.image) {
-      toast.error("No image to remove background from");
-      return;
-    }
-
-    setIsRemovingBg(true);
-    const formData = new FormData();
-    formData.append('image_file', product.image instanceof File ? product.image : await fetch(product.image).then(r => r.blob()));
-    formData.append('size', 'auto');
-
-    try {
-      const response = await axios({
-        method: 'post',
-        url: 'https://api.remove.bg/v1.0/removebg',
-        data: formData,
-        responseType: 'arraybuffer',
-        headers: {
-          'X-Api-Key': 'YqztAGpNGqCEmZbg3BDboxmA',
-        },
-      });
-
-      const blob = new Blob([response.data], { type: 'image/png' });
-      const file = new File([blob], 'removed-bg.png', { type: 'image/png' });
-      setProduct(prev => ({ ...prev, image: file }));
-      toast.success('Background removed successfully');
-    } catch (error) {
-      console.error('Error removing background:', error);
-      toast.error('Failed to remove background');
-    } finally {
-      setIsRemovingBg(false);
-    }
-  };
-
-  const handleDescriptionChange = (content) => {
+const handleDescriptionChange = (content) => {
     setProduct(prev => ({ ...prev, description: content }));
     setErrors(prev => ({ ...prev, description: "" }));
   };
@@ -356,33 +386,72 @@ function UpdateProduct() {
               <div className="space-y-6">
                 {/* Image Upload */}
                 <Card className="shadow-sm">
-                  <CardHeader className="bg-gray-50">
-                    <CardTitle className="text-xl font-semibold text-gray-700 flex items-center">
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-blue-600 rounded-t-md">
+                    <CardTitle className="text-xl font-semibold text-white flex items-center">
                       <FiImage className="mr-2" /> Product Image
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-4">
-                    <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer ${isDragActive ? 'border-gray-400 bg-gray-50' : 'border-gray-300'}`}>
+                    <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors duration-300 ${
+                      isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                    }`}>
                       <input {...getInputProps()} />
                       {product.image ? (
                         <div className="relative">
-                          <img src={product.image instanceof File ? URL.createObjectURL(product.image) : product.image} alt="Product preview" className="mx-auto max-h-48 rounded-lg" />
-                          <Button onClick={removeImage} variant="destructive" className="absolute top-2 right-2">
-                            <FiX className="mr-2" /> Remove
-                          </Button>
+                          <img 
+                            src={product.image instanceof File ? URL.createObjectURL(product.image) : product.image} 
+                            alt="Product preview" 
+                            className="mx-auto max-h-48 rounded-lg shadow-md"
+                          />
+                          <button 
+                            onClick={removeImage} 
+                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1 hover:bg-red-600 transition-colors duration-300"
+                          >
+                            <FiX />
+                          </button>
                         </div>
-                      ) : isDragActive ? (
-                        <p>Drop the image here ...</p>
                       ) : (
-                        <p>Drag 'n' drop an image here, or click to select one</p>
+                        <div>
+                          <FiUploadCloud className="mx-auto h-12 w-12 text-blue-400" />
+                          <p className="mt-2 text-sm text-gray-600">Drag 'n' drop an image here, or click to select one</p>
+                        </div>
                       )}
                     </div>
-                    {product.image && (
-                      <div className="mt-4">
-                        <Button onClick={removeBackground} disabled={isRemovingBg} className="w-full">
-                          {isRemovingBg ? 'Removing Background...' : 'Remove Background'}
+                    {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+                    
+                    <Separator className="my-6" />
+                    
+                    <div className="space-y-4">
+                      <Label htmlFor="imageUrl" className="text-lg font-light text-muted-foreground flex items-center">
+                        <FiLink className="mr-2 text-blue-500" /> Image URL
+                      </Label>
+                      <div className="flex">
+                        <Input
+                          id="imageUrl"
+                          type="url"
+                          placeholder="https://example.com/image.jpg"
+                          value={imageUrl}
+                          onChange={handleImageUrlChange}
+                          className="flex-grow mr-2 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                        />
+                        <Button 
+                          onClick={handleImageUrlSubmit} 
+                          type="button"
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition-colors duration-300"
+                        >
+                          Add Image
                         </Button>
                       </div>
+                    </div>
+                    
+                    {product.image && (
+                      <Button
+                        onClick={removeBackground}
+                        disabled={isRemovingBg}
+                        className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300"
+                      >
+                        {isRemovingBg ? 'Removing Background...' : 'Remove Background'}
+                      </Button>
                     )}
                   </CardContent>
                 </Card>

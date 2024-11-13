@@ -340,7 +340,7 @@ const TopPerformingPosts = ({ blogs, metric }) => {
   const maxValue = Math.max(...sortedBlogs.map(getMetricValue));
 
   const handleViewPost = (postId) => {
-    navigate(`/admin/blog/${postId}`);
+    navigate(`/blog/${postId}`);
   };
 
   const handleEditPost = (postId) => {

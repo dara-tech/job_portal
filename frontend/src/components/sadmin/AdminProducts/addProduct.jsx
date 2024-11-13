@@ -12,9 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 import { FiPackage, FiDollarSign, FiImage, FiUploadCloud, FiX, FiLink } from "react-icons/fi";
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios'; // Make sure to install and import axios
-import ReactQuill from 'react-quill'; // Add this import
-import 'react-quill/dist/quill.snow.css'; // Add this import for styles
+import axios from 'axios'; // Ensure axios is installed
+import ReactQuill from 'react-quill'; // Ensure react-quill is installed
+import 'react-quill/dist/quill.snow.css'; // Ensure styles are imported
 // import GoogleImageSearch from './components/Googlesearch';
 
 function AddProduct() {
@@ -126,7 +126,6 @@ function AddProduct() {
     if (!validateForm()) return;
 
     setLoading(true);
-
     const formData = new FormData();
     for (const key in product) {
       formData.append(key, product[key]);
@@ -140,7 +139,6 @@ function AddProduct() {
       });
 
       if (!response.ok) {
-        console.log(response);
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to add product');
       }

@@ -25,11 +25,11 @@ const ProductCard = ({ product }) => {
       className="group"
     >
       <Card className="w-full max-w-sm mx-auto overflow-hidden rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white border-none dark:bg-gray-900">
-        <div className="relative h-80 w-full overflow-hidden">
+        <div className="relative w-full pb-[100%] overflow-hidden">
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="absolute bottom-2 left-4 right-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex space-x-2">

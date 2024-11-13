@@ -135,7 +135,9 @@ import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import chatHandler from './middlewares/chatHandler.js';
 import blogRoute from './routes/blog.route.js';
+import pageRoutes from './routes/pageRoutes.js';
 import productRoute from './routes/productRoutes.js';
+import { Server } from 'socket.io';
 import path from 'path';
 import https from 'https';
 
@@ -160,6 +162,7 @@ app.use("/api/v1/application", applicationRoute);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/blog', blogRoute);
+ app.use('/api/v1/page', pageRoutes);
 app.use('/api/v1/product', productRoute);
 
 app.use(express.static(path.join(_dirname,'/frontend/dist')));
@@ -173,6 +176,16 @@ app.use((err, req, res, next) => {
     message: 'Something went wrong!',
     success: false
   });
+});
+
+//  Set up Socket.IO
+const io = new Server(httpServer, {
+  cors: corsOptions,
+});
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  chatHandler(io, socket);
 });
 
 const startServer = async () => {

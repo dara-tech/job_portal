@@ -99,7 +99,7 @@ function ProductTable() {
   };
 
   const handleView = (productId) => {
-    navigate(`/admin/products/${productId}`);
+    navigate(`/products/${productId}`);
   };
 
   const handleUpdate = (productId) => {
