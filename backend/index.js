@@ -116,7 +116,6 @@
 // startServer();
 
 
-
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -130,21 +129,22 @@ import connectDB from './utils/db.js';
 import userRoute from './routes/user.route.js';
 import companyRoute from './routes/company.route.js';
 import jobRoute from './routes/job.route.js';
-import applicationRoute from "./routes/application.route.js";
+import applicationRoute from './routes/application.route.js';
 import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import chatHandler from './middlewares/chatHandler.js';
 import blogRoute from './routes/blog.route.js';
 import pageRoutes from './routes/pageRoutes.js';
 import productRoute from './routes/productRoutes.js';
-import { Server } from 'socket.io';
 import path from 'path';
 import https from 'https';
 
+dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+const __dirname = path.resolve();
 
-const _dirname = path.resolve()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -158,17 +158,18 @@ app.use(cors(corsOptions));
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/job', jobRoute);
-app.use("/api/v1/application", applicationRoute);
+app.use('/api/v1/application', applicationRoute);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/blog', blogRoute);
- app.use('/api/v1/page', pageRoutes);
+app.use('/api/v1/page', pageRoutes);
 app.use('/api/v1/product', productRoute);
 
-app.use(express.static(path.join(_dirname,'/frontend/dist')));
-app.get ('*',(_,res)=>{
-  res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
-})
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+app.get('*', (_, res) => {
+  res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -178,7 +179,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-//  Set up Socket.IO
+// Create the HTTP server and attach Socket.IO
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: corsOptions,
 });
@@ -191,7 +193,7 @@ io.on('connection', (socket) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`Server running at port ${PORT}`);
       
       // Set up auto-reload mechanism
