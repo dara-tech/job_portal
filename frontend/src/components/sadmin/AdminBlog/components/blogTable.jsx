@@ -32,7 +32,7 @@ export default function BlogTable() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isImportPostOpen, setIsImportPostOpen] = useState(false);
   const navigate = useNavigate();
-  const itemsPerPage = 5;
+  const itemsPerPage = 9;
 
   const showNotification = useCallback((message, type = 'info') => {
     toast[type](message);

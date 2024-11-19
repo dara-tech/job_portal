@@ -23,18 +23,18 @@ export const generateBlogPost = async (title, tags) => {
   The blog post should be informative and engaging. The content should be in JSON format.`;
 
   try {
-    const result = await model.generate({
-      prompt, // Simplified prompt format
-      ...generationConfig,
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig,
     });
 
-    // Extracting the text content from the result
-    const rawText = result.content; // assuming `content` holds the response
+    const response = result.response;
+    const rawText = await response.text();
 
-    // Parse or clean the raw text as JSON
+    // Clean up the text to remove unnecessary characters and fix JSON formatting
     const cleanedText = cleanJSONText(rawText);
     
-    return JSON.parse(cleanedText);
+    return cleanedText;
   } catch (error) {
     console.error("Error generating blog post:", error);
     throw new Error("Failed to generate blog post content");
@@ -43,15 +43,10 @@ export const generateBlogPost = async (title, tags) => {
 
 // Helper function to clean JSON text
 const cleanJSONText = (text) => {
-  try {
-    // Parse the text directly as JSON if it's valid
-    return JSON.stringify(JSON.parse(text));
-  } catch (e) {
-    // Fallback: If parsing fails, try to clean and reformat
-    return text
-      .replace(/\\n/g, ' ') // Replace newline characters with spaces
-      .replace(/\s+/g, ' ') // Collapse multiple spaces into a single space
-      .replace(/\\\"/g, '"') // Unescape double quotes
-      .trim();               // Remove trailing and leading whitespace
-  }
+  // Remove any invalid characters, unnecessary line breaks, and trim whitespace
+  return text
+    .replace(/\\n/g, ' ') // Replace newline characters with spaces
+    .replace(/\s+/g, ' ') // Collapse multiple spaces into a single space
+    .replace(/\\\"/g, '"') // Unescape double quotes
+    .trim();               // Remove trailing and leading whitespace
 };
