@@ -344,7 +344,7 @@ const TopPerformingPosts = ({ blogs, metric }) => {
   };
 
   const handleEditPost = (postId) => {
-    navigate(`/admin/blog/edit/${postId}`);
+    navigate(`/admin/blog/update/${postId}`);
   };
 
   const handleDeletePost = (postId) => {

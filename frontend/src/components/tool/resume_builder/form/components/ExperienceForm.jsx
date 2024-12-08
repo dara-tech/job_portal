@@ -4,9 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Plus, Trash2, Wand2 } from "lucide-react";
+import { Plus, Trash2, Wand2, X } from "lucide-react";
 import { generateExperience } from '../../hook/Exp';
-
 
 export default function ExperienceForm({ experience, onChange }) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -26,7 +25,7 @@ export default function ExperienceForm({ experience, onChange }) {
       position: '', 
       startDate: '', 
       endDate: '', 
-      description: '' 
+      responsibilities: [] 
     }]);
   }, [experience, onChange]);
 
@@ -35,12 +34,18 @@ export default function ExperienceForm({ experience, onChange }) {
     onChange(updatedExperience);
   }, [experience, onChange]);
 
+  const removeResponsibility = useCallback((expIndex, respIndex) => {
+    const updatedExperience = [...experience];
+    updatedExperience[expIndex].responsibilities = updatedExperience[expIndex].responsibilities.filter((_, i) => i !== respIndex);
+    onChange(updatedExperience);
+  }, [experience, onChange]);
+
   const generateContent = useCallback(async (index) => {
     setIsGenerating(true);
     setError(null);
     setActiveExperienceIndex(index);
     try {
-      const content = await generateWorkExperienceDescription(experience[index]);
+      const content = await generateExperience(experience[index]);
       setGeneratedContent(content);
     } catch (err) {
       console.error("Error generating content:", err);
@@ -52,7 +57,7 @@ export default function ExperienceForm({ experience, onChange }) {
 
   const handleAIUpdate = useCallback((aiGeneratedContent, index) => {
     const updatedExperience = [...experience];
-    updatedExperience[index].description = aiGeneratedContent;
+    updatedExperience[index].responsibilities = aiGeneratedContent.split('\n').filter(item => item.trim());
     onChange(updatedExperience);
     setGeneratedContent(null);
   }, [experience, onChange]);
@@ -68,7 +73,7 @@ export default function ExperienceForm({ experience, onChange }) {
             <AccordionItem value={`experience-${index}`} key={index}>
               <AccordionTrigger>{exp.company || `Experience ${index + 1}`}</AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-4">
+                <div className="space-y-4 ">
                   <Input
                     placeholder="Company"
                     value={exp.company}
@@ -91,22 +96,40 @@ export default function ExperienceForm({ experience, onChange }) {
                     value={exp.endDate}
                     onChange={(e) => handleInputChange(e, index, 'endDate')}
                   />
-                  <Textarea
-                    placeholder="Description"
-                    value={exp.description}
-                    onChange={(e) => handleInputChange(e, index, 'description')}
-                  />
+                  <div>
+                    <label className="block mb-2">Responsibilities:</label>
+                    {exp.responsibilities?.map((resp, respIndex) => (
+                      <div key={respIndex} className="mb-2 flex items-center gap-2">
+                        <Input
+                          value={resp}
+                          onChange={(e) => {
+                            const updatedExperience = [...experience];
+                            updatedExperience[index].responsibilities[respIndex] = e.target.value;
+                            onChange(updatedExperience);
+                          }}
+                        />
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => removeResponsibility(index, respIndex)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                   <Button type="button" onClick={() => generateContent(index)} disabled={isGenerating}>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Generate Description
+                    Generate Responsibilities
                   </Button>
                   {isGenerating && index === activeExperienceIndex && (
-                    <p className="text-blue-500 text-sm">Generating description...</p>
+                    <p className="text-blue-500 text-sm">Generating responsibilities...</p>
                   )}
                   {generatedContent && index === activeExperienceIndex && (
                     <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
                       <h4 className="text-sm font-semibold mb-2">AI-Generated Suggestion:</h4>
-                      <p className="text-sm italic">{generatedContent}</p>
+                      <p className="text-sm italic whitespace-pre-line">{generatedContent}</p>
                       <div className="flex space-x-2 mt-3">
                         <Button
                           type="button"
@@ -114,7 +137,7 @@ export default function ExperienceForm({ experience, onChange }) {
                           size="sm"
                           onClick={() => handleAIUpdate(generatedContent, index)}
                         >
-                          Use This Description
+                          Use These Responsibilities
                         </Button>
                         <Button
                           type="button"
@@ -129,7 +152,7 @@ export default function ExperienceForm({ experience, onChange }) {
                     </div>
                   )}
                   <Button type="button" variant="destructive" onClick={() => removeExperience(index)}>
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="mr-2 h-4 w-4 " />
                     Remove
                   </Button>
                 </div>

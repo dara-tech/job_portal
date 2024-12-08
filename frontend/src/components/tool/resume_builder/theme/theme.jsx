@@ -16,19 +16,30 @@ const ClassicLayout = ({ resume }) => (
         <p dangerouslySetInnerHTML={{ __html: resume.summary }}></p>
       </section>
       <section className="mb-4">
-        <h2 className="text-xl font-semibold mb-2">Experience</h2>
-        {resume.experience.map((exp, index) => (
-          <div key={index} className="mb-2">
-            <h3 className="font-semibold" dangerouslySetInnerHTML={{ __html: exp.company }}></h3>
-            <p dangerouslySetInnerHTML={{ __html: `${exp.position} | ${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` }}></p>
-            <ul>
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+  <h2 className="text-xl font-semibold mb-2">Experience</h2>
+  {resume.experience.map((exp, index) => (
+    <div key={index} className="mb-2">
+      <h3
+        className="font-semibold"
+        dangerouslySetInnerHTML={{ __html: exp.company || "No company provided" }}
+      ></h3>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: `${exp.position || "No position provided"} | ${
+            exp.startDate ? new Date(exp.startDate).getFullYear() : "N/A"
+          } - ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`,
+        }}
+      ></p>
+      <ul>
+        {Array.isArray(exp.responsibilities) &&
+          exp.responsibilities.map((resp, idx) => (
+            <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
+          ))}
+      </ul>
+    </div>
+  ))}
+</section>
+
       <section className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Education</h2>
         {resume.education.map((edu, index) => (
@@ -86,20 +97,30 @@ const ModernLayout = ({ resume }) => (
     </CardHeader>
     <CardContent className="grid grid-cols-3 gap-4 mt-4">
       <div className="col-span-2">
-        <section className="mb-4">
-          <h2 className="text-xl font-semibold mb-2 text-blue-600">Experience</h2>
-          {resume.experience.map((exp, index) => (
-            <div key={index} className="mb-2">
-              <h3 className="font-semibold" dangerouslySetInnerHTML={{ __html: exp.company }}></h3>
-              <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: `${exp.position} | ${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` }}></p>
-              <ul>
-                {exp.responsibilities.map((resp, idx) => (
-                  <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
-                ))}
-              </ul>
-            </div>
+      <section className="mb-4">
+  <h2 className="text-xl font-semibold mb-2 text-blue-600">Experience</h2>
+  {resume.experience.map((exp, index) => (
+    <div key={index} className="mb-2">
+      <h3
+        className="font-semibold"
+        dangerouslySetInnerHTML={{ __html: exp.company || "No company provided" }}
+      ></h3>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: `${exp.position || "No position provided"} | ${
+            exp.startDate ? new Date(exp.startDate).getFullYear() : "N/A"
+          } - ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`,
+        }}
+      ></p>
+      <ul>
+        {Array.isArray(exp.responsibilities) &&
+          exp.responsibilities.map((resp, idx) => (
+            <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
           ))}
-        </section>
+      </ul>
+    </div>
+  ))}
+</section>
         <section className="mb-4">
           <h2 className="text-xl font-semibold mb-2 text-blue-600">Projects</h2>
           {resume.projects.map((project, index) => (
@@ -164,20 +185,30 @@ const MinimalistLayout = ({ resume }) => (
       <section className="mb-6">
         <p className="text-sm" dangerouslySetInnerHTML={{ __html: resume.summary }}></p>
       </section>
-      <section className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Experience</h2>
-        {resume.experience.map((exp, index) => (
-          <div key={index} className="mb-2">
-            <h3 className="font-medium" dangerouslySetInnerHTML={{ __html: `${exp.company} - ${exp.position}` }}></h3>
-            <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: `${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` }}></p>
-            <ul className="text-sm">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+      <section className="mb-4">
+  <h2 className="text-xl font-semibold mb-2">Experience</h2>
+  {resume.experience.map((exp, index) => (
+    <div key={index} className="mb-2">
+      <h3
+        className="font-semibold"
+        dangerouslySetInnerHTML={{ __html: exp.company || "No company provided" }}
+      ></h3>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: `${exp.position || "No position provided"} | ${
+            exp.startDate ? new Date(exp.startDate).getFullYear() : "N/A"
+          } - ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`,
+        }}
+      ></p>
+      <ul>
+        {Array.isArray(exp.responsibilities) &&
+          exp.responsibilities.map((resp, idx) => (
+            <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
+          ))}
+      </ul>
+    </div>
+  ))}
+</section>
       <section className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Education</h2>
         {resume.education.map((edu, index) => (
@@ -251,21 +282,30 @@ const CreativeLayout = ({ resume }) => (
         </section>
       </div>
       <div className="space-y-8">
-        <section>
-          <h2 className="text-3xl font-bold mb-4 border-b-2 border-white pb-2">Experience</h2>
-          {resume.experience.map((exp, index) => (
-            <div key={index} className="mb-6">
-              <h3 className="text-xl font-bold" dangerouslySetInnerHTML={{ __html: exp.company }}></h3>
-              <p className="text-lg font-semibold mb-2" dangerouslySetInnerHTML={{ __html: exp.position }}></p>
-              <p className="text-sm mb-2" dangerouslySetInnerHTML={{ __html: `${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` }}></p>
-              <ul className="list-disc list-inside text-base">
-                {exp.responsibilities.map((resp, idx) => (
-                  <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
-                ))}
-              </ul>
-            </div>
+      <section className="mb-4">
+  <h2 className="text-xl font-semibold mb-2">Experience</h2>
+  {resume.experience.map((exp, index) => (
+    <div key={index} className="mb-2">
+      <h3
+        className="font-semibold"
+        dangerouslySetInnerHTML={{ __html: exp.company || "No company provided" }}
+      ></h3>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: `${exp.position || "No position provided"} | ${
+            exp.startDate ? new Date(exp.startDate).getFullYear() : "N/A"
+          } - ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`,
+        }}
+      ></p>
+      <ul>
+        {Array.isArray(exp.responsibilities) &&
+          exp.responsibilities.map((resp, idx) => (
+            <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
           ))}
-        </section>
+      </ul>
+    </div>
+  ))}
+</section>
         <section>
           <h2 className="text-3xl font-bold mb-4 border-b-2 border-white pb-2">Education</h2>
           {resume.education.map((edu, index) => (
@@ -317,20 +357,30 @@ const ProfessionalLayout = ({ resume }) => (
         <h2 className="text-2xl font-semibold mb-3 text-blue-700 border-b-2 border-blue-200 pb-2">Professional Summary</h2>
         <p className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: resume.summary }}></p>
       </section>
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-3 text-blue-700 border-b-2 border-blue-200 pb-2">Professional Experience</h2>
-        {resume.experience.map((exp, index) => (
-          <div key={index} className="mb-6">
-            <h3 className="font-semibold text-lg text-gray-800" dangerouslySetInnerHTML={{ __html: exp.position }}></h3>
-            <p className="text-sm text-blue-600 mb-2" dangerouslySetInnerHTML={{ __html: `${exp.company} | ${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` }}></p>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+      <section className="mb-4">
+  <h2 className="text-xl font-semibold mb-2">Experience</h2>
+  {resume.experience.map((exp, index) => (
+    <div key={index} className="mb-2">
+      <h3
+        className="font-semibold"
+        dangerouslySetInnerHTML={{ __html: exp.company || "No company provided" }}
+      ></h3>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: `${exp.position || "No position provided"} | ${
+            exp.startDate ? new Date(exp.startDate).getFullYear() : "N/A"
+          } - ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`,
+        }}
+      ></p>
+      <ul>
+        {Array.isArray(exp.responsibilities) &&
+          exp.responsibilities.map((resp, idx) => (
+            <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
+          ))}
+      </ul>
+    </div>
+  ))}
+</section>
       <div className="grid grid-cols-2 gap-8">
         <section>
           <h2 className="text-2xl font-semibold mb-3 text-blue-700 border-b-2 border-blue-200 pb-2">Education</h2>
@@ -405,20 +455,30 @@ const CompactLayout = ({ resume }) => (
         <h2 className="text-lg font-semibold text-blue-600 border-b border-blue-200 pb-1 mb-2">Summary</h2>
         <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: resume.summary }}></p>
       </section>
-      <section>
-        <h2 className="text-lg font-semibold text-blue-600 border-b border-blue-200 pb-1 mb-2">Experience</h2>
-        {resume.experience.map((exp, index) => (
-          <div key={index} className="mb-3">
-            <p className="font-medium text-gray-800" dangerouslySetInnerHTML={{ __html: `${exp.company} - ${exp.position}` }}></p>
-            <p className="text-sm text-gray-600 mb-1" dangerouslySetInnerHTML={{ __html: `${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` }}></p>
-            <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="text-sm" dangerouslySetInnerHTML={{ __html: resp }}></li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+      <section className="mb-4">
+  <h2 className="text-xl font-semibold mb-2">Experience</h2>
+  {resume.experience.map((exp, index) => (
+    <div key={index} className="mb-2">
+      <h3
+        className="font-semibold"
+        dangerouslySetInnerHTML={{ __html: exp.company || "No company provided" }}
+      ></h3>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: `${exp.position || "No position provided"} | ${
+            exp.startDate ? new Date(exp.startDate).getFullYear() : "N/A"
+          } - ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`,
+        }}
+      ></p>
+      <ul>
+        {Array.isArray(exp.responsibilities) &&
+          exp.responsibilities.map((resp, idx) => (
+            <li key={idx} dangerouslySetInnerHTML={{ __html: resp }}></li>
+          ))}
+      </ul>
+    </div>
+  ))}
+</section>
       <section>
         <h2 className="text-lg font-semibold text-blue-600 border-b border-blue-200 pb-1 mb-2">Education</h2>
         {resume.education.map((edu, index) => (
@@ -562,7 +622,7 @@ const TimelineLayout = ({ resume }) => (
 
 // Two-Column Layout
 const TwoColumnLayout = ({ resume }) => (
-  <Card className=" max-w-4xl mx-auto border-none shadow-lg rounded-none">
+  <Card className="max-w-4xl mx-auto border-none shadow-lg rounded-none">
     <CardContent className="grid grid-cols-3 gap-6 p-8">
       <div className="col-span-1 bg-gray-50 p-6 rounded-lg">
         <div className="mb-6">
@@ -621,9 +681,13 @@ const TwoColumnLayout = ({ resume }) => (
               <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
               <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
               <ul className="list-disc list-inside text-gray-700">
-                {exp.responsibilities.map((resp, idx) => (
-                  <li key={idx} className="mb-1">{resp}</li>
-                ))}
+                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
               </ul>
             </div>
           ))}
@@ -662,9 +726,13 @@ const ExecutiveLayout = ({ resume }) => (
             <h3 className="font-semibold text-gray-800">{exp.position}</h3>
             <p className="text-sm text-gray-600">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx}>{resp}</li>
-              ))}
+            {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
             </ul>
           </div>
         ))}
@@ -756,9 +824,13 @@ const InfographicLayout = ({ resume }) => (
               <h3 className="font-medium text-gray-800">{exp.position}</h3>
               <p className="text-sm text-gray-600">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
               <ul className="list-disc list-inside text-sm text-gray-700 mt-2">
-                {exp.responsibilities.map((resp, idx) => (
-                  <li key={idx}>{resp}</li>
-                ))}
+              {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
               </ul>
             </div>
           ))}
@@ -810,9 +882,13 @@ const SkillFocusedLayout = ({ resume }) => (
             <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
             <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+            {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
             </ul>
           </div>
         ))}
@@ -878,9 +954,13 @@ const ProjectCentricLayout = ({ resume }) => (
             <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
             <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+            {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
             </ul>
           </div>
         ))}
@@ -935,9 +1015,13 @@ const AchievementsFocusedLayout = ({ resume }) => (
             <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
             <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+            {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
             </ul>
           </div>
         ))}
@@ -1015,9 +1099,13 @@ const TechStackLayout = ({ resume }) => (
             <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
             <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+            {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
             </ul>
           </div>
         ))}
@@ -1064,9 +1152,13 @@ const MinimalistPlusLayout = ({ resume }) => (
             <h3 className="text-xl font-medium text-gray-800">{exp.position}</h3>
             <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+            {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
             </ul>
           </div>
         ))}
@@ -1134,9 +1226,13 @@ const ModernTimelineLayout = ({ resume }) => (
                       <p className="text-purple-600">{item.company}</p>
                       <p className="text-sm text-gray-600">{new Date(item.startDate).getFullYear()} - {new Date(item.endDate).getFullYear()}</p>
                       <ul className="list-disc list-inside text-gray-700 mt-2">
-                        {item.responsibilities.map((resp, idx) => (
-                          <li key={idx}>{resp}</li>
-                        ))}
+                        {Array.isArray(item.responsibilities) && item.responsibilities.length > 0 ? (
+                          item.responsibilities.map((resp, idx) => (
+                            <li key={idx} className="mb-1">{resp}</li>
+                          ))
+                        ) : (
+                          <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                        )}
                       </ul>
                     </>
                   ) : 'institution' in item ? (
@@ -1195,7 +1291,7 @@ const SkillsMatrixLayout = ({ resume }) => (
       </section>
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Skills Matrix</h2>
-        <div className="grid grid-cols-2 m:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {resume.skills.map((skill, index) => (
             <div key={index} className="bg-gray-100 rounded-lg p-4">
               <h3 className="font-semibold text-gray-800">{skill}</h3>
@@ -1213,9 +1309,13 @@ const SkillsMatrixLayout = ({ resume }) => (
             <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
             <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-700">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+              {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                exp.responsibilities.map((resp, idx) => (
+                  <li key={idx} className="mb-1">{resp}</li>
+                ))
+              ) : (
+                <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+              )}
             </ul>
           </div>
         ))}
@@ -1266,9 +1366,13 @@ const InteractiveCardLayout = ({ resume }) => (
               <h3 className="text-xl font-semibold text-gray-800">{exp.position}</h3>
               <p className="text-gray-600 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
               <ul className="list-disc list-inside text-gray-700">
-                {exp.responsibilities.map((resp, idx) => (
-                  <li key={idx} className="mb-1">{resp}</li>
-                ))}
+                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                  exp.responsibilities.map((resp, idx) => (
+                    <li key={idx} className="mb-1">{resp}</li>
+                  ))
+                ) : (
+                  <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+                )}
               </ul>
             </div>
           ))}
@@ -1339,9 +1443,13 @@ const DarkModeLayout = ({ resume }) => (
             <h3 className="text-xl font-semibold text-blue-400">{exp.position}</h3>
             <p className="text-gray-400 mb-2">{exp.company} | {new Date(exp.startDate).getFullYear()} - {new Date(exp.endDate).getFullYear()}</p>
             <ul className="list-disc list-inside text-gray-300">
-              {exp.responsibilities.map((resp, idx) => (
-                <li key={idx} className="mb-1">{resp}</li>
-              ))}
+              {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 ? (
+                exp.responsibilities.map((resp, idx) => (
+                  <li key={idx} className="mb-1">{resp}</li>
+                ))
+              ) : (
+                <li className="mb-1 text-gray-500">No responsibilities listed.</li>
+              )}
             </ul>
           </div>
         ))}

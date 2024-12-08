@@ -200,7 +200,7 @@ export default function BlogDetail() {
       </form>
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div key={comment._id} className="bg-gray-100 p-4 rounded-lg">
+          <div key={comment._id} className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
                 <Avatar className="h-8 w-8">

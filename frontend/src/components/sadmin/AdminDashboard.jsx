@@ -84,11 +84,11 @@ const Dashboard = () => {
       }
       setFilteredApplicants(
         selectedCompany === "all"
-          ? applicants
-          : applicants?.filter((applicant) => {
+          ? applicants || []
+          : (applicants || []).filter((applicant) => {
               const job = allAdminJobs.find((job) => job._id === applicant.job);
               return job && job.company?.name === selectedCompany;
-            }) || []
+            })
       );
     } else {
       setCompaniesWithApplicants([]);
@@ -109,24 +109,28 @@ const Dashboard = () => {
       name: company.name,
       employees: company.employeeCount || 0,
       jobs: allAdminJobs.filter((job) => job.company?._id === company._id).length,
-      applicants: applicants?.filter(
-        (applicant) =>
-          allAdminJobs.find(
-            (job) =>
-              job._id === applicant.job && job.company?._id === company._id
-          )
-      ).length || 0,
+      applicants: Array.isArray(applicants) 
+        ? applicants.filter(
+            (applicant) =>
+              allAdminJobs.find(
+                (job) =>
+                  job._id === applicant.job && job.company?._id === company._id
+              )
+          ).length 
+        : 0,
     }));
   }, [companies, allAdminJobs, applicants]);
 
   const applicationStatusData = useMemo(() => {
-    const statusCounts = applicants?.reduce(
+    if (!Array.isArray(applicants)) return [];
+    
+    const statusCounts = applicants.reduce(
       (acc, applicant) => {
         acc[applicant.status] = (acc[applicant.status] || 0) + 1;
         return acc;
       },
       {}
-    ) || {};
+    );
     return Object.entries(statusCounts).map(([status, count]) => ({
       name: status,
       value: count,
@@ -141,11 +145,13 @@ const Dashboard = () => {
         { withCredentials: true }
       );
       if (response.data.success) {
-        const updatedApplicants = applicants?.map((applicant) =>
-          applicant._id === applicantId
-            ? { ...applicant, status: newStatus }
-            : applicant
-        );
+        const updatedApplicants = Array.isArray(applicants) 
+          ? applicants.map((applicant) =>
+              applicant._id === applicantId
+                ? { ...applicant, status: newStatus }
+                : applicant
+            )
+          : [];
         dispatch(setAllApplicants(updatedApplicants));
       }
     } catch (error) {
