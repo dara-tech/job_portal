@@ -19,8 +19,9 @@ const generationConfig = {
 };
 
 export const generateBlogPost = async (title, tags) => {
-  const prompt = `Write a blog post with the title "${title}" and covering the following tags: ${tags.join(", ")}. 
-  The blog post should be informative and engaging. The content should be in JSON format.`;
+  const prompt = `Craft a comprehensive and engaging blog post titled "${title}" that delves into the topics of ${tags.join(", ")}. 
+  The content should be well-researched, informative, and written in a style that resonates with a wide audience. 
+  Ensure the output is in JSON format and includes a brief summary, main content, and a conclusion.`;
 
   try {
     const result = await model.generateContent({

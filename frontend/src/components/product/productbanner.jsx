@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import axios from 'axios';
 import { PRODUCT_API_ENDPOINT } from '@/utils/constant';
 import { Link } from 'react-router-dom';
@@ -53,129 +53,100 @@ const ProductBanner = () => {
   const currentProduct = latestProducts[currentIndex];
 
   return (
-    <div className="dark:bg-gradient-to-r from-gray-900 to-gray-800 py-20 relative overflow-hidden mb-4 rounded-3xl">
-      <div className="container mx-auto px-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col md:flex-row items-center justify-between"
-          >
-            <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0 text-white">
-              <motion.h1 
-                className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-green-600 "
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 120 }}
-              >
+    <div className="relative overflow-hidden mb-6 rounded-xl bg-gray-900">
+      <div className="container mx-auto px-6 py-16">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="md:w-1/2 text-center md:text-left space-y-6">
+            <div className="space-y-2">
+              <Badge className="bg-purple-500/10 text-purple-300">
+                New Arrival
+              </Badge>
+              <h1 className="text-4xl md:text-5xl font-bold text-white">
                 {currentProduct.name}
-              </motion.h1>
-              <motion.p 
-                className="text-xl mb-8 text-gray-300"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
-              >
-                <div className='text-muted-foreground font-light' dangerouslySetInnerHTML={{ __html: currentProduct.description.substring(0, 100) }} />
-              </motion.p>
-              <motion.div 
-                className="flex items-center justify-center md:justify-start mb-8"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, type: "spring", stiffness: 80 }}
-              >
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-6 h-6 ${i < Math.round(currentProduct.rating) ? 'text-yellow-400' : 'text-gray-600'}`} />
-                ))}
-                <span className="ml-2 text-gray-300">({currentProduct.rating.toFixed(1)})</span>
-              </motion.div>
-              <motion.div
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5, type: "spring", stiffness: 60 }}
-              >
-                <Link to={`/products/${currentProduct._id}`}>
-                  <Button
-                    className="dark:bg-gradient-to-r from-purple-600 to-pink-600 bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all duration-300 text-lg px-10 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                  >
-                    <ShoppingBag className="mr-2 h-5 w-5" />
-                    Shop Now
-                  </Button>
-                </Link>
-              </motion.div>
+              </h1>
             </div>
-            <motion.div 
-              className="md:w-1/2 relative"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-            >
-              <img 
-                src={currentProduct.image} 
-                alt={currentProduct.name} 
-                className="w-full h-auto object-cover"
-              />
-              <motion.div 
-                className="absolute -bottom-5 -right-2 bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-full shadow-xl"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6, type: "spring", stiffness: 120 }}
-              >
-                <span className="text-3xl font-bold">${currentProduct.price.toFixed(2)}</span>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </AnimatePresence>
+
+            <div className="text-lg text-gray-300/90">
+              <div dangerouslySetInnerHTML={{ __html: currentProduct.description.substring(0, 100) }} />
+            </div>
+
+            <div className="flex items-center gap-4 justify-center md:justify-start">
+              <Link to={`/products/${currentProduct._id}`}>
+                <Button
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  Shop Now
+                </Button>
+              </Link>
+              <span className="text-2xl font-bold text-white">
+                ${currentProduct.price.toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          <div className="md:w-1/2">
+            <img
+              src={currentProduct.image}
+              alt={currentProduct.name}
+              className="rounded-lg w-full h-auto object-cover shadow-lg"
+            />
+          </div>
+        </div>
+
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+          {latestProducts.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                index === currentIndex
+                  ? 'bg-purple-500'
+                  : 'bg-gray-500'
+              }`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={prevProduct}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+        >
+          <ChevronLeft className="w-6 h-6 text-white" />
+        </button>
+
+        <button
+          onClick={nextProduct}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+        >
+          <ChevronRight className="w-6 h-6 text-white" />
+        </button>
       </div>
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3">
-        {latestProducts.map((_, index) => (
-          <button
-            key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentIndex ? 'bg-purple-600 scale-125' : 'bg-gray-400'
-            }`}
-            onClick={() => setCurrentIndex(index)}
-          />
-        ))}
-      </div>
-      <button
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-all duration-300"
-        onClick={prevProduct}
-      >
-        <ChevronLeft className="w-6 h-6 text-white" />
-      </button>
-      <button
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-all duration-300"
-        onClick={nextProduct}
-      >
-        <ChevronRight className="w-6 h-6 text-white" />
-      </button>
     </div>
   );
 };
 
 const ProductBannerSkeleton = () => {
   return (
-    <div className="dark:bg-gradient-to-r from-gray-900 to-gray-800 py-20 relative overflow-hidden mb-4 rounded-3xl">
+    <div className="bg-gray-900 py-16 relative overflow-hidden mb-6 rounded-xl">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
-            <div className="h-12 bg-gray-300 rounded w-3/4 mb-6 animate-pulse"></div>
-            <div className="h-4 bg-gray-300 rounded w-full mb-4 animate-pulse"></div>
-            <div className="h-4 bg-gray-300 rounded w-5/6 mb-8 animate-pulse"></div>
-            <div className="flex items-center justify-center md:justify-start mb-8">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-6 h-6 bg-gray-300 rounded-full mr-1 animate-pulse"></div>
-              ))}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="md:w-1/2 space-y-6">
+            <div className="space-y-2">
+              <div className="h-6 w-24 bg-gray-800 rounded-full" />
+              <div className="h-12 bg-gray-800 rounded-lg w-3/4" />
             </div>
-            <div className="h-12 bg-gray-300 rounded-full w-40 animate-pulse"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-800 rounded w-full" />
+              <div className="h-4 bg-gray-800 rounded w-5/6" />
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-32 bg-gray-800 rounded-lg" />
+              <div className="h-8 w-24 bg-gray-800 rounded-lg" />
+            </div>
           </div>
-          <div className="md:w-1/2 relative">
-            <div className="w-full h-80 bg-gray-300 rounded-lg animate-pulse"></div>
-            <div className="absolute -bottom-5 -right-2 bg-gray-300 w-24 h-12 rounded-full animate-pulse"></div>
+          <div className="md:w-1/2">
+            <div className="w-full aspect-video bg-gray-800 rounded-lg" />
           </div>
         </div>
       </div>

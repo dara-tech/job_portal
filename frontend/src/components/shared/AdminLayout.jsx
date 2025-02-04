@@ -265,10 +265,7 @@ const AdminLayout = () => {
             </div>
             <div className="flex items-center gap-4">
               <ModeToggle />
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600"></span>
-              </Button>
+             
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">
