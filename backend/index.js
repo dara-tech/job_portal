@@ -198,7 +198,7 @@ const startServer = async () => {
       
       // Set up auto-reload mechanism
       setInterval(() => {
-        https.get('https://job-portal-u3t0.onrender.com', (res) => {
+        https.get('https://genz-aicg.onrender.com', (res) => {
           console.log('Auto-reload request sent. Status:', res.statusCode);
         }).on('error', (err) => {
           console.error('Error during auto-reload request:', err.message);
