@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "@/components/shared/Navbar";
+// import Navbar from "@/components/shared/Navbar";
 import HeroSection from "./HeroSection";
 import LastestJobs from "./LastestJobs";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
@@ -7,6 +7,8 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { PAGE_API_ENDPOINT } from "@/utils/constant";
+import AllBlogs from "./blog/allblog";
+
 
 const Home = () => {
   useGetAllJobs();
@@ -56,6 +58,7 @@ const Home = () => {
       )}
       <HeroSection />
       <LastestJobs />
+      <AllBlogs/>
     </div>
   );
 };

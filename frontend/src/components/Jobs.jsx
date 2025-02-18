@@ -114,9 +114,9 @@ const Jobs = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black">
+    <div className=" bg-gray-50 dark:bg-black">
       {/* <Navbar /> */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="px-4 py-8">
         <FilterCard setSortOrder={setSortOrder} />
         <Card className="mt-8">
           <CardContent className="p-6">

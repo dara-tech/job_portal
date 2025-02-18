@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import JobCard from "@/components/LastestJobCards";
+import { Link } from "react-router-dom";
 
 const LatestJobs = () => {
   const { allJobs, loading, error } = useSelector((state) => state.job);
@@ -32,7 +33,7 @@ const LatestJobs = () => {
 
   if (loading) {
     return (
-      <Card className="w-full max-w-4xl mx-auto mt-8">
+      <Card className="w-full max-w-4xl mx-auto mt-8 p-6">
         <CardHeader>
           <CardTitle className="text-2xl font-extrabold text-center">
             <Skeleton className="h-8 w-48 mx-auto" />
@@ -67,7 +68,7 @@ const LatestJobs = () => {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto mt-8 dark:bg-transparent border-none shadow-none">
+    <Card className="w-full mx-auto mt-6 dark:bg-transparent border-none shadow-none ">
       <CardHeader>
         <CardTitle className="text-3xl font-extrabold text-center text-gray-800 dark:text-gray-200">
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
@@ -90,7 +91,7 @@ const LatestJobs = () => {
             </motion.div>
           ) : (
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               variants={container}
               initial="hidden"
               animate="visible"
@@ -110,10 +111,12 @@ const LatestJobs = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <Button variant="outline" className="group hover:bg-primary hover:text-white transition-colors duration-300">
-              View All Jobs
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
+            <Link to="/jobs">
+              <Button variant="outline" className="group hover:bg-primary hover:text-white transition-colors duration-300">
+                View All Jobs
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
           </motion.div>
         )}
       </CardContent>

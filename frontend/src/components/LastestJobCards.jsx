@@ -88,7 +88,7 @@ export default function JobCard({ job = {} }) {
   };
 
   return (
-    <Card className="ring-1 ring-gray-300 dark:ring-gray-700 w-full max-w-md mx-auto transition-all duration-300 hover:shadow-xl flex flex-col h-[500px] overflow-hidden group backdrop-blur-sm bg-white/30 dark:bg-gray-900/30 border border-white/50 dark:border-gray-700/50">
+    <Card className="ring-1 ring-gray-300 dark:ring-gray-700 w-full  mx-auto transition-all duration-300 hover:shadow-xl flex flex-col h-[500px] overflow-hidden group backdrop-blur-sm bg-white/30 dark:bg-gray-900/30 border border-white/50 dark:border-gray-700/50">
       <CardHeader className="relative pb-0">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center space-x-3">

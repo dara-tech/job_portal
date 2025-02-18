@@ -150,7 +150,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'https://job-portal-u3t0.onrender.com',
+  origin: 'https://genz-aicg.onrender.com',
   credentials: true
 };
 
