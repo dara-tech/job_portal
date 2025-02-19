@@ -150,7 +150,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'https://genz-aicg.onrender.com',
+  origin: ['http://localhost:8000','https://genz-aicg.onrender.com'],
   credentials: true
 };
 
