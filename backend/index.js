@@ -150,7 +150,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: ['http://localhost:8000','https://geez-eodh.onrender.com'],
+    origin: ['http://localhost:8000','https://genz-ur2f.onrender.com'],
   credentials: true
 };
 
@@ -198,7 +198,7 @@ const startServer = async () => {
       
       // Set up auto-reload mechanism
       setInterval(() => {
-        https.get('https://geez-eodh.onrender.com', (res) => {
+        https.get('https://genz-ur2f.onrender.com', (res) => {
           console.log('Auto-reload request sent. Status:', res.statusCode);
         }).on('error', (err) => {
           console.error('Error during auto-reload request:', err.message);
